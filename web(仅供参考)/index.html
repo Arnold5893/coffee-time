@@ -1,0 +1,331 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+<title>素晴 COFFEE SHOP</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Noto+Serif+SC:wght@500;700&family=Noto+Sans+SC:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #1d1915;
+    --panel: rgba(250, 245, 236, 0.94);
+    --ink: #2b2420;
+    --muted: #7a6d62;
+    --accent: #b8322a;
+    --wood: #c89a62;
+    --line: rgba(43, 36, 32, 0.12);
+  }
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) {
+      --panel: rgba(36, 31, 27, 0.94);
+      --ink: #f1e8dc;
+      --muted: #b3a493;
+      --line: rgba(241, 232, 220, 0.14);
+    }
+  }
+  :root[data-theme="dark"] {
+    --panel: rgba(36, 31, 27, 0.94);
+    --ink: #f1e8dc;
+    --muted: #b3a493;
+    --line: rgba(241, 232, 220, 0.14);
+  }
+  * { box-sizing: border-box; }
+  html, body { margin: 0; height: 100%; overflow: hidden; background: var(--bg); color: var(--ink);
+    font-family: "Noto Sans SC", system-ui, sans-serif; }
+  canvas { display: block; }
+  #brand { position: fixed; top: 16px; left: 16px; padding: 10px 16px 10px 14px; border-radius: 12px;
+    background: var(--panel); backdrop-filter: blur(8px); display: flex; align-items: center; gap: 10px;
+    box-shadow: 0 4px 20px rgba(0,0,0,.25); }
+  #brand .name { font-family: "Noto Serif SC", serif; font-weight: 700; font-size: 22px; letter-spacing: 4px; }
+  #brand .seal { color: var(--accent); border: 1.5px solid var(--accent); border-radius: 3px; font-size: 10px;
+    writing-mode: vertical-rl; padding: 3px 1px; letter-spacing: 2px; }
+  #brand .sub { font-size: 10px; letter-spacing: 3px; color: var(--accent); font-family: "Noto Serif SC", serif; }
+  #modes { position: fixed; top: 16px; right: 16px; display: flex; gap: 6px; padding: 5px; border-radius: 12px;
+    background: var(--panel); box-shadow: 0 4px 20px rgba(0,0,0,.25); }
+  #modes button { border: 0; background: transparent; color: var(--ink); padding: 8px 14px; border-radius: 8px;
+    font: inherit; font-size: 14px; cursor: pointer; }
+  #modes button.on { background: var(--wood); color: #fff; }
+  #help { position: fixed; bottom: 16px; left: 50%; transform: translateX(-50%); padding: 8px 16px; border-radius: 20px;
+    background: var(--panel); color: var(--muted); font-size: 13px; white-space: nowrap; box-shadow: 0 4px 20px rgba(0,0,0,.25); }
+  #crosshair { position: fixed; left: 50%; top: 50%; width: 8px; height: 8px; margin: -4px 0 0 -4px; border-radius: 50%;
+    border: 2px solid rgba(255,255,255,.85); display: none; pointer-events: none; mix-blend-mode: difference; }
+  #tip { position: fixed; pointer-events: none; padding: 4px 10px; border-radius: 6px; font-size: 13px;
+    background: var(--panel); color: var(--ink); display: none; box-shadow: 0 2px 10px rgba(0,0,0,.25); }
+  #card { position: fixed; right: 16px; top: 76px; width: min(380px, calc(100vw - 32px)); max-height: calc(100vh - 140px);
+    overflow: auto; padding: 18px 20px; border-radius: 14px; background: var(--panel); backdrop-filter: blur(8px);
+    box-shadow: 0 8px 32px rgba(0,0,0,.3); display: none; }
+  #card h2 { margin: 0 28px 8px 0; font-family: "Noto Serif SC", serif; font-size: 19px; }
+  #card p { margin: 0; line-height: 1.7; color: var(--muted); font-size: 14px; }
+  #card .x { position: absolute; top: 12px; right: 12px; border: 0; background: transparent; color: var(--muted);
+    font-size: 20px; cursor: pointer; line-height: 1; padding: 4px; }
+  .menu { margin-top: 14px; }
+  .menu h3 { font-family: "Noto Serif SC", serif; font-size: 14px; margin: 14px 0 6px; padding-bottom: 4px;
+    border-bottom: 1px solid var(--line); display: flex; justify-content: space-between; }
+  .menu h3 small { color: var(--muted); font-weight: 400; font-family: "Noto Sans SC"; }
+  .menu .row { display: flex; justify-content: space-between; font-size: 13px; padding: 3px 0; gap: 12px; }
+  .menu .row span:last-child { color: var(--accent); font-variant-numeric: tabular-nums; white-space: nowrap; }
+  .menu .chips { display: flex; flex-wrap: wrap; gap: 6px; font-size: 12px; }
+  .menu .chips span { padding: 2px 8px; border-radius: 10px; border: 1px solid var(--line); }
+  #loading { position: fixed; inset: 0; display: grid; place-items: center; background: var(--bg); color: #e9dcc9;
+    font-family: "Noto Serif SC", serif; font-size: 18px; letter-spacing: 3px; z-index: 10; }
+  #loading .bar { width: 200px; height: 2px; background: rgba(255,255,255,.15); margin-top: 14px; }
+  #loading .bar i { display: block; height: 100%; width: 0; background: var(--wood); transition: width .2s; }
+  @media (max-width: 600px) {
+    #brand .name { font-size: 18px; }
+    #help { font-size: 12px; white-space: normal; text-align: center; width: calc(100vw - 32px); }
+    #card { top: auto; bottom: 64px; max-height: 50vh; }
+    #modes button { padding: 7px 10px; }
+  }
+</style>
+</head>
+<body>
+<div id="loading"><div>素晴 · 正在开门<div class="bar"><i></i></div></div></div>
+<div id="brand"><div><div class="name">素晴</div><div class="sub">COFFEE SHOP</div></div><div class="seal">咖啡</div></div>
+<div id="modes"><button id="bOrbit" class="on">俯瞰</button><button id="bWalk">漫游</button></div>
+<div id="help"></div>
+<div id="crosshair"></div>
+<div id="tip"></div>
+<div id="card"><button class="x" aria-label="关闭">×</button><h2></h2><p></p><div class="extra"></div></div>
+
+<script type="importmap">
+{ "imports": {
+  "three": "https://cdn.jsdelivr.net/npm/three@0.169.0/build/three.module.js",
+  "three/addons/": "https://cdn.jsdelivr.net/npm/three@0.169.0/examples/jsm/"
+} }
+</script>
+<script type="module">
+import * as THREE from 'three';
+import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
+import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
+import { PointerLockControls } from 'three/addons/controls/PointerLockControls.js';
+import { RoomEnvironment } from 'three/addons/environments/RoomEnvironment.js';
+
+// ---------------- 菜单 (来自店内菜单照片) ----------------
+const MENU = [
+  { t: '美式 / Black Coffee', items: [['哥伦比亚拼配', 10], ['洪都拉斯拼配', 12], ['苹果美式', 13], ['零糖接骨木美式', 13],
+    ['零糖玫瑰美式', 13], ['冰摇黄杏美式', 13], ['冰摇荔枝美式', 13], ['冰摇梨香美式', 13]] },
+  { t: '拿铁 / Latte', items: [['经典拿铁', 13], ['生椰拿铁', 15], ['焦糖玛奇朵', 16], ['巧克力摩卡', 16], ['桂花拿铁', 16],
+    ['香蕉拿铁', 16], ['栀子花梨香拿铁', 16], ['荔枝玫瑰拿铁', 16], ['栗子拿铁', 16], ['肉桂苹果拿铁', 16],
+    ['蓝椰拿铁', 16], ['白桃米酿拿铁', 16], ['黄油啤酒拿铁', 16]] },
+  { t: '无咖啡 / Coffee-Free', items: [['抹茶拿铁', 13], ['热可可', 13], ['生椰抹茶', 15], ['生椰可可', 15]] },
+  { t: '东方茗 / Oriental Tea', price: 16, chips: ['金骏眉', '茉莉白茶', '老白茶', '菊花红茶', '玫瑰红茶', '漳平水仙',
+    '青提乌龙', '桂花乌龙', '蜜桃乌龙', '炭焙油切黑乌龙', '青柑普洱'] },
+  { t: '果花茶 / Fruit Flower Tea', price: 16, chips: ['苹果绿茶', '果香马黛茶', '草莓玫瑰茶', '玫瑰香柠红茶'] },
+];
+function menuHTML() {
+  return '<div class="menu">' + MENU.map(g => {
+    const head = `<h3>${g.t}${g.price ? `<small>¥${g.price}</small>` : ''}</h3>`;
+    if (g.chips) return head + `<div class="chips">${g.chips.map(c => `<span>${c}</span>`).join('')}</div>`;
+    return head + g.items.map(([n, p]) => `<div class="row"><span>${n}</span><span>¥${p}</span></div>`).join('');
+  }).join('') + '<p style="margin-top:12px;font-size:12px">咖啡放冷了可拿来加热 ☕</p></div>';
+}
+
+// ---------------- 场景 ----------------
+const renderer = new THREE.WebGLRenderer({ antialias: true });
+renderer.setPixelRatio(Math.min(devicePixelRatio, 2));
+renderer.setSize(innerWidth, innerHeight);
+renderer.toneMapping = THREE.AgXToneMapping;
+renderer.toneMappingExposure = 1.0;
+document.body.appendChild(renderer.domElement);
+
+const scene = new THREE.Scene();
+scene.background = new THREE.Color(0x1d1915);
+const pmrem = new THREE.PMREMGenerator(renderer);
+scene.environment = pmrem.fromScene(new RoomEnvironment(), 0.04).texture;
+scene.environmentIntensity = 0.22;
+scene.add(new THREE.HemisphereLight(0xffd7a8, 0x4a3a2c, 0.55));
+
+const camera = new THREE.PerspectiveCamera(55, innerWidth / innerHeight, 0.05, 200);
+const CENTER = new THREE.Vector3(4.7, 1.2, -6.4);
+
+// 平面图 -> 三维坐标 (与 build_shop.py 相同的比例)
+const S = 1.5 / 147;
+const P = (px, py) => [(px - 150) * S, -(1360 - py) * S];
+const FLOOR = [[160,115],[610,115],[610,295],[920,600],[1065,600],[1065,1180],[920,1180],[920,1350],[270,1350],[270,1175],[160,1078],[160,470]].map(p => P(...p));
+function insideFloor(x, z) {
+  let c = false;
+  for (let i = 0, j = FLOOR.length - 1; i < FLOOR.length; j = i++) {
+    const [xi, zi] = FLOOR[i], [xj, zj] = FLOOR[j];
+    if ((zi > z) !== (zj > z) && x < (xj - xi) * (z - zi) / (zj - zi) + xi) c = !c;
+  }
+  return c;
+}
+
+const orbit = new OrbitControls(camera, renderer.domElement);
+orbit.enableDamping = true;
+orbit.maxPolarAngle = Math.PI * 0.47;
+orbit.minDistance = 2;
+orbit.maxDistance = 30;
+const walk = new PointerLockControls(camera, document.body);
+
+let mode = 'orbit';
+const cutaway = [];     // 俯瞰时可自动隐藏的墙等
+const ceilings = [];
+const clickable = [];
+const colliders = [];
+
+// ---------------- 加载模型 ----------------
+const bar = document.querySelector('#loading i');
+new GLTFLoader().load('coffee_shop.glb', gltf => {
+  const root = gltf.scene;
+  root.traverse(o => {
+    if (o.isLight) {
+      o.intensity = 6; o.distance = 9; o.decay = 1.5; o.color.set(0xffb070);
+    }
+    if (o.isMesh) {
+      o.material.side = THREE.DoubleSide;
+      if (o.material.emissiveIntensity > 3) o.material.emissiveIntensity = 3;
+      if (o.material.name === 'window_glass') {   // 夜晚的窗：深墨绿 + 反光
+        o.material.color.set(0x0a1813); o.material.metalness = 0.7; o.material.roughness = 0.08;
+      }
+    }
+  });
+  root.children.forEach(o => {
+    const n = o.name;
+    if (/^Ceiling|^Bar_Ceiling/.test(n)) ceilings.push(o);
+    if (/^(Wall_|Door_|Bar_Lightbox|Entrance_Lightbox|Brass_Frame|Painting_|Bar_Ceiling)/.test(n)) {
+      const b = new THREE.Box3().setFromObject(o);
+      o.userData._c = b.getCenter(new THREE.Vector3());
+      cutaway.push(o);
+    }
+    if (o.userData.info_title) clickable.push(o);
+    if (!/^(Floor|Ceiling|Pendant|Bar_Ceiling|Bar_Rack|Brass)/.test(n) && !o.isLight) colliders.push(o);
+  });
+  scene.add(root);
+  setMode('orbit', true);
+  document.getElementById('loading').remove();
+}, e => { if (e.total) bar.style.width = (100 * e.loaded / e.total) + '%'; },
+   err => { document.querySelector('#loading div').textContent = '模型加载失败：请用本地服务器打开（见 README）'; console.error(err); });
+
+// ---------------- 模式切换 ----------------
+const help = document.getElementById('help');
+const isTouch = matchMedia('(pointer: coarse)').matches;
+function setMode(m, first) {
+  mode = m;
+  document.getElementById('bOrbit').classList.toggle('on', m === 'orbit');
+  document.getElementById('bWalk').classList.toggle('on', m === 'walk');
+  document.getElementById('crosshair').style.display = m === 'walk' ? 'block' : 'none';
+  if (m === 'orbit') {
+    if (walk.isLocked) walk.unlock();
+    ceilings.forEach(o => o.visible = false);
+    camera.position.set(-4.5, 13, 6.5);
+    orbit.target.copy(CENTER);
+    orbit.enabled = true;
+    help.textContent = isTouch ? '单指旋转 · 双指缩放 · 点击物体查看介绍' : '拖动旋转 · 右键平移 · 滚轮缩放 · 点击物体查看介绍';
+  } else {
+    orbit.enabled = false;
+    ceilings.forEach(o => o.visible = true);
+    cutaway.forEach(o => o.visible = true);
+    const [x, z] = P(260, 560);
+    camera.position.set(x + 0.6, 1.6, z);
+    camera.lookAt(x + 5, 1.5, z + 0.5);
+    help.textContent = isTouch ? '漫游模式需要键盘鼠标，手机请用俯瞰模式' : '点击画面开始 · WASD 移动 · Shift 加速 · 鼠标转向 · 对准物体点击查看 · Esc 退出';
+  }
+}
+document.getElementById('bOrbit').onclick = () => setMode('orbit');
+document.getElementById('bWalk').onclick = e => { e.stopPropagation(); setMode('walk'); };
+
+// ---------------- 拾取 / 信息卡 ----------------
+const ray = new THREE.Raycaster();
+const card = document.getElementById('card');
+const tip = document.getElementById('tip');
+function infoOf(o) { while (o) { if (o.userData && o.userData.info_title) return o; o = o.parent; } return null; }
+function pick(ndc) {
+  ray.setFromCamera(ndc, camera);
+  ray.far = mode === 'walk' ? 6 : 100;
+  const hits = ray.intersectObjects(scene.children, true).filter(h => h.object.visible && isVisible(h.object));
+  return hits.length ? infoOf(hits[0].object) : null;
+}
+function isVisible(o) { while (o) { if (!o.visible) return false; o = o.parent; } return true; }
+function showCard(o) {
+  if (!o) { card.style.display = 'none'; return; }
+  card.querySelector('h2').textContent = o.userData.info_title;
+  card.querySelector('p').textContent = o.userData.info_desc || '';
+  card.querySelector('.extra').innerHTML = /^Bar_Counter|^Cashier/.test(o.name) ? menuHTML() : '';
+  card.style.display = 'block';
+  card.scrollTop = 0;
+}
+card.querySelector('.x').onclick = () => showCard(null);
+
+let down = null;
+renderer.domElement.addEventListener('pointerdown', e => { down = [e.clientX, e.clientY]; });
+renderer.domElement.addEventListener('pointerup', e => {
+  if (!down || Math.hypot(e.clientX - down[0], e.clientY - down[1]) > 6) return;
+  if (mode === 'orbit') {
+    showCard(pick(new THREE.Vector2(e.clientX / innerWidth * 2 - 1, -e.clientY / innerHeight * 2 + 1)));
+  }
+});
+renderer.domElement.addEventListener('pointermove', e => {
+  if (mode !== 'orbit' || e.buttons) { tip.style.display = 'none'; return; }
+  const o = pick(new THREE.Vector2(e.clientX / innerWidth * 2 - 1, -e.clientY / innerHeight * 2 + 1));
+  renderer.domElement.style.cursor = o ? 'pointer' : '';
+  if (o && !isTouch) {
+    tip.textContent = o.userData.info_title;
+    tip.style.left = (e.clientX + 14) + 'px'; tip.style.top = (e.clientY + 14) + 'px';
+    tip.style.display = 'block';
+  } else tip.style.display = 'none';
+});
+document.body.addEventListener('click', e => {
+  if (mode !== 'walk' || e.target.closest('#modes, #card')) return;
+  if (!walk.isLocked) { walk.lock(); return; }
+  showCard(pick(new THREE.Vector2(0, 0)));
+});
+
+// ---------------- 漫游移动 + 碰撞 ----------------
+const keys = {};
+addEventListener('keydown', e => { keys[e.code] = true; });
+addEventListener('keyup', e => { keys[e.code] = false; });
+const hray = new THREE.Raycaster();
+function blocked(from, dir) {
+  for (const h of [0.35, 1.0]) {
+    hray.set(new THREE.Vector3(from.x, h, from.z), dir);
+    hray.far = 0.35;
+    if (hray.intersectObjects(colliders, true).length) return true;
+  }
+  return false;
+}
+function stepWalk(dt) {
+  const f = (keys.KeyW || keys.ArrowUp ? 1 : 0) - (keys.KeyS || keys.ArrowDown ? 1 : 0);
+  const r = (keys.KeyD || keys.ArrowRight ? 1 : 0) - (keys.KeyA || keys.ArrowLeft ? 1 : 0);
+  if (!f && !r) return;
+  const speed = (keys.ShiftLeft || keys.ShiftRight ? 3.2 : 1.6) * dt;
+  const fwd = new THREE.Vector3(); camera.getWorldDirection(fwd); fwd.y = 0; fwd.normalize();
+  const right = new THREE.Vector3().crossVectors(fwd, camera.up);
+  const mv = fwd.multiplyScalar(f).add(right.multiplyScalar(r)).normalize().multiplyScalar(speed);
+  for (const axis of ['x', 'z']) {        // 分轴移动 → 可以贴着墙滑动
+    const d = new THREE.Vector3(); d[axis] = mv[axis];
+    if (!d[axis]) continue;
+    const nx = camera.position.x + d.x, nz = camera.position.z + d.z;
+    if (insideFloor(nx, nz) && !blocked(camera.position, d.clone().normalize())) {
+      camera.position.x = nx; camera.position.z = nz;
+    }
+  }
+}
+
+// ---------------- 俯瞰时自动剖切 ----------------
+const tmp = new THREE.Vector3(), cdir = new THREE.Vector3();
+function updateCutaway() {
+  cdir.copy(camera.position).sub(CENTER); cdir.y = 0; cdir.normalize();
+  const steep = camera.position.y - CENTER.y > 18;
+  for (const o of cutaway) {
+    tmp.copy(o.userData._c).sub(CENTER); tmp.y = 0; tmp.normalize();
+    o.visible = steep || tmp.dot(cdir) < 0.3;
+  }
+}
+
+// ---------------- 主循环 ----------------
+const clock = new THREE.Clock();
+renderer.setAnimationLoop(() => {
+  const dt = Math.min(clock.getDelta(), 0.05);
+  if (mode === 'orbit') { orbit.update(); updateCutaway(); }
+  else if (walk.isLocked) stepWalk(dt);
+  renderer.render(scene, camera);
+});
+addEventListener('resize', () => {
+  camera.aspect = innerWidth / innerHeight; camera.updateProjectionMatrix();
+  renderer.setSize(innerWidth, innerHeight);
+});
+</script>
+</body>
+</html>
