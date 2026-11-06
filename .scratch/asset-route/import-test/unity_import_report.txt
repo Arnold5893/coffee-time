@@ -1,0 +1,8 @@
+=== Unity Import Report (glTFast) ===
+renderers=120 meshFilters=120
+verts=129494 tris=92366
+bounds_size_m=(10.21,4.50,13.00)
+bounds_center=(-4.96,2.25,-6.40)
+materials=58 withTexture=0 missingTexture=58
+root_children=AC_Cabinet, Back_Counter, Back_Counter_Misc, Bar_Ceiling, Bar_Counter, Bar_Lightbox, Bar_Rack, Bar_Stool_1, Bar_Stool_2, Bar_Stool_3, BarDownlight_0, BarDownlight_1, BarDownlight_2, BarDownlight_3, Bookshelf_Wall, Brass_Frame_Books, Brass_Frame_Diag, Brass_Frame_East, Brass_Frame_Immersive, Cashier, Ceiling_Grid, Ceiling_Soffits, Coffee_Machine, Divider_Bookshelf, Door_door_left, Door_door_right, Downlight_00, Downlight_01, Downlight_02, Downlight_03
+screenshot=import_screenshot.png

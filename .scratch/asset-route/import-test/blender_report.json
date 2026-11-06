@@ -1,0 +1,663 @@
+{
+  "unit_scale": 1.0,
+  "object_counts": {
+    "LIGHT": 26,
+    "MESH": 120
+  },
+  "mesh_object_count": 120,
+  "total_tris": 92366,
+  "total_verts": 52910,
+  "scene_dims_m": [
+    10.21,
+    13.0,
+    4.5
+  ],
+  "materials": [
+    {
+      "name": "aluminium",
+      "has_nodes": true,
+      "textures": 0
+    },
+    {
+      "name": "black_plastic",
+      "has_nodes": true,
+      "textures": 0
+    },
+    {
+      "name": "book_0",
+      "has_nodes": true,
+      "textures": 0
+    },
+    {
+      "name": "book_1",
+      "has_nodes": true,
+      "textures": 0
+    },
+    {
+      "name": "book_2",
+      "has_nodes": true,
+      "textures": 0
+    },
+    {
+      "name": "book_3",
+      "has_nodes": true,
+      "textures": 0
+    },
+    {
+      "name": "book_4",
+      "has_nodes": true,
+      "textures": 0
+    },
+    {
+      "name": "book_5",
+      "has_nodes": true,
+      "textures": 0
+    },
+    {
+      "name": "book_6",
+      "has_nodes": true,
+      "textures": 0
+    },
+    {
+      "name": "book_7",
+      "has_nodes": true,
+      "textures": 0
+    },
+    {
+      "name": "book_8",
+      "has_nodes": true,
+      "textures": 0
+    },
+    {
+      "name": "book_9",
+      "has_nodes": true,
+      "textures": 0
+    },
+    {
+      "name": "brass",
+      "has_nodes": true,
+      "textures": 0
+    },
+    {
+      "name": "bulb",
+      "has_nodes": true,
+      "textures": 0
+    },
+    {
+      "name": "ceiling_grid",
+      "has_nodes": true,
+      "textures": 1
+    },
+    {
+      "name": "ceramic_blue",
+      "has_nodes": true,
+      "textures": 0
+    },
+    {
+      "name": "ceramic_white",
+      "has_nodes": true,
+      "textures": 0
+    },
+    {
+      "name": "chrome",
+      "has_nodes": true,
+      "textures": 0
+    },
+    {
+      "name": "cork",
+      "has_nodes": true,
+      "textures": 0
+    },
+    {
+      "name": "cup_glass",
+      "has_nodes": true,
+      "textures": 0
+    },
+    {
+      "name": "cushion_denim",
+      "has_nodes": true,
+      "textures": 0
+    },
+    {
+      "name": "dark_box",
+      "has_nodes": true,
+      "textures": 0
+    },
+    {
+      "name": "door_glass",
+      "has_nodes": true,
+      "textures": 0
+    },
+    {
+      "name": "downlight",
+      "has_nodes": true,
+      "textures": 0
+    },
+    {
+      "name": "electric_box",
+      "has_nodes": true,
+      "textures": 0
+    },
+    {
+      "name": "fabric_gray",
+      "has_nodes": true,
+      "textures": 0
+    },
+    {
+      "name": "granite_floor",
+      "has_nodes": true,
+      "textures": 1
+    },
+    {
+      "name": "hat_ribbon",
+      "has_nodes": true,
+      "textures": 0
+    },
+    {
+      "name": "lcd_blue",
+      "has_nodes": true,
+      "textures": 0
+    },
+    {
+      "name": "leaf_a",
+      "has_nodes": true,
+      "textures": 0
+    },
+    {
+      "name": "leaf_b",
+      "has_nodes": true,
+      "textures": 0
+    },
+    {
+      "name": "leaf_c",
+      "has_nodes": true,
+      "textures": 0
+    },
+    {
+      "name": "leather_bluegray",
+      "has_nodes": true,
+      "textures": 0
+    },
+    {
+      "name": "lightbox_beans",
+      "has_nodes": true,
+      "textures": 1
+    },
+    {
+      "name": "lightbox_logo",
+      "has_nodes": true,
+      "textures": 1
+    },
+    {
+      "name": "machine_backlight",
+      "has_nodes": true,
+      "textures": 0
+    },
+    {
+      "name": "machine_white",
+      "has_nodes": true,
+      "textures": 0
+    },
+    {
+      "name": "menu",
+      "has_nodes": true,
+      "textures": 1
+    },
+    {
+      "name": "painting_1",
+      "has_nodes": true,
+      "textures": 1
+    },
+    {
+      "name": "painting_2",
+      "has_nodes": true,
+      "textures": 1
+    },
+    {
+      "name": "painting_3",
+      "has_nodes": true,
+      "textures": 1
+    },
+    {
+      "name": "paper",
+      "has_nodes": true,
+      "textures": 0
+    },
+    {
+      "name": "perforated_steel",
+      "has_nodes": true,
+      "textures": 1
+    },
+    {
+      "name": "pot_gray",
+      "has_nodes": true,
+      "textures": 0
+    },
+    {
+      "name": "pot_white",
+      "has_nodes": true,
+      "textures": 0
+    },
+    {
+      "name": "radiator_grille",
+      "has_nodes": true,
+      "textures": 1
+    },
+    {
+      "name": "socket",
+      "has_nodes": true,
+      "textures": 0
+    },
+    {
+      "name": "soil",
+      "has_nodes": true,
+      "textures": 0
+    },
+    {
+      "name": "stainless",
+      "has_nodes": true,
+      "textures": 0
+    },
+    {
+      "name": "stem",
+      "has_nodes": true,
+      "textures": 0
+    },
+    {
+      "name": "straw",
+      "has_nodes": true,
+      "textures": 0
+    },
+    {
+      "name": "trunk",
+      "has_nodes": true,
+      "textures": 0
+    },
+    {
+      "name": "white_ceiling",
+      "has_nodes": true,
+      "textures": 0
+    },
+    {
+      "name": "white_paint",
+      "has_nodes": true,
+      "textures": 0
+    },
+    {
+      "name": "window_glass",
+      "has_nodes": true,
+      "textures": 0
+    },
+    {
+      "name": "wood",
+      "has_nodes": true,
+      "textures": 1
+    },
+    {
+      "name": "wood_panel",
+      "has_nodes": true,
+      "textures": 1
+    },
+    {
+      "name": "zebra_blind",
+      "has_nodes": true,
+      "textures": 1
+    }
+  ],
+  "images": [
+    {
+      "name": "ceiling_grid",
+      "filepath": "//textures\\ceiling_grid.png",
+      "packed": false
+    },
+    {
+      "name": "granite",
+      "filepath": "//textures\\granite.png",
+      "packed": false
+    },
+    {
+      "name": "grille",
+      "filepath": "//textures\\grille.png",
+      "packed": false
+    },
+    {
+      "name": "lightbox_beans",
+      "filepath": "//textures\\lightbox_beans.png",
+      "packed": false
+    },
+    {
+      "name": "logo_white",
+      "filepath": "//textures\\logo_white.png",
+      "packed": false
+    },
+    {
+      "name": "menu.jpg",
+      "filepath": "//menu.jpg",
+      "packed": false
+    },
+    {
+      "name": "painting_1",
+      "filepath": "//textures\\painting_1.png",
+      "packed": false
+    },
+    {
+      "name": "painting_2",
+      "filepath": "//textures\\painting_2.png",
+      "packed": false
+    },
+    {
+      "name": "painting_3",
+      "filepath": "//textures\\painting_3.png",
+      "packed": false
+    },
+    {
+      "name": "painting_4",
+      "filepath": "//textures\\painting_4.png",
+      "packed": false
+    },
+    {
+      "name": "perforated",
+      "filepath": "//textures\\perforated.png",
+      "packed": false
+    },
+    {
+      "name": "wood_rubber",
+      "filepath": "//textures\\wood_rubber.png",
+      "packed": false
+    },
+    {
+      "name": "zebra_blind",
+      "filepath": "//textures\\zebra_blind.png",
+      "packed": false
+    }
+  ],
+  "top_meshes_by_tris": [
+    {
+      "name": "Plant_1",
+      "tris": 10668,
+      "verts": 5748,
+      "dims_m": [
+        0.844,
+        0.857,
+        2.166
+      ],
+      "materials": 7
+    },
+    {
+      "name": "Pendant_Entrance_Big",
+      "tris": 5584,
+      "verts": 2938,
+      "dims_m": [
+        0.839,
+        0.839,
+        1.197
+      ],
+      "materials": 3
+    },
+    {
+      "name": "Bookshelf_Wall",
+      "tris": 5432,
+      "verts": 3472,
+      "dims_m": [
+        4.134,
+        0.32,
+        2.35
+      ],
+      "materials": 14
+    },
+    {
+      "name": "Pendant_Immersive_292",
+      "tris": 4072,
+      "verts": 2154,
+      "dims_m": [
+        0.459,
+        0.458,
+        1.133
+      ],
+      "materials": 3
+    },
+    {
+      "name": "Pendant_Immersive_520",
+      "tris": 4072,
+      "verts": 2154,
+      "dims_m": [
+        0.459,
+        0.458,
+        1.133
+      ],
+      "materials": 3
+    },
+    {
+      "name": "Pendant_Diag_3",
+      "tris": 4072,
+      "verts": 2154,
+      "dims_m": [
+        0.459,
+        0.458,
+        1.033
+      ],
+      "materials": 3
+    },
+    {
+      "name": "Pendant_Diag_7",
+      "tris": 4072,
+      "verts": 2154,
+      "dims_m": [
+        0.459,
+        0.458,
+        1.033
+      ],
+      "materials": 3
+    },
+    {
+      "name": "Pendant_East_3",
+      "tris": 4072,
+      "verts": 2154,
+      "dims_m": [
+        0.459,
+        0.458,
+        1.033
+      ],
+      "materials": 3
+    },
+    {
+      "name": "Pendant_East_7",
+      "tris": 4072,
+      "verts": 2154,
+      "dims_m": [
+        0.459,
+        0.458,
+        1.033
+      ],
+      "materials": 3
+    },
+    {
+      "name": "Pendant_Books_3",
+      "tris": 4072,
+      "verts": 2154,
+      "dims_m": [
+        0.459,
+        0.458,
+        1.083
+      ],
+      "materials": 3
+    },
+    {
+      "name": "Pendant_Books_6",
+      "tris": 4072,
+      "verts": 2154,
+      "dims_m": [
+        0.459,
+        0.458,
+        1.083
+      ],
+      "materials": 3
+    },
+    {
+      "name": "Divider_Bookshelf",
+      "tris": 3116,
+      "verts": 1992,
+      "dims_m": [
+        2.878,
+        0.34,
+        2.1
+      ],
+      "materials": 13
+    },
+    {
+      "name": "Coffee_Machine",
+      "tris": 2186,
+      "verts": 1192,
+      "dims_m": [
+        0.805,
+        0.59,
+        0.784
+      ],
+      "materials": 8
+    },
+    {
+      "name": "Coffee_Machine_Logo",
+      "tris": 1428,
+      "verts": 1452,
+      "dims_m": [
+        0.225,
+        0.035,
+        0.002
+      ],
+      "materials": 1
+    },
+    {
+      "name": "Back_Counter",
+      "tris": 1080,
+      "verts": 624,
+      "dims_m": [
+        6.429,
+        0.65,
+        2.35
+      ],
+      "materials": 8
+    }
+  ],
+  "all_mesh_names": [
+    "Floor",
+    "Wall_Window_0",
+    "Wall_1",
+    "Wall_Window_2",
+    "Wall_3",
+    "Wall_Window_4",
+    "Door_door_right",
+    "Wall_6",
+    "Wall_7",
+    "Wall_8",
+    "Wall_9",
+    "Wall_10",
+    "Door_door_left",
+    "Wall_12",
+    "Ceiling_Grid",
+    "Ceiling_Soffits",
+    "Bar_Ceiling",
+    "Immersive_Table_1",
+    "Immersive_Sofa_1_L",
+    "Immersive_Sofa_1_R",
+    "Immersive_Table_2",
+    "Immersive_Sofa_2_L",
+    "Immersive_Sofa_2_R",
+    "Immersive_Table_3",
+    "Immersive_Chair_3_0",
+    "Immersive_Chair_3_1",
+    "Immersive_Chair_3_2",
+    "Immersive_Chair_3_3",
+    "Immersive_Table_4",
+    "Immersive_Chair_4_0",
+    "Immersive_Chair_4_1",
+    "Immersive_Chair_4_2",
+    "Immersive_Chair_4_3",
+    "Divider_Bookshelf",
+    "Bookshelf_Wall",
+    "Group_Table_1",
+    "Group_Sofa_1_-1",
+    "Group_Sofa_1_1",
+    "Meeting_Table",
+    "Meeting_Chair_0_-1",
+    "Meeting_Chair_0_1",
+    "Meeting_Chair_1_-1",
+    "Meeting_Chair_1_1",
+    "Meeting_Chair_2_-1",
+    "Meeting_Chair_2_1",
+    "Round_Table_1",
+    "Round1_Chair_0",
+    "Round1_Chair_1",
+    "Round1_Chair_2",
+    "Round1_Chair_3",
+    "Group_Table_2",
+    "Group_Sofa_2_-1",
+    "Group_Sofa_2_1",
+    "Group_Table_3",
+    "Group_Sofa_3_-1",
+    "Group_Sofa_3_1",
+    "Round_Table_2",
+    "Round2_Chair_0",
+    "Round2_Chair_1",
+    "Round2_Chair_2",
+    "Round_Table_3",
+    "Round3_Chair_0",
+    "Round3_Chair_1",
+    "Round_Table_4",
+    "Round4_Chair_0",
+    "Round4_Chair_1",
+    "Round4_Chair_2",
+    "Sun_Stool_D1",
+    "Sun_Stool_D2",
+    "Sun_Stool_D3",
+    "Sun_Stool_D4",
+    "Sun_Stool_D5",
+    "Sun_Stool_D6",
+    "Sun_Stool_E7",
+    "Sun_Stool_E8",
+    "Sun_Stool_E9",
+    "Sun_Stool_E10",
+    "Sun_Stool_E11",
+    "Sun_Stool_E12",
+    "Bar_Counter",
+    "Cashier",
+    "Bar_Stool_1",
+    "Bar_Stool_2",
+    "Bar_Stool_3",
+    "Back_Counter",
+    "Bar_Lightbox",
+    "Coffee_Machine",
+    "Coffee_Machine_Logo",
+    "Grinder_1",
+    "Tamper",
+    "Grinder_2",
+    "Back_Counter_Misc",
+    "Bar_Rack",
+    "Pendant_Immersive_292",
+    "Pendant_Immersive_520",
+    "Pendant_Diag_3",
+    "Pendant_Diag_7",
+    "Pendant_East_3",
+    "Pendant_East_7",
+    "Pendant_Books_3",
+    "Pendant_Books_6",
+    "Pendant_Entrance_Big",
+    "Pendant_Bar_Flower",
+    "Plant_0",
+    "Plant_1",
+    "Plant_2",
+    "Plant_3",
+    "Plant_4",
+    "Plant_5",
+    "Plant_6",
+    "Plant_7",
+    "Painting_0",
+    "Painting_1",
+    "Painting_2",
+    "Brass_Frame_Immersive",
+    "Brass_Frame_Diag",
+    "Brass_Frame_East",
+    "Brass_Frame_Books",
+    "Entrance_Lightbox",
+    "AC_Cabinet"
+  ]
+}

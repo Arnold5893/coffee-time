@@ -17,3 +17,6 @@ desktop.ini
 # 编辑器
 .vscode/
 .idea/
+
+# Unity 验证工程（体量大，只保留报告与截图）
+.scratch/asset-route/import-test/UnityImportTest/

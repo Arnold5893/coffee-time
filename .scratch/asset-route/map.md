@@ -18,9 +18,11 @@
 
 <!-- 每条已关闭票据一行：概要 + 链接 -->
 
+- [01 Unity 开发环境就绪](issues/01-unity-environment-setup.md): Unity 6000.3.28f1 + Personal 许可证 + Android Build Support 就绪；批处理调用须先 export PROGRAMDATA
 - [03 角色资产选型](issues/03-character-asset-selection.md): 定 Quaternius Universal Base Characters + Modular Outfits（CC0，模块化发型/服装/肤色，Humanoid 骨骼，URP 支持）；否决 RPM（服务停汰）
 - [04 动画来源选型](issues/04-animation-source-selection.md): Mixamo 主库 + Mecanim Humanoid retarget；吧台按住类与端盘走程序化 IK；缺口 Blender 自制
 - [05 家具道具选型](issues/05-furniture-prop-asset-selection.md): Poly Haven 写实基线 + ambientCG 材质；吧台特定器具（咖啡机/磨豆机/茶罐/茶壶/托盘）Blender 自制
+- [02 Blender 场景资产导入验证](issues/02-blender-import-validation.md): 结论"改造后用"——比例/结构/面数全优；管线定为 .blend→FBX→Extract Textures→转 URP；纹理已从 GLB 抢救
 
 ## Not yet specified
 
