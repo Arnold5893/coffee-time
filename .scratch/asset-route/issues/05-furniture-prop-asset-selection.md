@@ -1,7 +1,7 @@
 # 05 · 家具与道具资产选型
 
 Type: research
-Status: open
+Status: resolved
 Blocked by: （无）
 
 ## Question
@@ -18,3 +18,25 @@ Blocked by: （无）
 ## 完成标准
 
 推荐基线确定，缺口清单明确；登记到 map。
+
+## Answer（2026-11-06）
+
+**结论：Poly Haven 为写实道具基线 + ambientCG 补 PBR 材质；风格化库仅作补充；吧台特定器具用 Blender 自制。**
+
+分类基线：
+
+| 类别 | 来源 | 许可 | 说明 |
+| --- | --- | --- | --- |
+| 写实家具/道具（桌、沙发、杯壶、器皿） | Poly Haven | CC0 | 风格最贴"接近写实"，免署名，glTF/FBX 直出 |
+| 木纹/材质/HDRI | ambientCG + Poly Haven | CC0 | 日式木质暖光的材质基础 |
+| 风格化补充（小道具、食物） | Kenney / Quaternius | CC0 | 谨慎混搭，避免与写实件同框冲突 |
+| 单件补充（咖啡机等） | Sketchfab 仅筛 CC0/CC-BY | 逐件核查 | NC/ND 一律不用；CC-BY 记署名文件 |
+| 缺口自制 | Blender（本机已装） | — | 见下 |
+
+缺口清单（Blender 自制或改造）：浓缩咖啡机、磨豆机、透明玻璃茶罐（带茶叶可见）、茶壶＋玻璃小杯、托盘、搅拌棒、真实菜单重点商品的独立模型。
+
+杯型体系实现路径：热饮陶瓷杯＝现成模型；冰饮分层＝透明杯模型＋液面颜色 shader；茶壶液面颜色按茶种配置（设计方案 9.3）。
+
+要点提醒：Sketchfab 免费区许可证混杂，Epic 已表示将移除其免费许可下载，依赖它的资产应尽早落库存档。
+
+来源：polyhaven.com；cinevva.com/guides/free-3d-model-sites 与 sketchfab-polyhaven-kenney 对比；cuberta.com 免费工具栈许可分析。

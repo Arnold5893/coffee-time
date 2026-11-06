@@ -18,7 +18,9 @@
 
 <!-- 每条已关闭票据一行：概要 + 链接 -->
 
-（暂无）
+- [03 角色资产选型](issues/03-character-asset-selection.md): 定 Quaternius Universal Base Characters + Modular Outfits（CC0，模块化发型/服装/肤色，Humanoid 骨骼，URP 支持）；否决 RPM（服务停汰）
+- [04 动画来源选型](issues/04-animation-source-selection.md): Mixamo 主库 + Mecanim Humanoid retarget；吧台按住类与端盘走程序化 IK；缺口 Blender 自制
+- [05 家具道具选型](issues/05-furniture-prop-asset-selection.md): Poly Haven 写实基线 + ambientCG 材质；吧台特定器具（咖啡机/磨豆机/茶罐/茶壶/托盘）Blender 自制
 
 ## Not yet specified
 
