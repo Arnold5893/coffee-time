@@ -136,9 +136,10 @@ public static class ProjectSetup
             // 6.5 碰撞体烘焙（02 票）：按每个网格的局部包围盒烘一个 BoxCollider。
             //     跳过天花板以上与细杆件，避免吊灯/画框/挂杆把角色挡在过道里。
             var skipPrefix = new[] { "Ceiling", "Pendant", "Painting", "Lightbox", "Hood" };
-            // 门框是"环形"网格（两侧立框 + 上方亮子玻璃），按整体包围盒烘一个 box 会把整个门洞封死。
-            // 门扇是独立对象，各自有包围盒，不需要门框兜底。
-            var skipExact = new[] { "Door_door_left", "Door_door_right" };
+            // 门框是"环形"网格（两侧立框 + 门头以上白墙），按整体包围盒烘一个 box 会把整个门洞封死。
+            // 门扇 / 固定亮子 / 门槛条都是独立对象，各自有包围盒，不需要门框兜底。
+            // 左上那扇常闭门（Door_locked）反过来 —— 它就是整体一件，必须烘，才能把门洞堵住。
+            var skipExact = new[] { "Door_entrance" };
             int colliderCount = 0;
             foreach (var mf in shop.GetComponentsInChildren<MeshFilter>(true))
             {
@@ -228,9 +229,12 @@ public static class ProjectSetup
             // 7.4 玩家角色 + 第三人称跟随镜头（02 票）+ 门外出生点（03 票）
             //     外观是程序化占位体，接 Quaternius 模型时整体替换 Player/Visual 子物体即可，
             //     角色控制与镜头代码不感知外观。
-            var leafLT = all.FirstOrDefault(t => t.name == "Door_door_left_LeafL");
-            var leafRT = all.FirstOrDefault(t => t.name == "Door_door_left_LeafR");
-            var doorFrameT = all.FirstOrDefault(t => t.name == "Door_door_left");
+            // 入口在右下侧（方案 12.2「主入口位于右下侧门，左上双开门保持关闭」）。
+            // 会开的那一扇单独成一件、原点落在铰链轴上；门槛条给出门洞的精确中心与净宽。
+            var leafT = all.FirstOrDefault(t => t.name == "Door_entrance_Leaf");
+            var thrT = all.FirstOrDefault(t => t.name == "Door_entrance_Threshold");
+            var frameT = all.FirstOrDefault(t => t.name == "Door_entrance");
+            var panelT = all.FirstOrDefault(t => t.name == "Door_entrance_Panel");
             var porchT = all.FirstOrDefault(t => t.name == "Porch");
 
             Vector3 spawn = bounds.center; spawn.y = 0.06f;
@@ -238,26 +242,25 @@ public static class ProjectSetup
             Vector3 doorCenterW = bounds.center; doorCenterW.y = 0f;
             Vector3 interiorDir = Vector3.forward;
             Vector3 interiorAnchor = bounds.center; interiorAnchor.y = 0.06f;
-            float doorHalfWidth = 1.26f;
+            float doorHalfWidth = 0.75f;
 
-            if (leafLT != null && leafRT != null)
+            if (leafT != null && thrT != null)
             {
-                // 两扇门的铰链中点就是门洞中心
-                doorCenterW = (leafLT.position + leafRT.position) * 0.5f;
-                doorCenterW.y = 0f;
-                Vector3 leafSpan = leafRT.position - leafLT.position; leafSpan.y = 0f;
-                doorHalfWidth = leafSpan.magnitude * 0.5f;
+                // 门槛条就是门洞本身：中心 = 门洞中心，较长的那条水平边 = 净宽
+                Bounds tb = thrT.GetComponent<Renderer>().bounds;
+                doorCenterW = new Vector3(tb.center.x, 0f, tb.center.z);
+                doorHalfWidth = Mathf.Max(tb.size.x, tb.size.z) * 0.5f;
+                Vector3 lateralAxis = tb.size.x >= tb.size.z ? Vector3.right : Vector3.forward;
 
-                // 门洞法线：垂直于门扇连线。取"从门往里走一步还在地板上"的那一侧，
-                // 不能拿整体包围盒中心减门心——店面是多边形，那个方向是斜的。
-                Vector3 nrm = Vector3.Cross(Vector3.up, leafSpan.normalized);
-                var floorR = all.FirstOrDefault(t => t.name == "Floor");
-                if (floorR != null && floorR.GetComponent<Renderer>() != null)
+                // 门洞法线：垂直于门槛。正负不用包围盒中心猜（店面是多边形，那方向是斜的），
+                // 由门外地台定：从地台指向门的那一侧就是"往店内"。
+                Vector3 nrm = Vector3.Cross(Vector3.up, lateralAxis).normalized;
+                if (porchT != null && porchT.GetComponent<Renderer>() != null)
                 {
-                    Bounds floorBb = floorR.GetComponent<Renderer>().bounds;
-                    // 地板是零厚度的平面，y 必须取 0 才落在包围盒内
-                    Vector3 probe = doorCenterW + nrm * 0.8f; probe.y = floorBb.center.y;
-                    if (!floorBb.Contains(probe)) nrm = -nrm;
+                    Bounds pb = porchT.GetComponent<Renderer>().bounds;
+                    Vector3 toDoor = doorCenterW - new Vector3(pb.center.x, 0f, pb.center.z);
+                    toDoor.y = 0f;
+                    if (toDoor.sqrMagnitude > 1e-4f && Vector3.Dot(toDoor, nrm) < 0f) nrm = -nrm;
                 }
 
                 if (nrm.sqrMagnitude > 1e-4f)
@@ -265,9 +268,9 @@ public static class ProjectSetup
                     nrm.Normalize();
                     interiorDir = nrm;
                     facing = nrm;                          // 出生时正对着店门
-                    spawn = doorCenterW - nrm * 1.55f;     // 站在门外地台上
+                    spawn = doorCenterW - nrm * 1.75f;     // 站在门外地台上
                     spawn.y = 0.06f;
-                    report.AppendLine($"door normal={nrm} span={leafSpan.magnitude:F2}m");
+                    report.AppendLine($"door normal={nrm} width={doorHalfWidth * 2f:F2}m");
 
                     // 店内视点：从店面中心向外螺旋找一块不压家具的空位。
                     // 不能贴着门口取（门两侧就是书墙，第三人称镜头会被顶到 1m 内，构图没法看）。
@@ -296,10 +299,10 @@ public static class ProjectSetup
                     }
                     if (!found) report.AppendLine("interior anchor: NOT FOUND, using shop center");
 
-                    // 出生点自检：被门扇/墙压住就往外退
-                    for (float back = 0f; back <= 1.2f; back += 0.2f)
+                    // 出生点自检：被门扇/墙压住就往外退（门外地台进深 3.0m，最多退到 2.65m）
+                    for (float back = 0f; back <= 0.9f; back += 0.2f)
                     {
-                        Vector3 p = doorCenterW - nrm * (1.55f + back); p.y = 0.06f;
+                        Vector3 p = doorCenterW - nrm * (1.75f + back); p.y = 0.06f;
                         Vector3 a = new Vector3(p.x, 0.50f, p.z);
                         Vector3 b = new Vector3(p.x, 1.40f, p.z);
                         if (Physics.CheckCapsule(a, b, 0.32f, ~0, QueryTriggerInteraction.Ignore)) continue;
@@ -373,13 +376,12 @@ public static class ProjectSetup
             report.AppendLine($"player spawn=({spawn.x:F2}, {spawn.z:F2}) facing=({facing.x:F2}, {facing.z:F2})");
 
             // 7.5 入口门 + 门外地台围挡（03 票）
-            if (leafLT != null && leafRT != null)
+            if (leafT != null && thrT != null)
             {
                 var doorGO = new GameObject("EntranceDoor");
                 doorGO.transform.position = doorCenterW;
                 var door = doorGO.AddComponent<CoffeeShop.Interaction.EntranceDoor>();
-                door.leafL = leafLT;
-                door.leafR = leafRT;
+                door.leaf = leafT;
                 door.doorCenter = doorCenterW;
                 door.interiorDir = interiorDir;
                 door.halfWidth = doorHalfWidth;
@@ -387,7 +389,7 @@ public static class ProjectSetup
                 door.Bind(router);
 
                 var targets = new System.Collections.Generic.List<Collider>();
-                foreach (var t in new[] { leafLT, leafRT, doorFrameT })
+                foreach (var t in new[] { leafT, panelT, thrT })
                 {
                     if (t == null) continue;
                     var c = t.GetComponent<Collider>();
@@ -402,6 +404,18 @@ public static class ProjectSetup
                 bell.minDistance = 2f;
                 bell.maxDistance = 30f;
                 door.bellSource = bell;
+
+                // 门外没有外立面也就没有路灯，门口会是一片死黑。
+                // 门头补一盏暖光——照片里门头上方本来就有灯，顺带把门外地台照亮。
+                var lampGO = new GameObject("EntranceLamp");
+                lampGO.transform.position = doorCenterW - interiorDir.normalized * 1.10f + Vector3.up * 2.90f;
+                var lamp = lampGO.AddComponent<Light>();
+                lamp.type = LightType.Point;
+                lamp.range = 9f;
+                lamp.intensity = 4f;
+                lamp.color = new Color(1f, 0.88f, 0.72f);
+                lamp.shadows = LightShadows.None;
+
                 report.AppendLine($"entrance door: center=({doorCenterW.x:F2}, {doorCenterW.z:F2}) " +
                                   $"halfWidth={doorHalfWidth:F2} clickTargets={targets.Count}");
 

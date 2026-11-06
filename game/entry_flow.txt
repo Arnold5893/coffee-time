@@ -1,17 +1,17 @@
-spawnDepth=-1.55 (负值=在门外)
+spawnDepth=-1.75 (负值=在门外)
   ok   出生点在门外地台上
-closedDoor: moved=1.17m depth=-0.38 state=Closed
+closedDoor: moved=1.33m depth=-0.42 state=Closed
   ok   角色确实朝门走了
   ok   门关着时被挡在门外，没有穿透
-cam=(4.47,3.15) aimScreen=(320,325) screen=(640,480) hit=True bell=1
-  dbgRay(mask=-257) hits Floor (layer 0, d=7.62m); clickTargets=[Door_door_left_LeafL Door_door_left_LeafR ]
+cam=(-10.75,3.15) aimScreen=(320,332) screen=(640,480) hit=True bell=1
+  dbgRay(mask=-257) hits Door_entrance_Leaf (layer 0, d=4.66m); clickTargets=[Door_entrance_Leaf Door_entrance_Panel Door_entrance_Threshold ]
   ok   射线打到门并触发开门
   ok   门铃响了一次
 open again while opening -> False bells=1
   ok   开门过程中重复点击无副作用
-door open: amount=1.00 state=Open after=0.55s
-  ok   门扇开到 85°
-afterWalkIn: depth=3.25 hasEntered=True state=Closed
+door open: amount=1.00 state=Open after=0.60s
+  ok   门扇开到 92°
+afterWalkIn: depth=2.17 hasEntered=True state=Closed
   ok   玩家已越过门槛进店
   ok   流程记录到已进店
 door closed: state=Closed amount=0.00 after=0.00s

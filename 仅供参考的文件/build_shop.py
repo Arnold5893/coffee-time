@@ -152,6 +152,10 @@ M_STEEL = mat("stainless", (0.75, 0.75, 0.74), 0.25, 1.0)
 M_CHROME = mat("chrome", (0.9, 0.9, 0.9), 0.08, 1.0)
 M_GLASS = mat("window_glass", (0.02, 0.07, 0.05), 0.04, 0.0)
 M_DOORGLASS = mat("door_glass", (0.6, 0.7, 0.75), 0.02, 0.0, alpha=0.25)
+# 主入口是原木门（照片 入口门.jpg）：暖棕木框 + 上半磨砂玻璃 + 下部木裙板
+M_DOORWOOD = mat("door_wood", (0.30, 0.15, 0.06), 0.42)
+M_FROSTED = mat("frosted_glass", (0.80, 0.85, 0.81), 0.22, alpha=0.72)
+M_EXIT = mat("exit_sign", (0.05, 0.45, 0.14), 0.5, emit=(0.10, 0.90, 0.30), emit_strength=3.0)
 M_BLIND = mat("zebra_blind", img=TX["blind"], rough=0.9, tile=0.13)
 M_GRILLE = mat("radiator_grille", img=TX["grille"], rough=0.5, tile=0.1)
 M_PERF = mat("perforated_steel", img=TX["perf"], rough=0.3, metal=0.8, tile=0.025)
@@ -403,8 +407,10 @@ class Seg:
 
 SEGS = [Seg(FPW[i], FPW[(i + 1) % len(FPW)]) for i in range(len(FPW))]
 # 每段墙的类型
-WALL_TYPE = ["window_ledge", "white", "window_counter", "white", "window_counter", "door_right",
-             "wood", "wood_back", "wood", "white", "white", "door_left", "white"]
+# 方案文档 12.2：「主入口位于右下侧门，左上双开门保持关闭」。
+# 所以 seg5（右下）是 entrance，seg11（左上）是 door_locked —— 别再搞反了。
+WALL_TYPE = ["window_ledge", "white", "window_counter", "white", "window_counter", "entrance",
+             "white", "wood_back", "wood", "white", "white", "door_locked", "white"]
 
 # 地面
 b = B("Floor")
@@ -457,43 +463,97 @@ def build_window_wall(b, s, counter, rng):
             s.box(b, tm - 0.45, tm + 0.45, 0.0, 0.015, 0.15, 0.7, M_GRILLE)
 
 
-def build_door_frame(b, s):
-    """门洞的固定部分：上亮子玻璃 + 上横档 + 两侧立框。
-    可开合的门扇单独成对象（见 build_door_leaf），方便 Unity 里绕铰链旋转。"""
+# ---------------- 门 ----------------
+DOOR_HEAD = 2.30        # 门洞净高
+ENTRY_OPEN = 1.50       # 主入口门洞净宽
+ENTRY_PANEL = 0.40      # 门旁那条固定窄亮子（照片 入口门.jpg 里门右手边那条）
+
+
+def build_locked_door(b, s):
+    """左上双开玻璃门 —— 方案里明确「保持关闭」，所以整体做成一件不可开的门。
+    对象不拆扇，Unity 里按整体包围盒烘一个碰撞体正好把门洞堵死（本来就不该过人）。"""
     dz = 2.45
-    s.box(b, 0, s.L, -0.11, -0.09, dz, H, M_DOORGLASS)
+    s.box(b, 0, s.L, -0.11, -0.09, dz, H, M_DOORGLASS)                    # 上亮子
     s.box(b, 0, s.L, -0.13, -0.07, dz - 0.04, dz + 0.04, M_ALU)
     s.box(b, -0.04, 0.04, -0.13, -0.07, 0, H, M_ALU)
     s.box(b, s.L - 0.04, s.L + 0.04, -0.13, -0.07, 0, H, M_ALU)
-
-
-def build_door_leaf(name, s, hinge_t, sign, lw, dz=2.45):
-    """单扇玻璃门。对象原点放在铰链轴上，局部 +X 从铰链指向自由边，
-    局部 Z 向上 —— Unity 里直接绕本地 Z 轴转即可开合。
-    sign=+1 表示门扇沿墙段 u 正方向展开，-1 表示反向。"""
-    b = B(name)
-    hgt = dz - 0.04                     # 玻璃高度（0.02 → 2.41）
-    gz = (0.02 + hgt + 0.02) / 2        # 玻璃中心 z
-    # 玻璃
-    b.box((lw - 0.08, 0.02, hgt), (lw / 2, 0.0, gz), M_DOORGLASS)
-    # 上下横档 + 两侧竖梃（铝）
-    b.box((lw - 0.04, 0.04, 0.08), (lw / 2, 0.0, 0.04), M_ALU)
-    b.box((lw - 0.04, 0.04, 0.06), (lw / 2, 0.0, dz - 0.07), M_ALU)
-    for x in (0.04, lw - 0.04):
-        b.box((0.04, 0.04, dz - 0.08), (x, 0.0, (0.08 + dz - 0.04) / 2), M_ALU)
-    # 木质长拉手（内外各一根）
-    for y in (0.055, -0.055):
-        b.box((0.05, 0.06, 1.40), (lw - 0.12, y, 1.20), M_WOOD)
-    loc = s.pt(hinge_t, -0.10, 0)
-    rotz = s.ang if sign > 0 else s.ang + math.pi
-    return b.finish(COLLS["Structure"], loc=loc, rotz=rotz)
-
-
-def build_door_leaf_pair(kind, s):
-    """双开门：左扇铰链在 t=0，右扇铰链在 t=L，中间对开。"""
+    s.box(b, s.L / 2 - 0.03, s.L / 2 + 0.03, -0.13, -0.07, 0, dz, M_ALU)   # 两扇对缝处的中梃
     lw = s.L / 2
-    return (build_door_leaf("Door_%s_LeafL" % kind, s, 0.0, +1, lw),
-            build_door_leaf("Door_%s_LeafR" % kind, s, s.L, -1, lw))
+    for k in range(2):
+        t0 = k * lw
+        s.box(b, t0 + 0.05, t0 + lw - 0.05, -0.11, -0.09, 0.02, dz - 0.06, M_DOORGLASS)
+        s.box(b, t0 + 0.05, t0 + lw - 0.05, -0.12, -0.08, 0.0, 0.08, M_ALU)          # 下横档
+        s.box(b, t0 + 0.05, t0 + lw - 0.05, -0.12, -0.08, dz - 0.10, dz - 0.06, M_ALU)
+        hx = t0 + (lw - 0.14 if k == 0 else 0.14)                                     # 竖木拉手
+        for d in (0.0, -0.2):
+            s.box(b, hx - 0.025, hx + 0.025, d - 0.05, d + 0.0, 0.5, 1.9, M_WOOD)
+
+
+def build_entrance_frame(b, s):
+    """主入口门框：木框 + 门头以上白墙 + 门洞两侧墙垛 + 安全出口灯箱。
+    会开合的那一扇单独成对象（Door_entrance_Leaf），门洞精确范围由门槛条给。"""
+    t0 = (s.L - ENTRY_OPEN) / 2
+    t1 = t0 + ENTRY_OPEN
+    s.box(b, 0, t0, -T, 0, 0, H, M_WHITE)                      # 东侧墙垛（正好收到墙段端点，
+                                                               # 别再往外伸 T/2，否则会从东立面上戳出来）
+    s.box(b, t1, s.L, -T, 0, 0, H, M_WHITE)                    # 西侧墙垛
+    s.box(b, t0, t1, -T, 0, DOOR_HEAD, H, M_WHITE)             # 门头上方白墙
+    # 木门框：两侧立框 + 上框，比墙面凸出 2cm（不然从店外看是"凹"的，白墙边缘会露一圈斜茬）
+    s.box(b, t0 - 0.05, t0, -0.22, -0.05, 0, DOOR_HEAD, M_DOORWOOD)
+    s.box(b, t1, t1 + 0.05, -0.22, -0.05, 0, DOOR_HEAD, M_DOORWOOD)
+    s.box(b, t0, t1, -0.22, -0.05, DOOR_HEAD - 0.09, DOOR_HEAD, M_DOORWOOD)
+    # 门上方的「安全出口」灯箱（照片里有）
+    s.box(b, t0 + ENTRY_OPEN / 2 - 0.19, t0 + ENTRY_OPEN / 2 + 0.19,
+          -0.26, -0.19, 2.52, 2.68, M_EXIT)
+
+
+def build_entrance_threshold(s):
+    """门槛条。除了挡门缝，它还是 Unity 侧唯一的「门洞精确范围」锚点：
+    包围盒中心 = 门洞中心，较长的一条水平边 = 净宽。"""
+    t0 = (s.L - ENTRY_OPEN) / 2
+    b = B("Door_entrance_Threshold")
+    b.box((ENTRY_OPEN, 0.22, 0.03), s.pt(t0 + ENTRY_OPEN / 2, -0.09, 0.015), M_STEEL,
+          (0, 0, s.ang))
+    return b.finish(COLLS["Structure"])
+
+
+def build_wood_door_leaf(name, s, hinge_t, lw):
+    """原木门扇（照片 入口门.jpg）：四边木梃 + 下部木裙板 + 大面磨砂玻璃 + 竖长拉手。
+    对象原点放在铰链轴上，局部 +X 从铰链指向自由边，局部 Z 向上 —— Unity 里绕本地 Y 转即开合。"""
+    b = B(name)
+    h = DOOR_HEAD - 0.10        # 门扇高（上面留 1cm 给门头横框）
+    th = 0.055                  # 门扇厚
+    st = 0.10                   # 边梃 / 横档宽
+    low = 0.80                  # 下部裙板顶面高度
+    top = h - st - 0.02         # 玻璃顶
+    # 左右边梃
+    for x in (st / 2, lw - st / 2):
+        b.box((st, th, h - 0.02), (x, 0, (0.02 + h) / 2), M_DOORWOOD)
+    # 上下横档
+    b.box((lw - 2 * st, th, st), (lw / 2, 0, h - 0.02 - st / 2), M_DOORWOOD)
+    b.box((lw - 2 * st, th, st), (lw / 2, 0, 0.02 + st / 2), M_DOORWOOD)
+    # 下部木裙板 + 中横档
+    b.box((lw - 2 * st, th, low - 0.02 - st), (lw / 2, 0, (0.02 + st + low) / 2), M_DOORWOOD)
+    b.box((lw - 2 * st, th, 0.09), (lw / 2, 0, low), M_DOORWOOD)
+    # 磨砂玻璃
+    b.box((lw - 2 * st - 0.02, 0.012, top - low - 0.055),
+          (lw / 2, 0, (low + top) / 2), M_FROSTED)
+    # 竖长拉手（内外各一根）
+    for y in (th / 2 + 0.045, -th / 2 - 0.045):
+        b.box((0.035, 0.05, 0.34), (lw - 0.16, y, 1.02), M_STEEL)
+    return b.finish(COLLS["Structure"], loc=s.pt(hinge_t, -0.10, 0), rotz=s.ang)
+
+
+def build_entrance_panel(s, t_center, w):
+    """门旁那条固定窄玻璃，木框包边。"""
+    b = B("Door_entrance_Panel")
+    h = DOOR_HEAD - 0.02
+    b.box((w - 0.05, 0.022, h - 0.14), (0, 0, h / 2), M_FROSTED)
+    for x in (-(w / 2 - 0.025), (w / 2 - 0.025)):
+        b.box((0.05, 0.055, h), (x, 0, h / 2), M_DOORWOOD)
+    b.box((w - 0.05, 0.055, 0.06), (0, 0, h - 0.03), M_DOORWOOD)
+    b.box((w - 0.05, 0.055, 0.07), (0, 0, 0.035), M_DOORWOOD)
+    return b.finish(COLLS["Structure"], loc=s.pt(t_center, -0.10, 0), rotz=s.ang)
 
 
 for s, kind in zip(SEGS, WALL_TYPE):
@@ -508,27 +568,37 @@ for s, kind in zip(SEGS, WALL_TYPE):
         else:
             ob["info_title"] = "沉浸区窗边"
             ob["info_desc"] = "沙发区背靠大窗，窗台上摆着老板养的小绿植。"
-    elif kind.startswith("door"):
-        b = B("Door_%s" % kind)
-        build_door_frame(b, s)
+    elif kind == "entrance":
+        b = B("Door_entrance")
+        build_entrance_frame(b, s)
         ob = b.finish(COLLS["Structure"])
-        ob["info_title"] = "入口" if kind == "door_left" else "侧门"
-        ob["info_desc"] = "玻璃门配原木长拉手。" if kind == "door_left" else "通往另一侧走廊的玻璃门。"
-        build_door_leaf_pair(kind, s)
+        ob["info_title"] = "入口"
+        ob["info_desc"] = "原木门配竖长拉手，门头上挂着「安全出口」的小灯箱。"
+        build_entrance_threshold(s)
+        t0 = (s.L - ENTRY_OPEN) / 2
+        # 铰链在最东侧（平面图上的门弧就画在这一侧），固定亮子在西侧
+        build_wood_door_leaf("Door_entrance_Leaf", s, t0, ENTRY_OPEN - ENTRY_PANEL)
+        build_entrance_panel(s, t0 + ENTRY_OPEN - ENTRY_PANEL / 2, ENTRY_PANEL)
+    elif kind == "door_locked":
+        b = B("Door_locked")
+        build_locked_door(b, s)
+        ob = b.finish(COLLS["Structure"])
+        ob["info_title"] = "双开玻璃门"
+        ob["info_desc"] = "方案里这扇门一直关着，只用来看风景和采光。"
     else:
         b = B("Wall_%d" % SEGS.index(s))
         m = M_WOODP if kind.startswith("wood") else M_WHITE
         s.box(b, -T / 2, s.L + T / 2, -T, 0, 0, H, m)
         b.finish(COLLS["Structure"])
 
-# ---- 门外门廊地台（03 票：只做一块铺装平台，不做外立面）----
-PORCH = SEGS[WALL_TYPE.index("door_left")]      # 入口所在墙段
-PORCH_DEPTH = 2.80                              # 外挑深度（沿段法线向外）
-PORCH_MARGIN = 1.20                             # 门洞两侧各留出的宽度
+# ---- 门外入口铺装（03 票：只做一块地台，不做外立面）----
+# 入口在右下角的凹口里，宽度正好等于那段墙，往南伸到与店内南墙齐平再多一点，
+# 给"站在门外看店"留出站立空间。
+PORCH = SEGS[WALL_TYPE.index("entrance")]
+PORCH_DEPTH = 3.00
 b = B("Porch")
-_t0, _t1 = -PORCH_MARGIN, PORCH.L + PORCH_MARGIN
-b.box((_t1 - _t0, PORCH_DEPTH, 0.15),
-      PORCH.pt((_t0 + _t1) / 2, -PORCH_DEPTH / 2, -0.075),
+b.box((PORCH.L, PORCH_DEPTH, 0.15),
+      PORCH.pt(PORCH.L / 2, -PORCH_DEPTH / 2, -0.075),
       M_PORCH, (0, 0, PORCH.ang))
 b.finish(COLLS["Structure"], info=("门外", "店门口的一小块铺装地台。"))
 
@@ -1318,8 +1388,10 @@ def plant(name, loc, kind, seed):
 # 2026-11-06：原 (608,500) 的天堂鸟就在斜窗长桌吧凳边上、挡着 D2/D3 座位，实景没有，已删掉。
 # 同时把斜窗那棵发财树往墙根挪 0.45m（py 325→292）：原位置压进 Sun_Stool_D1 0.36m。
 # 书墙前那棵发财树（224,976）实景也没有，已删掉。
+# 2026-11-06：右下角 (1028,1075) 那棵龟背竹删掉 —— 那里现在是主入口门洞，
+# 一盆冠幅 1.1m 的绿植正堵在门内 0.4m 处，人进不来。
 PLANTS = [((793, 854), "small"), ((793, 731), "small"), ((595, 292), "tree"),
-          ((497, 440), "monstera"), ((1028, 1075), "monstera")]
+          ((497, 440), "monstera")]
 for i, ((px, py), kind) in enumerate(PLANTS):
     plant("Plant_%d" % i, (*P(px, py), 0), kind, i * 13 + 1)
 

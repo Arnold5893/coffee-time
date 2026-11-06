@@ -99,7 +99,7 @@ namespace CoffeeShop.Testing
             float wait = 0f;
             while (door.OpenAmount < 0.999f && wait < 3f) { wait += Time.deltaTime; yield return null; }
             log.AppendLine($"door open: amount={door.OpenAmount:F2} state={door.Current} after={wait:F2}s");
-            Check(door.OpenAmount > 0.99f, "门扇开到 85°");
+            Check(door.OpenAmount > 0.99f, "门扇开到 92°");
 
             // ---- 5. 自己走进去 --------------------------------------------
             if (followRig != null) { followRig.enabled = true; followRig.SnapToTarget(); }
