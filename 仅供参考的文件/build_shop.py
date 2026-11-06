@@ -281,6 +281,32 @@ class B:
             self.box((ch, w, h), (center[0] + radius * math.cos(tm), center[1] + radius * math.sin(tm), z), m,
                      (0, 0, tm + math.pi / 2))
 
+    def band(self, r, a0, a1, w, m, n, ztop, zbot, center=(0, 0)):
+        """沿圆弧的曲木板带：ztop/zbot 是角度 t 的函数（顶/底边高度可沿弧变化），板厚 w（径向）"""
+        i = self._mi(m)
+        vs = []
+        for k in range(n + 1):
+            t = a0 + (a1 - a0) * k / n
+            cx, cy = center[0] + r * math.cos(t), center[1] + r * math.sin(t)
+            nx, ny = math.cos(t), math.sin(t)
+            zt, zb = ztop(t), zbot(t)
+            vs.append([self.bm.verts.new((cx - nx * w / 2, cy - ny * w / 2, zb)),
+                       self.bm.verts.new((cx - nx * w / 2, cy - ny * w / 2, zt)),
+                       self.bm.verts.new((cx + nx * w / 2, cy + ny * w / 2, zt)),
+                       self.bm.verts.new((cx + nx * w / 2, cy + ny * w / 2, zb))])
+        faces = []
+        for k in range(n):
+            a, c = vs[k], vs[k + 1]
+            faces += [self.bm.faces.new((a[0], c[0], c[1], a[1])),   # 内圈
+                      self.bm.faces.new((a[3], a[2], c[2], c[3])),   # 外圈
+                      self.bm.faces.new((a[1], c[1], c[2], a[2])),   # 顶边
+                      self.bm.faces.new((a[0], a[3], c[3], c[0]))]   # 底边
+        faces.append(self.bm.faces.new(vs[0]))
+        faces.append(self.bm.faces.new(tuple(reversed(vs[n]))))
+        for f in faces:
+            f.material_index = i
+        bmesh.ops.recalc_face_normals(self.bm, faces=faces)
+
     def finish(self, coll, loc=(0, 0, 0), rotz=0.0, info=None, parent=None):
         bm = self.bm
         bm.normal_update()
@@ -613,19 +639,26 @@ def mushroom_chair(name, loc, rot, bar=False, info=None, coll="Furniture"):
 
 
 def armchair(name, loc, rot, info=None):
-    """弧形扶手靠背椅 (照片2)，正面 +Y"""
+    """曲木矮凳 (photos/矮凳子.jpg)，正面 +Y
+
+    结构：布艺圆垫座面 + 木底托；一条弯曲胶合板带从一侧前腿起，经扶手绕到靠背
+    （顶边中高两端低的弧线），再下到另一侧前腿直落到地；背面底部有一圈矮围板。
+    """
     b = B(name)
+    # 布艺圆凳 + 木底托
     b.cyl(0.27, 0.13, (0, 0.02, 0.385), M_FABRIC, seg=32, scale=(1.0, 0.92, 1))
     b.cyl(0.29, 0.04, (0, 0.02, 0.30), M_WOOD, seg=32, scale=(1.0, 0.92, 1))
+    # 曲木靠背扶手带：165°→375° 绕过背面(-Y)，开口朝正面 +Y；
+    # 顶边从两端扶手 0.63 拱起到靠背中 0.76，底边从 0.56 降到靠背中 0.44
+    b.band(0.305, math.radians(165), math.radians(375), 0.03, M_WOOD, 16,
+           lambda t: 0.63 + 0.13 * max(0.0, -math.sin(t)),
+           lambda t: 0.56 - 0.12 * max(0.0, -math.sin(t)),
+           center=(0, 0.01))
     for sx in (-1, 1):
-        b.beam((sx * 0.24, 0.24, 0), (sx * 0.23, 0.2, 0.3), 0.04, M_WOOD)
-        b.beam((sx * 0.24, -0.22, 0), (sx * 0.23, -0.18, 0.3), 0.04, M_WOOD)
-        b.beam((sx * 0.29, 0.12, 0.3), (sx * 0.30, 0.10, 0.64), 0.04, M_WOOD)
-    # 弧形靠背+扶手 (大半圈) —— 靠背必须在背面(-Y)：165°→375° 绕过 -Y，开口朝正面 +Y
-    b.arc(0.30, math.radians(165), math.radians(375), 0.66, 0.11, 0.035, M_WOOD, n=16, center=(0, 0.0))
-    for sx in (-1, 1):
-        b.box((0.07, 0.18, 0.035), (sx * 0.29, 0.13, 0.64), M_WOOD)
-    b.beam((0, -0.29, 0.32), (0, -0.30, 0.62), 0.07, M_WOOD, d=0.02)
+        b.box((0.09, 0.05, 0.62), (sx * 0.295, 0.09, 0.31), M_WOOD)       # 前腿（宽板腿直落到地）
+        b.box((0.085, 0.22, 0.03), (sx * 0.30, 0.17, 0.625), M_WOOD)      # 扶手平板（带端向前伸出）
+    # 背面底部弧形矮围板
+    b.arc(0.28, math.radians(205), math.radians(335), 0.09, 0.07, 0.025, M_WOOD, n=6, center=(0, 0.01))
     if random.random() < 0.6:
         b.box((0.4, 0.38, 0.012), (0, 0.04, 0.455), M_CUSHION, (0, 0, random.uniform(-0.3, 0.3)))
     return b.finish(COLLS["Furniture"], loc, rot, info)
@@ -767,7 +800,7 @@ for sx in (-1, 1):
 c = P(366, 898)
 conference_table("Meeting_Table", (*c, 0), math.pi / 2,
                  info=("会议桌", "1.8 米原木长桌，可坐 6 人，适合小组讨论或自习。"))
-for k, py in enumerate((840, 898, 956)):
+for k, py in enumerate((830, 898, 966)):
     for sx, px in ((-1, 287), (1, 445)):
         sp = P(px, py)
         armchair("Meeting_Chair_%d_%d" % (k, sx), (*sp, 0), face_to(sp, (c[0], sp[1])))
@@ -778,8 +811,8 @@ for k in range(4):
     a = math.pi / 4 + k * math.pi / 2
     sp = (c[0] + 0.62 * math.cos(a), c[1] + 0.62 * math.sin(a))
     armchair("Round1_Chair_%d" % k, (*sp, 0), face_to(sp, c))
-# --- 多人桌 2、3 ---
-for no, (px, py) in ((2, (608, 740)), (3, (608, 977))):
+# --- 多人桌 2、3 ---（整组向北 +0.8m：原位置沙发与吧台凳边距仅 0.47m，太挤）
+for no, (px, py) in ((2, (608, 662)), (3, (608, 899))):
     c = P(px, py)
     oval_table("Group_Table_%d" % no, (*c, 0), 0, info=("多人桌 %d" % no, "椭圆桌配两张双人沙发，可坐 4 人。"))
     for sy in (-1, 1):
@@ -867,6 +900,15 @@ for k, px in enumerate((518, 615, 711)):
     mushroom_chair("Bar_Stool_%d" % (k + 1), (*p, 0), math.pi, bar=True, coll="Bar",
                    info=("吧台 %d 号座" % (k + 1), "坐在这里可以看咖啡师做咖啡。"))
 
+# --- 打印机（吧台下面，顾客侧开放层板上，免费打印）---
+b = B("Printer")
+b.box((0.40, 0.32, 0.26), (0, 0, 0.13), M_BLACK)                        # 机身
+b.box((0.30, 0.02, 0.10), (0, 0.165, 0.16), M_PAPER)                    # 出纸口白色面板
+b.box((0.34, 0.24, 0.02), (0, 0.02, 0.27), M_DARKBOX)                   # 顶部扫描盖板
+b.cyl(0.045, 0.10, (0.26, 0.02, 0.05), M_BLACK, seg=12)                 # 旁边的笔筒
+b.finish(COLLS["Bar"], (P(716, 0)[0], BAR_C[1] + 0.10, 0.52), 0,
+         info=("打印机", "店里提供免费打印，扫码就能打。"))
+
 # --- 后操作台 (靠后墙) ---
 BACK_Y = 0.1 + 0.33
 b = B("Back_Counter")
@@ -895,7 +937,7 @@ b.img_plane(lb_len - 2 * logo_w - 0.4, 0.56, MX(((bx0b + bx1b) / 2, 0.205, 2.85)
 b.finish(COLLS["Bar"], info=("素晴 灯箱", "吧台后的发光灯箱，左边是店名「素晴」书法 logo。"))
 
 # --- 咖啡机 VISACREM Ottima 2.0 (照片14) ---
-# 位置东移 (px 470→616)：原位置左侧放不下水槽/材料台/热水机（实景顺序：热水机→材料台→水槽→磨豆→压粉→磨豆→咖啡机）
+# 位置东移 (px 470→630)：原位置左侧放不下水槽/材料台/热水机（实景顺序：热水机→材料台→水槽→磨豆→压粉→磨豆→咖啡机）
 CM = (P(630, 0)[0], BACK_Y + 0.0, 0.9)
 b = B("Coffee_Machine")
 b.box((0.78, 0.55, 0.13), (0, 0, 0.065), M_WHITEM)
@@ -982,24 +1024,25 @@ b.beam((0, -0.17, 0.25), (0, 0.04, 0.25), 0.014, M_CHROME)              # 龙头
 b.finish(COLLS["Bar"], (CM[0] - 1.798, BACK_Y, 0.9), 0,
          info=("水槽", "洗杯子、洗拉花缸。台下柜体用铁板封住。"))
 
-# --- 台面置物架（实景照片：顶层茶叶罐、中层杯子、底层罐装材料）---
+# --- 墙面置物架（挂墙，在水槽正上方；实景照片：顶面茶叶罐、中层杯子、下层玻璃杯）---
 b = B("Counter_Shelf")
 SW, SD, SH = 0.78, 0.32, 0.85
 for sx in (-1, 1):
     b.box((0.025, SD, SH), (sx * (SW / 2 - 0.013), 0, SH / 2), M_WHITEM)
 b.box((SW, SD, 0.025), (0, 0, SH - 0.013), M_WHITEM)                    # 顶板
+b.box((SW, SD, 0.025), (0, 0, 0.0125), M_WHITEM)                        # 底板
 b.box((SW - 0.05, SD - 0.03, 0.02), (0, 0, 0.42), M_WHITEM)             # 中层板
 b.box((SW, 0.02, SH - 0.06), (0, -SD / 2 + 0.01, SH / 2), M_WHITEM)     # 背板
-for k in range(6):                                                      # 顶层：玻璃茶叶罐
+for k in range(6):                                                      # 顶面：玻璃茶叶罐
     x = -SW / 2 + 0.09 + k * 0.125
     b.cyl(0.045, 0.11, (x, 0.02, SH + 0.055), M_CUPGLASS, seg=12)
     b.cyl(0.038, 0.065, (x, 0.02, SH + 0.04), M_SOIL, seg=12)
 for k in range(5):                                                      # 中层：杯子
     b.cyl(0.035, 0.08, (-SW / 2 + 0.1 + k * 0.15, 0.01, 0.475), M_CERAMIC if k % 2 else M_CERAMIC_B, seg=12)
-for k in range(3):                                                      # 底层：罐装材料
-    b.cyl(0.05, 0.13, (-SW / 2 + 0.12 + k * 0.24, 0.01, 0.075), M_CORK if k == 1 else M_CERAMIC, seg=12)
-b.finish(COLLS["Bar"], (CM[0] - 2.518, BACK_Y + 0.05, 0.9), 0,
-         info=("置物架", "顶层茶叶罐、中层杯子、底层罐装材料。台面上放可可粉、抹茶粉、巧克力酱。"))
+for k in range(4):                                                      # 下层：玻璃杯
+    b.cyl(0.032, 0.12, (-SW / 2 + 0.12 + k * 0.18, 0.01, 0.085), M_CUPGLASS, seg=12)
+b.finish(COLLS["Bar"], (CM[0] - 1.798, 0.36, 1.30), 0,
+         info=("置物架", "挂在水槽正上方的墙架：顶面茶叶罐、中层杯子、下层玻璃杯；台面上放可可粉、抹茶粉、巧克力酱。"))
 # 台面上的常温材料罐（可可粉/抹茶粉/巧克力酱）
 b = B("Counter_Canisters")
 for k, m in enumerate((M_CORK, M_LEAF[1], M_BLACK)):
@@ -1200,8 +1243,8 @@ def plant(name, loc, kind, seed):
     return b.finish(COLLS["Plants"], loc, rng.uniform(0, 6.28), ("绿植", "店里到处是老板养的绿植：天堂鸟、发财树、龟背竹……"))
 
 
-PLANTS = [((405, 190), "bird"), ((595, 325), "tree"), ((497, 440), "monstera"), ((608, 610), "bird"),
-          ((608, 855), "bird"), ((820, 830), "bird"), ((820, 950), "bird"), ((1028, 1075), "monstera")]
+PLANTS = [((405, 500), "bird"), ((595, 325), "tree"), ((497, 440), "monstera"), ((608, 500), "bird"),
+          ((704, 855), "bird"), ((820, 830), "bird"), ((820, 950), "bird"), ((1028, 1075), "monstera")]
 for i, ((px, py), kind) in enumerate(PLANTS):
     plant("Plant_%d" % i, (*P(px, py), 0), kind, i * 13 + 1)
 
