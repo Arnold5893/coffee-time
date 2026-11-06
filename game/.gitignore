@@ -1,0 +1,25 @@
+# Unity 标准忽略（game/ 工程目录）
+[Ll]ibrary/
+[Tt]emp/
+[Oo]bj/
+[Bb]uild/
+[Bb]uilds/
+[Ll]ogs/
+[Uu]ser[Ss]ettings/
+
+# Visual Studio / Rider / VS Code
+.vs/
+.idea/
+.vscode/
+*.csproj
+*.sln
+*.user
+*.userprefs
+
+# 批处理验证产物（验收证据存档在 ../.scratch/）
+setup_report.txt
+setup_screenshot_*.png
+
+# 系统
+.DS_Store
+Thumbs.db

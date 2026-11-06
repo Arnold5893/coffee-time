@@ -4,9 +4,17 @@
 
 **Blocked by:** None (can start immediately)
 
-**Status:** ready-for-agent
+**Status:** resolved
 
-- [ ] Unity URP 工程在仓库内可打开，批处理构建脚本可用（注意先 export PROGRAMDATA）
-- [ ] 场景导入后 120 个对象结构完整，包围盒约 10.2×4.5×13.0 m
-- [ ] 纹理经 Extract Textures 绑定，材质已转 URP，颜色与参考一致
-- [ ] 前柜北移后通道实测 ≥1.2m，吧凳/灯架随移无穿插
+- [x] Unity URP 工程在仓库内可打开，批处理构建脚本可用（注意先 export PROGRAMDATA）
+- [x] 场景导入后 120 个对象结构完整，包围盒约 10.2×4.5×13.0 m
+- [x] 纹理经 Extract Textures 绑定，材质已转 URP，颜色与参考一致
+- [x] 前柜北移后通道实测 ≥1.2m，吧凳/灯架随移无穿插
+
+**结果（2026-11-06）：**
+- 工程建于 `game/`，URP 17 管线资产 + 持久化 Renderer 子资产 + ACES 全局 Volume
+- 通道轴实测为 **-Z**（修正 06 票"Blender +Y = Unity +Z"的假设；FBX 导入后实为 -Z）。原通道 0.32m，前柜组 6 对象整体 -Z 移 0.88m，实测通道 1.20m
+- 材质：FBX 在 URP 激活后导入，天然生成 URP/Lit（无需转换器；官方批处理转换器在本版本有 Base2DMaterialUpgrader 无默认构造的 bug，已绕开）
+- 截图管线：URP 不支持 Camera.Render()，改走 Play 模式 RenderTexture（必须 ARGBHalf，否则 URP 跳过后处理）；验收图存于 `.scratch/vertical-slice/acceptance/01/`
+- `BuildScript.BuildWindows` 批处理构建通过（`game/Builds/Windows/CoffeeTime.exe`）
+- 已知留待后续：验证用基线光照偏亮（ambient 0.25 + 直射 0.8），三时段氛围光照属后续票据；`downlight` 材质自发光 30x HDR，正式灯光方案时统一处理

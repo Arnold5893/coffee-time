@@ -1,0 +1,71 @@
+URP pipeline asset created & assigned (renderer persisted as sub-asset)
+textures extracted & materials remapped
+renderer material slots converted to URP: 0
+shaders in scene: Universal Render Pipeline/Lit
+mat machine_white: emission=False emColor=RGBA(0.00, 0.00, 0.00, 0.00) baseMap=null
+mat radiator_grille: emission=False emColor=RGBA(0.00, 0.00, 0.00, 0.00) baseMap=grille
+mat stainless: emission=False emColor=RGBA(0.00, 0.00, 0.00, 0.00) baseMap=null
+mat black_plastic: emission=False emColor=RGBA(0.00, 0.00, 0.00, 0.00) baseMap=null
+mat wood: emission=False emColor=RGBA(0.00, 0.00, 0.00, 0.00) baseMap=wood_rubber
+mat ceramic_white: emission=False emColor=RGBA(0.00, 0.00, 0.00, 0.00) baseMap=null
+mat paper: emission=False emColor=RGBA(0.00, 0.00, 0.00, 0.00) baseMap=null
+mat ceramic_blue: emission=False emColor=RGBA(0.00, 0.00, 0.00, 0.00) baseMap=null
+mat cork: emission=False emColor=RGBA(0.00, 0.00, 0.00, 0.00) baseMap=null
+mat electric_box: emission=False emColor=RGBA(0.00, 0.00, 0.00, 0.00) baseMap=null
+mat cup_glass: emission=False emColor=RGBA(0.00, 0.00, 0.00, 0.00) baseMap=null
+mat dark_box: emission=False emColor=RGBA(0.00, 0.00, 0.00, 0.00) baseMap=null
+mat white_ceiling: emission=False emColor=RGBA(0.00, 0.00, 0.00, 0.00) baseMap=null
+mat wood_panel: emission=False emColor=RGBA(0.00, 0.00, 0.00, 0.00) baseMap=wood_rubber
+mat downlight: emission=True emColor=RGBA(30.00, 25.80, 20.40, 30.00) baseMap=null
+mat trunk: emission=False emColor=RGBA(0.00, 0.00, 0.00, 0.00) baseMap=null
+mat book_3: emission=False emColor=RGBA(0.00, 0.00, 0.00, 0.00) baseMap=null
+mat book_9: emission=False emColor=RGBA(0.00, 0.00, 0.00, 0.00) baseMap=null
+mat book_8: emission=False emColor=RGBA(0.00, 0.00, 0.00, 0.00) baseMap=null
+mat book_2: emission=False emColor=RGBA(0.00, 0.00, 0.00, 0.00) baseMap=null
+mat book_5: emission=False emColor=RGBA(0.00, 0.00, 0.00, 0.00) baseMap=null
+mat menu: emission=False emColor=RGBA(0.00, 0.00, 0.00, 0.00) baseMap=menu
+mat white_paint: emission=False emColor=RGBA(0.00, 0.00, 0.00, 0.00) baseMap=null
+mat lightbox_logo: emission=True emColor=RGBA(1.00, 1.00, 1.00, 1.00) baseMap=logo_white
+mat lightbox_beans: emission=True emColor=RGBA(1.00, 1.00, 1.00, 1.00) baseMap=lightbox_beans
+mat brass: emission=False emColor=RGBA(0.00, 0.00, 0.00, 0.00) baseMap=null
+mat leather_bluegray: emission=False emColor=RGBA(0.00, 0.00, 0.00, 0.00) baseMap=null
+mat book_1: emission=False emColor=RGBA(0.00, 0.00, 0.00, 0.00) baseMap=null
+mat book_0: emission=False emColor=RGBA(0.00, 0.00, 0.00, 0.00) baseMap=null
+mat book_6: emission=False emColor=RGBA(0.00, 0.00, 0.00, 0.00) baseMap=null
+mat book_4: emission=False emColor=RGBA(0.00, 0.00, 0.00, 0.00) baseMap=null
+mat book_7: emission=False emColor=RGBA(0.00, 0.00, 0.00, 0.00) baseMap=null
+mat lcd_blue: emission=True emColor=RGBA(0.90, 2.70, 6.00, 6.00) baseMap=null
+mat ceiling_grid: emission=False emColor=RGBA(0.00, 0.00, 0.00, 0.00) baseMap=ceiling_grid
+mat perforated_steel: emission=False emColor=RGBA(0.00, 0.00, 0.00, 0.00) baseMap=perforated
+mat machine_backlight: emission=True emColor=RGBA(2.40, 2.70, 3.00, 3.00) baseMap=null
+mat chrome: emission=False emColor=RGBA(0.00, 0.00, 0.00, 0.00) baseMap=null
+mat door_glass: emission=False emColor=RGBA(0.00, 0.00, 0.00, 0.00) baseMap=null
+mat aluminium: emission=False emColor=RGBA(0.00, 0.00, 0.00, 0.00) baseMap=null
+mat granite_floor: emission=False emColor=RGBA(0.00, 0.00, 0.00, 0.00) baseMap=granite
+mat straw: emission=False emColor=RGBA(0.00, 0.00, 0.00, 0.00) baseMap=null
+mat hat_ribbon: emission=False emColor=RGBA(0.00, 0.00, 0.00, 0.00) baseMap=null
+mat fabric_gray: emission=False emColor=RGBA(0.00, 0.00, 0.00, 0.00) baseMap=null
+mat cushion_denim: emission=False emColor=RGBA(0.00, 0.00, 0.00, 0.00) baseMap=null
+mat painting_1: emission=False emColor=RGBA(0.00, 0.00, 0.00, 0.00) baseMap=painting_1
+mat painting_2: emission=False emColor=RGBA(0.00, 0.00, 0.00, 0.00) baseMap=painting_2
+mat painting_3: emission=False emColor=RGBA(0.00, 0.00, 0.00, 0.00) baseMap=painting_3
+mat bulb: emission=True emColor=RGBA(25.00, 18.00, 10.50, 25.00) baseMap=null
+mat soil: emission=False emColor=RGBA(0.00, 0.00, 0.00, 0.00) baseMap=null
+mat pot_white: emission=False emColor=RGBA(0.00, 0.00, 0.00, 0.00) baseMap=null
+mat stem: emission=False emColor=RGBA(0.00, 0.00, 0.00, 0.00) baseMap=null
+mat leaf_a: emission=False emColor=RGBA(0.00, 0.00, 0.00, 0.00) baseMap=null
+mat leaf_c: emission=False emColor=RGBA(0.00, 0.00, 0.00, 0.00) baseMap=null
+mat leaf_b: emission=False emColor=RGBA(0.00, 0.00, 0.00, 0.00) baseMap=null
+mat pot_gray: emission=False emColor=RGBA(0.00, 0.00, 0.00, 0.00) baseMap=null
+mat window_glass: emission=False emColor=RGBA(0.00, 0.00, 0.00, 0.00) baseMap=null
+mat zebra_blind: emission=False emColor=RGBA(0.00, 0.00, 0.00, 0.00) baseMap=zebra_blind
+mat socket: emission=False emColor=RGBA(0.00, 0.00, 0.00, 0.00) baseMap=null
+emissive materials: 6/58
+ambient: mode=Skybox intensity=1.00 skybox=Default-Skybox
+gaps: z+=-1.84 z-=0.32 x+=-5.57 x-=-6.45
+aisle axis=(0.00, 0.00, -1.00) current=0.32m shift=0.88m
+front group moved (6/6 objects)
+aisle_width_m=1.20 (target>=1.20)
+volume profile assigned: True guid=5dbee4add3425934cab54bda7fc65c14
+ambientIntensity set to 0.25 (interior baseline)
+scene saved: Assets/Scenes/Main.unity (screenshots via PlayCapture)
