@@ -23,3 +23,25 @@ desktop.ini
 
 # 本地 agent 状态（记忆 / 身份文件，不随仓库分发）
 .workbuddy/
+
+# ---------------------------------------------------------------------------
+# Unity 工程（game/）的可再生目录 —— 与 game/.gitignore 内容同源。
+# 这里再写一遍，是为了兼容「只读仓库根 .gitignore、不读子目录 .gitignore」的客户端：
+# 否则那些客户端会把 game/Library（约 2 万个文件）当成待提交的改动列出来。
+# ---------------------------------------------------------------------------
+game/[Ll]ibrary/
+game/[Tt]emp/
+game/[Oo]bj/
+game/[Bb]uild/
+game/[Bb]uilds/
+game/[Ll]ogs/
+game/[Uu]ser[Ss]ettings/
+game/.vs/
+game/.idea/
+game/.vscode/
+game/*.csproj
+game/*.sln
+game/*.user
+game/*.userprefs
+game/setup_report.txt
+game/setup_screenshot_*.png
