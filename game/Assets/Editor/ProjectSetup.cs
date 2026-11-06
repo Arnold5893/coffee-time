@@ -461,6 +461,9 @@ public static class ProjectSetup
             rig.spawnPoint = spawnGO.transform;
             rig.interiorPoint = interiorGO.transform;
             rig.door = Object.FindFirstObjectByType<CoffeeShop.Interaction.EntranceDoor>();
+            // 门口落脚区机位：站在店内正对门 3.3m，一眼看到门、门口空地、以及阳光区长桌收头
+            rig.camPosEntry = doorCenterW + interiorDir * 3.3f + Vector3.up * 1.6f;
+            rig.camLookEntry = doorCenterW + Vector3.up * 0.85f;
             // 吧台机位：站在通道正中（两柜之间），沿吧台纵向（X）偏一点看过去，能同时看到前柜、通道、后柜
             var aisleCenter = (frontR.bounds.center + backR.bounds.center) * 0.5f;
             rig.camPosBar = aisleCenter + new Vector3(2.8f, 0.7f, 0f);

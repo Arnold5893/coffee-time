@@ -32,6 +32,8 @@ public class ScreenshotRig : MonoBehaviour
 
     // 03 票：入口门
     public CoffeeShop.Interaction.EntranceDoor door;
+    public Vector3 camPosEntry;
+    public Vector3 camLookEntry;
 
     IEnumerator Start()
     {
@@ -119,6 +121,10 @@ public class ScreenshotRig : MonoBehaviour
                 for (int i = 0; i < 4; i++) yield return null;
             }
         }
+
+        // ---- 门口落脚区：阳光区长桌在 12 号凳后收头，门前留出空地 ----
+        if (followRig != null) followRig.enabled = false;
+        yield return Capture(cam, rt, camPosEntry, camLookEntry, "setup_screenshot_entry_corner.png");
 
         // 全景前临时隐藏吊顶（完全位于 cutY 之上的渲染器），拍完恢复
         // 静态机位必须先把跟随镜头关掉，否则它会在 LateUpdate 里把相机又拖回角色身后

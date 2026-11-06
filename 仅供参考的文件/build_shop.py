@@ -412,6 +412,12 @@ SEGS = [Seg(FPW[i], FPW[(i + 1) % len(FPW)]) for i in range(len(FPW))]
 WALL_TYPE = ["window_ledge", "white", "window_counter", "white", "window_counter", "entrance",
              "white", "wood_back", "wood", "white", "white", "door_locked", "white"]
 
+# 东窗那段阳光区长桌不做满整段：平面图上桌尾收在 12 号吧凳（py=975）下面一点、
+# py≈1040 处，门洞（py=1180）前留出约 1.8m 的进门落脚区。
+# 斜窗那段（seg2）照旧做满，不在此列。
+COUNTER_END_PY = 1040
+COUNTER_LEN = {4: (COUNTER_END_PY - 600) * S}
+
 # 地面
 b = B("Floor")
 b.poly([(x, y, 0) for x, y in FPW], M_FLOOR, flip=not CCW)
@@ -423,7 +429,7 @@ b.poly([(x, y, H) for x, y in FPW], M_GRID, flip=CCW)
 b.finish(COLLS["Ceiling"])
 
 
-def build_window_wall(b, s, counter, rng):
+def build_window_wall(b, s, counter, rng, counter_len=None):
     sill = 1.26 if counter else 0.88
     s.box(b, -T / 2, s.L + T / 2, -T, 0, 0, sill, M_WOODP if not counter else M_WHITE)
     s.box(b, 0, s.L, -0.11, -0.09, sill, H, M_GLASS)
@@ -446,12 +452,18 @@ def build_window_wall(b, s, counter, rng):
         b.cyl(0.04, t1 - t0, p, M_WHITE, rot=(0, math.pi / 2, s.ang), seg=12)
     if counter:
         # 阳光区长桌: 桌面 / 挡板 / 前面板 / 暖气格栅 / 插座
-        s.box(b, 0.02, s.L - 0.02, 0.0, 0.48, 1.0, 1.04, M_WOOD)
-        s.box(b, 0.02, s.L - 0.02, 0.0, 0.025, 1.04, 1.26, M_WOOD)
-        s.box(b, 0.02, s.L - 0.02, 0.40, 0.42, 0.0, 1.0, M_WOODP)
-        s.box(b, 0.02, s.L - 0.02, 0.40, 0.43, 0.0, 0.06, M_BLACK)
+        # 桌尾不一定做到墙段端点：东窗那段在门口前收头，留出进门落脚区
+        cl = s.L - 0.02 if counter_len is None else counter_len
+        s.box(b, 0.02, cl, 0.0, 0.48, 1.0, 1.04, M_WOOD)
+        s.box(b, 0.02, cl, 0.0, 0.025, 1.04, 1.26, M_WOOD)
+        s.box(b, 0.02, cl, 0.40, 0.42, 0.0, 1.0, M_WOODP)
+        s.box(b, 0.02, cl, 0.40, 0.43, 0.0, 0.06, M_BLACK)
+        if cl < s.L - 0.05:
+            s.box(b, cl - 0.03, cl, 0.0, 0.42, 0.0, 1.04, M_WOODP)   # 桌尾封板
         for i in range(n):
             tm = (i + 0.5) * w
+            if tm + 0.42 > cl:
+                continue                                  # 桌尾之外的暖气格栅/插座不放
             s.box(b, tm - 0.4, tm + 0.4, 0.42, 0.435, 0.3, 0.8, M_GRILLE)
             for k in (-0.35, 0.35):
                 s.box(b, tm + k - 0.045, tm + k + 0.045, 0.025, 0.035, 1.1, 1.19, M_SOCKET)
@@ -559,8 +571,9 @@ def build_entrance_panel(s, t_center, w):
 for s, kind in zip(SEGS, WALL_TYPE):
     rng = random.Random(int(s.L * 100))
     if kind.startswith("window"):
-        b = B("Wall_Window_%d" % SEGS.index(s))
-        build_window_wall(b, s, kind == "window_counter", rng)
+        idx = SEGS.index(s)
+        b = B("Wall_Window_%d" % idx)
+        build_window_wall(b, s, kind == "window_counter", rng, COUNTER_LEN.get(idx))
         ob = b.finish(COLLS["Structure"])
         if kind == "window_counter":
             ob["info_title"] = "阳光区长桌"
