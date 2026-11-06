@@ -5,8 +5,9 @@ import bpy, bmesh, math, random, os
 import numpy as np
 from mathutils import Matrix, Vector, Euler
 
-ROOT = os.path.dirname(os.path.abspath(__file__)) if "__file__" in dir() else r"D:\coffee_shop"
-ROOT = r"D:\coffee_shop"
+ROOT = os.path.dirname(os.path.abspath(__file__)) if "__file__" in dir() else r"D:\coffee_shop\仅供参考的文件"
+ROOT = os.path.normpath(ROOT)   # 资产源目录（仅供参考的文件/）
+PHOTOS = os.path.normpath(os.path.join(ROOT, "..", "photos"))
 TEX = os.path.join(ROOT, "textures")
 REFS = os.path.join(ROOT, "refs")
 os.makedirs(TEX, exist_ok=True)
@@ -76,56 +77,17 @@ def crop_image(src, fx0, fy0, fx1, fy1, name, out_w=1024):
 
 
 def gen_textures():
-    rng = np.random.default_rng(1)
+    """加载既有贴图（原始 refs/ 素材目录已不存，贴图以 textures/ 下抢救版为准）。
+    painting_4 按原裁剪比例从 photos/吧台的左半部分 重新裁。"""
     t = {}
-    # 花岗岩地砖 (0.8m 一块)
-    n = 512
-    low = rng.random((8, 8))
-    low = np.kron(low, np.ones((64, 64)))
-    base = np.empty((n, n, 3))
-    base[:] = [0.64, 0.62, 0.59]
-    base *= (0.94 + 0.08 * low)[..., None]
-    r = rng.random((n, n))
-    base[r < 0.14] *= 0.45
-    base[(r > 0.14) & (r < 0.20)] *= 0.75
-    base[r > 0.95] = [0.86, 0.85, 0.83]
-    base[:2, :] = 0.48; base[:, :2] = 0.48
-    t["granite"] = save_img("granite", rgba(base))
-    # 黑色格栅吊顶
-    g = np.full((64, 64, 3), 0.025)
-    g[:5, :] = 0.11; g[:, :5] = 0.11
-    t["grid"] = save_img("ceiling_grid", rgba(g))
-    # 斑马帘
-    b = np.empty((96, 4, 3))
-    b[:56] = [0.90, 0.86, 0.78]
-    b[56:] = [0.56, 0.55, 0.52]
-    t["blind"] = save_img("zebra_blind", rgba(b))
-    # 暖气格栅
-    gr = np.empty((64, 4, 3))
-    for i in range(64):
-        gr[i] = 0.93 if (i % 16) < 10 else 0.22
-    t["grille"] = save_img("grille", rgba(gr))
-    # 冲孔不锈钢
-    yy, xx = np.mgrid[0:64, 0:64]
-    pf = np.full((64, 64, 3), 0.62)
-    pf[((xx - 32) ** 2 + (yy - 32) ** 2) < 18 ** 2] = 0.04
-    t["perf"] = save_img("perforated", rgba(pf))
-    # 照片裁剪
-    t["wood"] = crop_image(os.path.join(REFS, "17.jpg"), 0.05, 0.05, 0.95, 0.75, "wood_rubber", 1024)
-    t["beans"] = crop_image(os.path.join(ROOT, "吧台的左半部分（该图的左侧是门）.jpg"),
-                            0.487, 0.228, 0.933, 0.312, "lightbox_beans", 1024)
-    t["paint1"] = crop_image(os.path.join(REFS, "6.jpg"), 0.445, 0.022, 0.503, 0.092, "painting_1", 512)
-    t["paint2"] = crop_image(os.path.join(REFS, "6.jpg"), 0.585, 0.047, 0.645, 0.124, "painting_2", 512)
-    t["paint3"] = crop_image(os.path.join(REFS, "7.jpg"), 0.03, 0.29, 0.114, 0.355, "painting_3", 512)
-    t["paint4"] = crop_image(os.path.join(ROOT, "吧台的左半部分（该图的左侧是门）.jpg"),
+    for key, fn in (("granite", "granite"), ("grid", "ceiling_grid"), ("blind", "zebra_blind"),
+                    ("grille", "grille"), ("perf", "perforated"), ("wood", "wood_rubber"),
+                    ("beans", "lightbox_beans"), ("logo", "logo_white"),
+                    ("paint1", "painting_1"), ("paint2", "painting_2"), ("paint3", "painting_3")):
+        t[key] = bpy.data.images.load(os.path.join(TEX, fn + ".png"))
+    t["paint4"] = crop_image(os.path.join(PHOTOS, "吧台的左半部分（该图的左侧是门）.jpg"),
                              0.13, 0.46, 0.22, 0.56, "painting_4", 512)
-    lp = load_pixels(os.path.join(ROOT, "logo.png"))
-    a = lp[..., 3:4]
-    lp[..., :3] = lp[..., :3] * a + (1 - a)
-    lp[..., 3] = 1
-    t["logo"] = save_img("logo_white", lp)
-    menu = bpy.data.images.load(os.path.join(ROOT, "menu.jpg"))
-    t["menu"] = menu
+    t["menu"] = bpy.data.images.load(os.path.join(ROOT, "menu.jpg"))
     return t
 
 
@@ -638,8 +600,9 @@ def mushroom_chair(name, loc, rot, bar=False, info=None, coll="Furniture"):
         b.beam((sx * hw, -hd - 0.03, 0), (sx * (hw - 0.01), -hd, sh + 0.33), 0.04, M_WOOD)
     b.box((0.42, 0.40, 0.05), (0, 0, sh - 0.045), M_WOOD)
     b.box((0.42, 0.40, 0.045), (0, 0.0, sh), M_SEATBLUE if bar else M_FABRIC)
-    # 弧形靠背
-    b.arc(0.9, math.radians(76), math.radians(104), sh + 0.27, 0.15, 0.03, M_WOOD, n=6, center=(0, 0.7))
+    # 弧形靠背：取圆心 (0,0.7) 的下半圆（256°→284°），靠背落在座面后侧 y≈-0.2、两端略向前包
+    # （旧值 76°→104° 取成上半圆，靠背飘到 y≈1.6 —— 错位 bug）
+    b.arc(0.9, math.radians(256), math.radians(284), sh + 0.27, 0.15, 0.03, M_WOOD, n=6, center=(0, 0.7))
     # 横档
     zs = (0.25, 0.25) if bar else (0.14, 0.14)
     for sy in (-1, 1):
@@ -658,8 +621,8 @@ def armchair(name, loc, rot, info=None):
         b.beam((sx * 0.24, 0.24, 0), (sx * 0.23, 0.2, 0.3), 0.04, M_WOOD)
         b.beam((sx * 0.24, -0.22, 0), (sx * 0.23, -0.18, 0.3), 0.04, M_WOOD)
         b.beam((sx * 0.29, 0.12, 0.3), (sx * 0.30, 0.10, 0.64), 0.04, M_WOOD)
-    # 弧形靠背+扶手 (大半圈)
-    b.arc(0.30, math.radians(-15), math.radians(195), 0.66, 0.11, 0.035, M_WOOD, n=16, center=(0, 0.0))
+    # 弧形靠背+扶手 (大半圈) —— 靠背必须在背面(-Y)：165°→375° 绕过 -Y，开口朝正面 +Y
+    b.arc(0.30, math.radians(165), math.radians(375), 0.66, 0.11, 0.035, M_WOOD, n=16, center=(0, 0.0))
     for sx in (-1, 1):
         b.box((0.07, 0.18, 0.035), (sx * 0.29, 0.13, 0.64), M_WOOD)
     b.beam((0, -0.29, 0.32), (0, -0.30, 0.62), 0.07, M_WOOD, d=0.02)
@@ -912,12 +875,8 @@ b.box((bx1b - bx0b, 0.62, 0.86), ((bx0b + bx1b) / 2, BACK_Y, 0.43), M_STEEL)
 b.box((bx1b - bx0b, 0.64, 0.04), ((bx0b + bx1b) / 2, BACK_Y, 0.88), M_STEEL)
 for x in np.arange(bx0b + 0.4, bx1b, 0.8):
     b.box((0.02, 0.01, 0.7), (x, BACK_Y + 0.315, 0.45), M_BLACK)
-# 墙上层板 + 杯子
-for z in (1.55, 1.95):
-    b.box((2.2, 0.25, 0.03), (bx0b + 1.4, 0.23, z), M_WOOD)
-    for k in range(9):
-        b.cyl(0.04, 0.09, (bx0b + 0.5 + k * 0.22, 0.23, z + 0.06), M_CERAMIC if k % 3 else M_CERAMIC_B, seg=12)
 # 软木留言板 + 配电箱
+# （原墙上杯架层板已移除：杯子按实景归置到台面置物架中层，见 Counter_Shelf）
 b.box((0.9, 0.03, 0.6), (bx0b + 4.0, 0.12, 1.85), M_CORK)
 for k in range(10):
     b.box((0.09, 0.005, 0.07), (bx0b + 3.65 + (k % 5) * 0.16, 0.137, 1.7 + (k // 5) * 0.22), M_PAPER,
@@ -936,7 +895,8 @@ b.img_plane(lb_len - 2 * logo_w - 0.4, 0.56, MX(((bx0b + bx1b) / 2, 0.205, 2.85)
 b.finish(COLLS["Bar"], info=("素晴 灯箱", "吧台后的发光灯箱，左边是店名「素晴」书法 logo。"))
 
 # --- 咖啡机 VISACREM Ottima 2.0 (照片14) ---
-CM = (P(470, 0)[0], BACK_Y + 0.0, 0.9)
+# 位置东移 (px 470→616)：原位置左侧放不下水槽/材料台/热水机（实景顺序：热水机→材料台→水槽→磨豆→压粉→磨豆→咖啡机）
+CM = (P(630, 0)[0], BACK_Y + 0.0, 0.9)
 b = B("Coffee_Machine")
 b.box((0.78, 0.55, 0.13), (0, 0, 0.065), M_WHITEM)
 b.box((0.72, 0.30, 0.025), (0, 0.10, 0.145), M_STEEL)
@@ -1012,10 +972,70 @@ straw_hat(b, (0, 0, 0.34), 1.0, (0.05, -0.08))
 b.finish(COLLS["Bar"], (CM[0] - 0.9, BACK_Y, 0.9), 0,
          info=("自动压粉机", "和磨豆机一样戴着同款草帽，保证每一份粉饼都压得平整。"))
 grinder("Grinder_2", (CM[0] - 1.2, BACK_Y, 0.9), info=("第二台磨豆机", "同样戴着草帽，用来磨另一款豆子。"))
+
+# --- 水槽（磨豆机2号继续往右）---
+b = B("Sink")
+b.box((0.56, 0.44, 0.03), (0, 0, 0.015), M_STEEL)                       # 盆沿
+b.box((0.47, 0.35, 0.025), (0, 0.005, 0.012), M_DARKBOX)                # 盆体（暗色内凹感）
+b.cyl(0.015, 0.26, (0, -0.17, 0.13), M_CHROME, seg=12)                  # 龙头立管
+b.beam((0, -0.17, 0.25), (0, 0.04, 0.25), 0.014, M_CHROME)              # 龙头横臂
+b.finish(COLLS["Bar"], (CM[0] - 1.798, BACK_Y, 0.9), 0,
+         info=("水槽", "洗杯子、洗拉花缸。台下柜体用铁板封住。"))
+
+# --- 台面置物架（实景照片：顶层茶叶罐、中层杯子、底层罐装材料）---
+b = B("Counter_Shelf")
+SW, SD, SH = 0.78, 0.32, 0.85
+for sx in (-1, 1):
+    b.box((0.025, SD, SH), (sx * (SW / 2 - 0.013), 0, SH / 2), M_WHITEM)
+b.box((SW, SD, 0.025), (0, 0, SH - 0.013), M_WHITEM)                    # 顶板
+b.box((SW - 0.05, SD - 0.03, 0.02), (0, 0, 0.42), M_WHITEM)             # 中层板
+b.box((SW, 0.02, SH - 0.06), (0, -SD / 2 + 0.01, SH / 2), M_WHITEM)     # 背板
+for k in range(6):                                                      # 顶层：玻璃茶叶罐
+    x = -SW / 2 + 0.09 + k * 0.125
+    b.cyl(0.045, 0.11, (x, 0.02, SH + 0.055), M_CUPGLASS, seg=12)
+    b.cyl(0.038, 0.065, (x, 0.02, SH + 0.04), M_SOIL, seg=12)
+for k in range(5):                                                      # 中层：杯子
+    b.cyl(0.035, 0.08, (-SW / 2 + 0.1 + k * 0.15, 0.01, 0.475), M_CERAMIC if k % 2 else M_CERAMIC_B, seg=12)
+for k in range(3):                                                      # 底层：罐装材料
+    b.cyl(0.05, 0.13, (-SW / 2 + 0.12 + k * 0.24, 0.01, 0.075), M_CORK if k == 1 else M_CERAMIC, seg=12)
+b.finish(COLLS["Bar"], (CM[0] - 2.518, BACK_Y + 0.05, 0.9), 0,
+         info=("置物架", "顶层茶叶罐、中层杯子、底层罐装材料。台面上放可可粉、抹茶粉、巧克力酱。"))
+# 台面上的常温材料罐（可可粉/抹茶粉/巧克力酱）
+b = B("Counter_Canisters")
+for k, m in enumerate((M_CORK, M_LEAF[1], M_BLACK)):
+    b.cyl(0.045, 0.16, (k * 0.13 - 0.13, 0, 0.08), m, seg=14)
+    b.cyl(0.046, 0.02, (k * 0.13 - 0.13, 0, 0.165), M_CHROME, seg=14)
+b.finish(COLLS["Bar"], (CM[0] - 2.518, BACK_Y + 0.2, 0.9), 0,
+         info=("常温材料", "可可粉、抹茶粉、巧克力酱。"))
+
+# --- 热水机（台面最右端，黑色带蓝色屏显）---
+b = B("Water_Boiler")
+b.box((0.38, 0.42, 0.52), (0, 0, 0.26), M_BLACK)                        # 机身
+b.box((0.34, 0.06, 0.3), (0, 0.19, 0.15), M_STEEL)                      # 接水台
+b.img_plane(0.09, 0.05, MX((0, 0.215, 0.42), (0, 0, math.pi)), M_LCD)   # 蓝色屏显
+b.cyl(0.012, 0.1, (0, 0.2, 0.28), M_CHROME, seg=10)                     # 出水嘴
+b.box((0.36, 0.4, 0.03), (0, 0.01, 0.53), M_BLACK)                      # 顶盖
+b.finish(COLLS["Bar"], (CM[0] - 3.148, BACK_Y, 0.9), 0,
+         info=("热水机", "电热开水机，泡茶、冲热饮用它。"))
+
+# --- 台下设备（面向通道开门，略突出柜台面 2cm）---
+b = B("Fridge")
+b.box((0.58, 0.62, 0.84), (0, 0, 0.42), M_STEEL)
+b.box((0.52, 0.02, 0.76), (0, 0.32, 0.44), M_WHITEM)                    # 门板
+b.box((0.035, 0.04, 0.42), (0.20, 0.33, 0.45), M_CHROME)                # 竖拉手
+b.finish(COLLS["Bar"], (CM[0] - 3.281, BACK_Y + 0.01, 0), 0,
+         info=("台下冰箱", "纯牛奶、椰奶、咖啡奶都冰在这里。"))
+b = B("Ice_Maker")
+b.box((0.62, 0.62, 0.84), (0, 0, 0.42), M_STEEL)
+b.box((0.56, 0.02, 0.34), (0, 0.32, 0.62), M_WHITEM)                    # 上门板（取冰口）
+b.box((0.5, 0.02, 0.26), (0, 0.32, 0.18), M_GRILLE)                     # 下散热格栅
+b.finish(COLLS["Bar"], (CM[0], BACK_Y + 0.01, 0), 0,
+         info=("制冰机", "在咖啡机正下方，冰块随取随用。"))
+
 b = B("Back_Counter_Misc")
-b.cyl(0.08, 0.3, (CM[0] + 0.75, BACK_Y, 1.05), M_CERAMIC, seg=20)
-b.cyl(0.07, 0.12, (CM[0] + 1.55, BACK_Y + 0.1, 0.96), M_CUPGLASS, seg=16)
-b.box((0.4, 0.35, 0.35), (CM[0] + 2.3, BACK_Y, 1.075), M_DARKBOX)
+b.cyl(0.08, 0.3, (CM[0] + 1.0, BACK_Y, 1.05), M_CERAMIC, seg=20)
+b.cyl(0.07, 0.12, (CM[0] + 1.8, BACK_Y + 0.1, 0.96), M_CUPGLASS, seg=16)
+b.box((0.4, 0.35, 0.35), (CM[0] + 2.5, BACK_Y, 1.075), M_DARKBOX)
 b.finish(COLLS["Bar"])
 
 # --- 吧台上方铜色吊架 ---

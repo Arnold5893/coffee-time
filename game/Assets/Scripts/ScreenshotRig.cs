@@ -16,6 +16,12 @@ public class ScreenshotRig : MonoBehaviour
     public Vector3 camLookBar;
     public Vector3 camPosAll;
     public Vector3 camLookAll;
+    public Vector3 camPosEq;
+    public Vector3 camLookEq;
+    public Vector3 camPosStool;
+    public Vector3 camLookStool;
+    public Vector3 camPosChair;
+    public Vector3 camLookChair;
 
     IEnumerator Start()
     {
@@ -37,6 +43,9 @@ public class ScreenshotRig : MonoBehaviour
         for (int i = 0; i < 15; i++) yield return null;
 
         yield return Capture(cam, rt, camPosBar, camLookBar, "setup_screenshot_bar.png");
+        yield return Capture(cam, rt, camPosEq, camLookEq, "setup_screenshot_equipment.png");
+        yield return Capture(cam, rt, camPosStool, camLookStool, "setup_screenshot_stool.png");
+        yield return Capture(cam, rt, camPosChair, camLookChair, "setup_screenshot_armchair.png");
 
         // 全景前临时隐藏吊顶（完全位于 cutY 之上的渲染器），拍完恢复
         const float cutY = 2.7f;

@@ -181,6 +181,39 @@ public static class ProjectSetup
             // 全景机位：接近俯视（无吊顶楼板遮挡），看得到店内布局
             rig.camPosAll = bounds.center + new Vector3(0.5f, 11f, 4.5f);
             rig.camLookAll = bounds.center;
+            // 后吧台正视（顾客视角，对照"吧台和做咖啡的地方(近景).jpg"）；取咖啡机与最右端热水机的中点取景
+            var cmT = all.FirstOrDefault(t => t.name == "Coffee_Machine");
+            var wbT = all.FirstOrDefault(t => t.name == "Water_Boiler");
+            if (cmT != null)
+            {
+                var cmc = cmT.GetComponent<Renderer>().bounds.center;
+                float midX = wbT != null ? (cmc.x + wbT.GetComponent<Renderer>().bounds.center.x) / 2f : cmc.x - 1.5f;
+                rig.camPosEq = new Vector3(midX, 1.6f, cmc.z - 3.7f);
+                rig.camLookEq = new Vector3(midX, 0.95f, cmc.z + 0.1f);
+            }
+            // 吧台凳特写（从顾客侧后方看靠背）
+            var stoolT = all.FirstOrDefault(t => t.name == "Bar_Stool_1");
+            if (stoolT != null)
+            {
+                var sc = stoolT.GetComponent<Renderer>().bounds.center;
+                rig.camPosStool = sc + new Vector3(0.55f, 0.45f, -0.95f);
+                rig.camLookStool = sc + new Vector3(0f, 0.15f, 0f);
+            }
+            // 矮凳特写：站到"圆桌→椅子"连线的延长线上回看，修对时镜头正对靠背环
+            var chairT = all.FirstOrDefault(t => t.name.StartsWith("Round2_Chair"));
+            var tableT = all.FirstOrDefault(t => t.name == "Round_Table_2");
+            if (chairT != null && tableT != null)
+            {
+                var cc = chairT.GetComponent<Renderer>().bounds.center;
+                var tc = tableT.GetComponent<Renderer>().bounds.center;
+                var back = (cc - tc); back.y = 0; back = back.normalized;
+                rig.camPosChair = cc + back * 1.1f + new Vector3(0, 0.55f, 0);
+                rig.camLookChair = cc + new Vector3(0f, 0.05f, 0f);
+            }
+            // 未找到的对象用全景机位兜底，避免相机落在原点
+            if (rig.camPosEq == Vector3.zero) { rig.camPosEq = rig.camPosAll; rig.camLookEq = rig.camLookAll; }
+            if (rig.camPosStool == Vector3.zero) { rig.camPosStool = rig.camPosAll; rig.camLookStool = rig.camLookAll; }
+            if (rig.camPosChair == Vector3.zero) { rig.camPosChair = rig.camPosAll; rig.camLookChair = rig.camLookAll; }
 
             EditorSceneManager.SaveScene(scene, "Assets/Scenes/Main.unity");
             AssetDatabase.SaveAssets();
