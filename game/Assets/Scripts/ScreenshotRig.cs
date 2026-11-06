@@ -23,10 +23,18 @@ public class ScreenshotRig : MonoBehaviour
     public Vector3 camPosChair;
     public Vector3 camLookChair;
 
+    // 02 票：玩家与跟随镜头
+    public CoffeeShop.Player.PlayerMotor player;
+    public CoffeeShop.Cameras.ThirdPersonCameraRig followRig;
+    public CoffeeShop.Cameras.CameraOcclusionFader fader;
+    public Transform spawnPoint;
+
     IEnumerator Start()
     {
         var cam = Camera.main;
         cam.allowHDR = true;
+        // 静态机位截图期间关掉跟随镜头，免得 LateUpdate 把相机挪走
+        if (followRig != null) followRig.enabled = false;
         // HDR 缓冲：URP 只在 HDR 目标上跑后处理（ACES），LDR RT 会被整个跳过
         var rt = new RenderTexture(1280, 800, 24, RenderTextureFormat.ARGBHalf);
         cam.targetTexture = rt;
@@ -46,6 +54,41 @@ public class ScreenshotRig : MonoBehaviour
         yield return Capture(cam, rt, camPosEq, camLookEq, "setup_screenshot_equipment.png");
         yield return Capture(cam, rt, camPosStool, camLookStool, "setup_screenshot_stool.png");
         yield return Capture(cam, rt, camPosChair, camLookChair, "setup_screenshot_armchair.png");
+
+        // ---- 02 票验收：第三人称跟随镜头 + 遮挡淡化 ----
+        if (followRig != null && player != null)
+        {
+            // 跟随镜头构图：站回出生点，镜头按默认俯角跟住
+            player.Teleport(spawnPoint != null ? spawnPoint.position : player.transform.position,
+                            spawnPoint != null ? spawnPoint.rotation : player.transform.rotation);
+            followRig.enabled = true;
+            followRig.RestoreDefaultView();
+            for (int i = 0; i < 10; i++) yield return null;
+            yield return CaptureCurrent(cam, rt, "setup_screenshot_playerview.png");
+
+            // 遮挡淡化：角色放双面隔断书架一侧、镜头放另一侧，让书架正好挡在中间
+            Transform shelf = null;
+            foreach (var r in FindObjectsOfType<Renderer>())
+                if (r.name == "Divider_Bookshelf") { shelf = r.transform; break; }
+            if (shelf != null)
+            {
+                Bounds b = shelf.GetComponent<Renderer>().bounds;
+                Vector3 c = b.center;
+                bool thinX = b.extents.x < b.extents.z;
+                Vector3 thin = thinX ? Vector3.right : Vector3.forward;
+                float halfThick = thinX ? b.extents.x : b.extents.z;
+
+                followRig.enabled = false;                 // 手动机位，别让跟随覆盖
+                var pp = c - thin * (halfThick + 1.35f);
+                pp.y = 0.05f;
+                player.Teleport(pp, Quaternion.LookRotation(c - pp, Vector3.up));
+                cam.transform.position = c + thin * (halfThick + 1.10f) + Vector3.up * 1.55f;
+                cam.transform.LookAt(pp + Vector3.up * 1.10f);
+                for (int i = 0; i < 10; i++) yield return null;
+                yield return CaptureCurrent(cam, rt, "setup_screenshot_occlusion.png");
+                followRig.enabled = true;
+            }
+        }
 
         // 全景前临时隐藏吊顶（完全位于 cutY 之上的渲染器），拍完恢复
         const float cutY = 2.7f;
@@ -67,7 +110,17 @@ public class ScreenshotRig : MonoBehaviour
         cam.transform.position = pos;
         cam.transform.LookAt(look);
         for (int i = 0; i < 6; i++) yield return null;   // 渲染几帧后再读回
+        yield return Readback(rt, file);
+    }
 
+    /// <summary>不动相机，只把当前画面读回（供跟随镜头/遮挡淡化验收用）。</summary>
+    IEnumerator CaptureCurrent(Camera cam, RenderTexture rt, string file)
+    {
+        yield return Readback(rt, file);
+    }
+
+    IEnumerator Readback(RenderTexture rt, string file)
+    {
         var prev = RenderTexture.active;
         RenderTexture.active = rt;
         var tex = new Texture2D(rt.width, rt.height, TextureFormat.RGB24, false);
@@ -77,6 +130,7 @@ public class ScreenshotRig : MonoBehaviour
 
         File.WriteAllBytes(file, tex.EncodeToPNG());
         Debug.Log("screenshot saved: " + file);
+        yield return null;
     }
 
     // 看门狗：600 帧（约 10 秒渲染循环）内未完成也强制退出，避免批处理挂死
