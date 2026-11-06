@@ -644,44 +644,52 @@ def mushroom_chair(name, loc, rot, bar=False, info=None, coll="Furniture"):
     return b.finish(COLLS[coll], loc, rot, info)
 
 
-def armchair(name, loc, rot, info=None):
-    """曲木桶形矮凳 (photos/矮凳子.jpg)，正面 +Y
+def rrect_pts(w, d, r, n=3):
+    """圆角矩形轮廓点（逆时针一圈），给 prism 做坐板 / 坐垫"""
+    pts = []
+    for sx, sy in ((1, 1), (-1, 1), (-1, -1), (1, -1)):
+        ccx, ccy = sx * (w / 2 - r), sy * (d / 2 - r)
+        base = math.atan2(sy, sx) - math.pi / 4
+        for k in range(n + 1):
+            a = base + (math.pi / 2) * k / n
+            pts.append((ccx + r * math.cos(a), ccy + r * math.sin(a)))
+    return pts
 
-    照实拍重建的五件式结构：
-      ① 四条方形微收腿，下端外撇 2cm —— 旧版只有两条宽板"前腿"、背面悬空，是主要错处；
-      ② 座下一圈曲木裙板（收进座面内侧）+ 木质座底托；
-      ③ 上小下大的鼓形包布坐垫，顶面铺蓝白花布垫；
-      ④ 一条弯曲胶合板带：从右侧扶手绕过背面回到左侧扶手（开口朝 +Y），
-         顶边在靠背中点拱起 10cm、底边在靠背中点下探 7cm，板带在背面最深；
-      ⑤ 板带两端各接一块平板扶手，扶手前端坐到前腿顶端。
+
+def armchair(name, loc, rot, info=None):
+    """弧形靠背软包木椅（店内统一样式，见 photos/矮凳子.jpg），本地坐标正面朝 +Y
+
+    旧版是曲木桶形围板＋平板扶手，结构过度复杂且与实物不符。现按店里实际那把
+    简式靠背椅重建，只保证"是正常能坐的椅子"：
+      ① 四条方形腿，下端略外撇；后腿越过座面向上延伸成靠背立柱；
+      ② 座框：圆角座板 + 四周望板；
+      ③ 圆角布艺坐垫；
+      ④ 一块微弯的曲木靠背板，两端搭在后腿顶端，与坐面留 6cm 空隙；
+      ⑤ 四边横档加固。
     """
     b = B(name)
-    RB = 0.305                    # 靠背带中径
-    ZF = 0.34                     # 座底托顶面（坐垫从这里往上）
     SH = 0.45                     # 坐垫面高
-    PAD_Z = 0.585                 # 扶手板面高
-    # ① 四条方腿（下端外撇）
+    ZB = 0.78                     # 靠背板顶边
+    hw, hd = 0.20, 0.19           # 半宽 / 半深
+    # ① 四腿（下端外撇 1.2cm），后腿延伸为靠背立柱
     for sx in (-1, 1):
-        b.beam((sx * 0.245, 0.199, PAD_Z), (sx * 0.252, 0.216, 0.0), 0.045, M_WOOD)   # 前腿直通扶手
-        b.beam((sx * 0.234, -0.194, ZF), (sx * 0.252, -0.216, 0.0), 0.042, M_WOOD)    # 后腿
-    # ② 座下曲木裙板 + 座底托
-    b.band(0.282, 0.0, 2 * math.pi, 0.026, M_WOOD, 32,
-           lambda t: 0.355, lambda t: 0.245)
-    b.cyl(0.29, 0.04, (0, 0, ZF - 0.02), M_WOOD, seg=36)
-    # ③ 鼓形包布坐垫
-    b.cyl(0.275, 0.075, (0, 0, ZF + 0.0375), M_FABRIC, seg=36, r2=0.264)
-    b.cyl(0.265, 0.025, (0, 0, ZF + 0.085), M_FABRIC, seg=32, r2=0.252)
-    # ④ 弯曲胶合板靠背扶手带（开口朝 +Y，两端落到扶手高度）
-    b.band(RB, math.radians(158), math.radians(382), 0.03, M_WOOD, 18,
-           lambda t: 0.60 + 0.10 * max(0.0, -math.sin(t)),
-           lambda t: 0.455 - 0.07 * max(0.0, -math.sin(t)))
-    # ⑤ 平板扶手 + 横档
+        b.beam((sx * (hw + 0.012), hd + 0.008, 0.0), (sx * (hw - 0.008), hd - 0.008, SH - 0.05), 0.042, M_WOOD)
+        b.beam((sx * (hw + 0.012), -hd - 0.022, 0.0), (sx * (hw - 0.008), -hd, ZB), 0.042, M_WOOD)
+    # ② 座框（圆角座板 + 望板）
+    b.prism(rrect_pts(0.42, 0.40, 0.05), 0.03, M_WOOD, MX((0, 0, SH - 0.075)))
+    for sy in (-1, 1):
+        b.box((2 * hw, 0.022, 0.05), (0, sy * (hd - 0.004), SH - 0.115), M_WOOD)
     for sx in (-1, 1):
-        b.box((0.095, 0.235, 0.028), (sx * 0.258, 0.105, PAD_Z), M_WOOD)
-        b.box((0.026, 0.36, 0.026), (sx * 0.243, 0.0, 0.215), M_WOOD)   # 侧横档
-    b.box((0.43, 0.026, 0.026), (0, 0.207, 0.195), M_WOOD)              # 前横档
-    if random.random() < 0.75:
-        b.box((0.40, 0.37, 0.012), (0, 0.02, ZF + 0.105), M_CUSHION, (0, 0, random.uniform(-0.3, 0.3)))
+        b.box((0.022, 2 * hd - 0.012, 0.05), (sx * (hw - 0.004), 0, SH - 0.115), M_WOOD)
+    # ③ 布艺坐垫
+    b.prism(rrect_pts(0.40, 0.38, 0.05), 0.055, M_FABRIC, MX((0, 0, SH - 0.0275)))
+    # ④ 微弯靠背板（大半径近直圆弧，两端正好落在后腿外侧，中心在 y≈-0.205）
+    b.arc(0.9, math.radians(256), math.radians(284), ZB - 0.085, 0.17, 0.028, M_WOOD, n=12, center=(0, 0.695))
+    # ⑤ 横档
+    for sy in (-1, 1):
+        b.box((2 * hw - 0.02, 0.026, 0.026), (0, sy * hd, 0.16), M_WOOD)
+    for sx in (-1, 1):
+        b.box((0.026, 2 * hd - 0.02, 0.026), (sx * hw, 0, 0.16), M_WOOD)
     return b.finish(COLLS["Furniture"], loc, rot, info)
 
 
@@ -827,7 +835,7 @@ for k, py in enumerate((866, 811, 756)):
         armchair("Meeting_Chair_%d_%d" % (k, sx), (*sp, 0), face_to(sp, (c[0], sp[1])))
 # --- 圆桌 1 ---（前柜北移后，这一组原位置会压进吧台；南凳留 0.3m 到吧凳）
 c = P(366, 988)
-round_table("Round_Table_1", (*c, 0), info=("圆桌 1", "三脚原木小圆桌，配弧形扶手椅。"))
+round_table("Round_Table_1", (*c, 0), info=("圆桌 1", "三脚原木小圆桌，配弧形靠背软包小椅。"))
 for k in range(4):
     a = math.pi / 4 + k * math.pi / 2
     sp = (c[0] + 0.63 * math.cos(a), c[1] + 0.63 * math.sin(a))
@@ -842,7 +850,7 @@ for no, (px, py) in ((2, (588, 662)), (3, (588, 899))):
 # --- 圆桌 2/3/4 ---（较平面图西移 0.4m：让出阳光区斜窗吧凳；台距沿用平面图 1.56m）
 for no, py in ((2, 670), (3, 792), (4, 915)):
     c = P(793, py)
-    round_table("Round_Table_%d" % no, (*c, 0), info=("圆桌 %d" % no, "三脚原木小圆桌，配弧形扶手椅。"))
+    round_table("Round_Table_%d" % no, (*c, 0), info=("圆桌 %d" % no, "三脚原木小圆桌，配弧形靠背软包小椅。"))
     seats = [(-0.63, 0), (0.63, 0)]
     if no == 2:
         seats.append((0, 0.63))
@@ -923,14 +931,7 @@ for k, px in enumerate((518, 615, 711)):
     mushroom_chair("Bar_Stool_%d" % (k + 1), (*p, 0), math.pi, bar=True, coll="Bar",
                    info=("吧台 %d 号座" % (k + 1), "坐在这里可以看咖啡师做咖啡。"))
 
-# --- 打印机（吧台下面，顾客侧开放层板上，免费打印）---
-b = B("Printer")
-b.box((0.40, 0.32, 0.26), (0, 0, 0.13), M_BLACK)                        # 机身
-b.box((0.30, 0.02, 0.10), (0, 0.165, 0.16), M_PAPER)                    # 出纸口白色面板
-b.box((0.34, 0.24, 0.02), (0, 0.02, 0.27), M_DARKBOX)                   # 顶部扫描盖板
-b.cyl(0.045, 0.10, (0.26, 0.02, 0.05), M_BLACK, seg=12)                 # 旁边的笔筒
-b.finish(COLLS["Bar"], (P(716, 0)[0], BAR_C[1] + 0.10, 0.52), 0,
-         info=("打印机", "店里提供免费打印，扫码就能打。"))
+# --- 原「打印机」已移除：店里实际没有这台黑色设备，不再虚构摆放 ---
 
 # --- 后操作台 (靠后墙) ---
 BACK_Y = 0.1 + 0.33
@@ -1285,11 +1286,12 @@ def plant(name, loc, kind, seed):
 # 圆桌之间原摆了三盆天堂鸟：台间距只有 0.4m，盆径 0.5m 且叶片展开 0.7m，
 # 必然压进两侧矮凳（截图 3 的错处）。本轮把这三盆移走，只在吧台东端留一盆。
 # 另：多人桌 1 北上后原位置被沙发占住，第 1 盆改到书墙前（x0.85, y4.5）。
-# 圆桌之间（台距 1.56m 留出 0.86m 缝）恢复平面图上的桌间绿植，用紧凑的龟背竹，
+# 圆桌之间（台距 1.56m 留出 0.86m 缝）摆平面图上的桌间绿植，用紧凑的小盆栽，
 # 叶片不越过凳背；书墙前一盆发财树，靠墙不占过道。
+# 2026-11-06：原 (608,500) 的天堂鸟就在斜窗长桌吧凳边上、挡着 D2/D3 座位，实景没有，已删掉。
+# 同时把斜窗那棵发财树往墙根挪 0.45m（py 325→292）：原位置压进 Sun_Stool_D1 0.36m。
 PLANTS = [((224, 976), "tree"), ((793, 854), "small"), ((793, 731), "small"),
-          ((595, 325), "tree"), ((497, 440), "monstera"), ((608, 500), "bird"),
-          ((1028, 1075), "monstera")]
+          ((595, 292), "tree"), ((497, 440), "monstera"), ((1028, 1075), "monstera")]
 for i, ((px, py), kind) in enumerate(PLANTS):
     plant("Plant_%d" % i, (*P(px, py), 0), kind, i * 13 + 1)
 

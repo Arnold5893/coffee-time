@@ -20,3 +20,6 @@ desktop.ini
 
 # Unity 验证工程（体量大，只保留报告与截图）
 .scratch/asset-route/import-test/UnityImportTest/
+
+# 本地 agent 状态（记忆 / 身份文件，不随仓库分发）
+.workbuddy/
