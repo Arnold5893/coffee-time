@@ -1,0 +1,45 @@
+registry: seats=33 missing=0 errors=0 bar=3 meeting=6 round=12 sun=12
+  ok   配置无错误
+  ok   所有 anchor 都在场景里找到
+  ok   座位总数 33 >= 20
+  ok   吧台凳 3 个
+  ok   圆桌座位 12 个
+  ok   会议桌座位 6 个
+  ok   阳光区座位 12 个
+    cramped sun-5: 原地起立，理想站位被挡住: Round2_Chair_2
+    cramped sun-6: 原地起立，理想站位被挡住: Round2_Chair_2 | Round_Table_2 | Round2_Chair_1
+geometry: badFacing=0 badSurface=0 badStand=0 badSeat=0 cramped=2
+  ok   所有座位朝向都是水平单位向量
+  ok   所有桌面点位高度合理
+  ok   所有站位都在座位后方 0.70m 以内
+  ok   原地起立的夹缝座 2 个（上限 3，背后就是家具）
+  ok   所有座面高度合理
+  ok   找到 bar-2
+near seat: bar-2(bar) seat=(-5.93,-3.28) face=((0.00, 0.00, 1.00)) surface=(-5.81,1.05,-2.92)  player=(-5.93, 0.03, -3.85)
+  ok   站位 0.5m 内识别到这张空座
+  ok   坐下前是空的
+  ok   离 3m 远时不提示
+sit: seated=True blend=1.00 occupant=player motorEnabled=False ctl=False
+  ok   按下交互后进入坐姿
+  ok   坐下过渡走完
+  ok   座位被标记为占用
+  ok   占用者是玩家
+  ok   坐下期间角色控制器关闭（不会被重力拖走）
+  ok   人落在座位点上（偏差 0.00m）
+reuse: npc=False playerTrySit=False rejected=0
+  ok   别的角色抢不到已占用的座位
+  ok   玩家不能在同一张座位上再坐一次
+  ok   重复占用请求不影响当前坐姿
+stand: seated=False free=True ctl=True pos=(-5.93, 0.03, -3.85)
+  ok   起身后退出坐姿
+  ok   起身后座位被释放
+  ok   角色控制器恢复
+  ok   人回到座位后方的站位（偏差 0.00m）
+  ok   释放后的座位可以再次占用
+  ok   二次起身后座位再次释放
+round seat: round1-1 sat=True blend=1.00
+  ok   圆桌椅子也能坐下（座面高度与吧台凳不同）
+  ok   圆桌椅子起身后释放
+counts: sit=3 stand=3 rejected=0
+failures=0
+SEAT RESULT: PASS

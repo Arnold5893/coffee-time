@@ -122,6 +122,41 @@ public class ScreenshotRig : MonoBehaviour
             }
         }
 
+        // ---- 04 票验收：靠近空座出提示 / 坐进吧台凳 ----
+        var seatMgr = Object.FindFirstObjectByType<CoffeeShop.Seating.SeatingManager>();
+        var seatAct = Object.FindFirstObjectByType<CoffeeShop.Seating.SeatInteraction>();
+        if (seatMgr != null && seatAct != null && player != null && followRig != null)
+        {
+            var seat = seatMgr.Find("bar-2") ?? (seatMgr.Seats.Count > 0 ? seatMgr.Seats[0] : null);
+            if (seat != null)
+            {
+                player.Teleport(seat.StandPoint, seat.Facing);
+                // 座位特写用固定机位：跟随镜头站在人身后，在吧台凳这种狭窄位置会被挤到贴脸
+                if (followRig != null) followRig.enabled = false;
+                Vector3 seatFwd = seat.Facing * Vector3.forward;
+                Vector3 seatLat = Vector3.Cross(Vector3.up, seatFwd).normalized;
+                // 机位在座位斜后方：同时看得到人、凳子、以及前方的吧台
+                cam.transform.position = seat.SeatPoint - seatFwd * 1.15f + seatLat * 1.85f + Vector3.up * 1.55f;
+                cam.transform.LookAt(seat.SeatPoint + Vector3.up * 0.85f);
+                for (int i = 0; i < 12; i++) yield return null;
+                yield return CaptureCurrent(cam, rt, "setup_screenshot_seat_prompt.png");
+
+                if (seatAct.TrySit(seat))
+                {
+                    for (int i = 0; i < 45; i++) yield return null;   // 0.5s 坐下过渡
+                    Debug.Log($"[rig] seated={seat.Id} blend={seatAct.Blend:F2} occupied={!seat.IsFree}");
+                    yield return CaptureCurrent(cam, rt, "setup_screenshot_seated.png");
+                    seatAct.TryStand();
+                    for (int i = 0; i < 30; i++) yield return null;
+                    Debug.Log($"[rig] stood up, occupied={!seat.IsFree} blend={seatAct.Blend:F2}");
+                }
+                else
+                {
+                    Debug.LogWarning($"[rig] trySit 失败: {seat.Id}");
+                }
+            }
+        }
+
         // ---- 门口落脚区：阳光区长桌在 12 号凳后收头，门前留出空地 ----
         if (followRig != null) followRig.enabled = false;
         yield return Capture(cam, rt, camPosEntry, camLookEntry, "setup_screenshot_entry_corner.png");

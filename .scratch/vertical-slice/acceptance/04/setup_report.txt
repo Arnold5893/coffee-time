@@ -1,0 +1,125 @@
+URP pipeline asset created & assigned (renderer persisted as sub-asset)
+textures extracted & materials remapped
+renderer material slots converted to URP: 0
+shaders in scene: Universal Render Pipeline/Lit
+mat machine_white: emission=False emColor=RGBA(0.00, 0.00, 0.00, 0.00) baseMap=null
+mat radiator_grille: emission=False emColor=RGBA(0.00, 0.00, 0.00, 0.00) baseMap=grille
+mat stainless: emission=False emColor=RGBA(0.00, 0.00, 0.00, 0.00) baseMap=null
+mat black_plastic: emission=False emColor=RGBA(0.00, 0.00, 0.00, 0.00) baseMap=null
+mat cork: emission=False emColor=RGBA(0.00, 0.00, 0.00, 0.00) baseMap=null
+mat paper: emission=False emColor=RGBA(0.00, 0.00, 0.00, 0.00) baseMap=null
+mat electric_box: emission=False emColor=RGBA(0.00, 0.00, 0.00, 0.00) baseMap=null
+mat ceramic_white: emission=False emColor=RGBA(0.00, 0.00, 0.00, 0.00) baseMap=null
+mat cup_glass: emission=False emColor=RGBA(0.00, 0.00, 0.00, 0.00) baseMap=null
+mat dark_box: emission=False emColor=RGBA(0.00, 0.00, 0.00, 0.00) baseMap=null
+mat white_ceiling: emission=False emColor=RGBA(0.00, 0.00, 0.00, 0.00) baseMap=null
+mat wood_panel: emission=False emColor=RGBA(0.00, 0.00, 0.00, 0.00) baseMap=wood_rubber
+mat downlight: emission=True emColor=RGBA(30.00, 25.80, 20.40, 30.00) baseMap=null
+mat wood: emission=False emColor=RGBA(0.00, 0.00, 0.00, 0.00) baseMap=wood_rubber
+mat trunk: emission=False emColor=RGBA(0.00, 0.00, 0.00, 0.00) baseMap=null
+mat book_3: emission=False emColor=RGBA(0.00, 0.00, 0.00, 0.00) baseMap=null
+mat book_9: emission=False emColor=RGBA(0.00, 0.00, 0.00, 0.00) baseMap=null
+mat book_8: emission=False emColor=RGBA(0.00, 0.00, 0.00, 0.00) baseMap=null
+mat book_2: emission=False emColor=RGBA(0.00, 0.00, 0.00, 0.00) baseMap=null
+mat book_5: emission=False emColor=RGBA(0.00, 0.00, 0.00, 0.00) baseMap=null
+mat menu: emission=False emColor=RGBA(0.00, 0.00, 0.00, 0.00) baseMap=menu
+mat white_paint: emission=False emColor=RGBA(0.00, 0.00, 0.00, 0.00) baseMap=null
+mat lightbox_logo: emission=True emColor=RGBA(1.00, 1.00, 1.00, 1.00) baseMap=logo_white
+mat lightbox_beans: emission=True emColor=RGBA(1.00, 1.00, 1.00, 1.00) baseMap=lightbox_beans
+mat brass: emission=False emColor=RGBA(0.00, 0.00, 0.00, 0.00) baseMap=null
+mat leather_bluegray: emission=False emColor=RGBA(0.00, 0.00, 0.00, 0.00) baseMap=null
+mat book_1: emission=False emColor=RGBA(0.00, 0.00, 0.00, 0.00) baseMap=null
+mat book_0: emission=False emColor=RGBA(0.00, 0.00, 0.00, 0.00) baseMap=null
+mat book_6: emission=False emColor=RGBA(0.00, 0.00, 0.00, 0.00) baseMap=null
+mat book_4: emission=False emColor=RGBA(0.00, 0.00, 0.00, 0.00) baseMap=null
+mat book_7: emission=False emColor=RGBA(0.00, 0.00, 0.00, 0.00) baseMap=null
+mat ceramic_blue: emission=False emColor=RGBA(0.00, 0.00, 0.00, 0.00) baseMap=null
+mat ceiling_grid: emission=False emColor=RGBA(0.00, 0.00, 0.00, 0.00) baseMap=ceiling_grid
+mat perforated_steel: emission=False emColor=RGBA(0.00, 0.00, 0.00, 0.00) baseMap=perforated
+mat machine_backlight: emission=True emColor=RGBA(2.40, 2.70, 3.00, 3.00) baseMap=null
+mat chrome: emission=False emColor=RGBA(0.00, 0.00, 0.00, 0.00) baseMap=null
+mat leaf_b: emission=False emColor=RGBA(0.00, 0.00, 0.00, 0.00) baseMap=null
+mat soil: emission=False emColor=RGBA(0.00, 0.00, 0.00, 0.00) baseMap=null
+mat door_wood: emission=False emColor=RGBA(0.00, 0.00, 0.00, 0.00) baseMap=null
+mat exit_sign: emission=True emColor=RGBA(0.30, 2.70, 0.90, 3.00) baseMap=null
+mat frosted_glass: emission=False emColor=RGBA(0.00, 0.00, 0.00, 0.00) baseMap=null
+mat door_glass: emission=False emColor=RGBA(0.00, 0.00, 0.00, 0.00) baseMap=null
+mat aluminium: emission=False emColor=RGBA(0.00, 0.00, 0.00, 0.00) baseMap=null
+mat granite_floor: emission=False emColor=RGBA(0.00, 0.00, 0.00, 0.00) baseMap=granite
+mat lcd_blue: emission=True emColor=RGBA(0.90, 2.70, 6.00, 6.00) baseMap=null
+mat straw: emission=False emColor=RGBA(0.00, 0.00, 0.00, 0.00) baseMap=null
+mat hat_ribbon: emission=False emColor=RGBA(0.00, 0.00, 0.00, 0.00) baseMap=null
+mat fabric_gray: emission=False emColor=RGBA(0.00, 0.00, 0.00, 0.00) baseMap=null
+mat cushion_denim: emission=False emColor=RGBA(0.00, 0.00, 0.00, 0.00) baseMap=null
+mat painting_1: emission=False emColor=RGBA(0.00, 0.00, 0.00, 0.00) baseMap=painting_1
+mat painting_2: emission=False emColor=RGBA(0.00, 0.00, 0.00, 0.00) baseMap=painting_2
+mat painting_3: emission=False emColor=RGBA(0.00, 0.00, 0.00, 0.00) baseMap=painting_3
+mat bulb: emission=True emColor=RGBA(25.00, 18.00, 10.50, 25.00) baseMap=null
+mat stem: emission=False emColor=RGBA(0.00, 0.00, 0.00, 0.00) baseMap=null
+mat pot_gray: emission=False emColor=RGBA(0.00, 0.00, 0.00, 0.00) baseMap=null
+mat leaf_a: emission=False emColor=RGBA(0.00, 0.00, 0.00, 0.00) baseMap=null
+mat leaf_c: emission=False emColor=RGBA(0.00, 0.00, 0.00, 0.00) baseMap=null
+mat pot_white: emission=False emColor=RGBA(0.00, 0.00, 0.00, 0.00) baseMap=null
+mat porch_paving: emission=False emColor=RGBA(0.00, 0.00, 0.00, 0.00) baseMap=null
+mat window_glass: emission=False emColor=RGBA(0.00, 0.00, 0.00, 0.00) baseMap=null
+mat zebra_blind: emission=False emColor=RGBA(0.00, 0.00, 0.00, 0.00) baseMap=zebra_blind
+mat socket: emission=False emColor=RGBA(0.00, 0.00, 0.00, 0.00) baseMap=null
+emissive materials: 7/62
+ambient: mode=Skybox intensity=1.00 skybox=Default-Skybox
+gaps: z+=-2.91 z-=1.20 x+=-6.96 x-=-8.06
+aisle axis=(0.00, 0.00, -1.00) current=1.20m shift=0.00m
+front group moved (5/5 objects)
+aisle_width_m=1.20 (target>=1.20)
+  big-xz Bar_Ceiling size=(8.29,1.34,2.97)
+  big-xz Brass_Frame_Diag size=(3.52,1.22,3.47)
+  big-xz Ceiling_Grid size=(11.54,0.00,15.75)
+  big-xz Ceiling_Soffits size=(8.63,0.56,13.31)
+  big-xz Floor size=(11.54,0.00,15.75)
+  big-xz Plant_3 size=(1.87,1.36,1.74)
+  big-xz Porch size=(1.85,0.15,3.00)
+  big-xz Wall_9 size=(1.69,4.50,1.52)
+  big-xz Wall_Window_2 size=(4.49,4.50,4.43)
+box colliders baked: 102
+volume profile assigned: True guid=5dbee4add3425934cab54bda7fc65c14
+ambientIntensity set to 0.25 (interior baseline)
+door normal=(0.00, 0.00, -1.00) width=1.50m
+interior anchor at r=0.6m ang=90deg
+player spawn=(-10.75, -0.46) facing=(0.00, -1.00)
+entrance door: center=(-10.75, -2.21) halfWidth=0.75 clickTargets=3
+porch boundary guards=3 layer=8 extentN=1.50 extentL=0.92
+seating: seats=33 missing=0 errors=0 bar=3 meeting=6 round=12 sun=12
+  seat bar-1(bar) seat=(-4.69,-3.28) face=((0.00, 0.00, 1.00)) surface=(-4.79,1.05,-2.89)
+  seat bar-2(bar) seat=(-5.93,-3.28) face=((0.00, 0.00, 1.00)) surface=(-5.81,1.05,-2.92)
+  seat bar-3(bar) seat=(-7.16,-3.28) face=((0.00, 0.00, 1.00)) surface=(-7.01,1.05,-2.97)
+  seat sun-1(sun) seat=(-5.67,-12.73) face=((-0.71, 0.00, -0.71)) surface=(-5.96,1.04,-13.01)
+  seat sun-2(sun) seat=(-6.33,-12.08) face=((-0.71, 0.00, -0.71)) surface=(-6.62,1.04,-12.36)
+  seat sun-3(sun) seat=(-6.99,-11.43) face=((-0.71, 0.00, -0.71)) surface=(-7.27,1.04,-11.71)
+  seat sun-4(sun) seat=(-7.65,-10.78) face=((-0.71, 0.00, -0.71)) surface=(-7.93,1.04,-11.07)
+  seat sun-5(sun) seat=(-8.31,-10.13) face=((-0.71, 0.00, -0.71)) surface=(-8.59,1.04,-10.42)
+  seat sun-6(sun) seat=(-8.97,-9.49) face=((-0.71, 0.00, -0.71)) surface=(-9.25,1.04,-9.77)
+  seat sun-7(sun) seat=(-10.57,-8.64) face=((-1.00, 0.00, 0.00)) surface=(-11.10,1.04,-8.64)
+  seat sun-8(sun) seat=(-10.57,-7.90) face=((-1.00, 0.00, 0.00)) surface=(-11.10,1.04,-7.90)
+  seat sun-9(sun) seat=(-10.57,-7.14) face=((-1.00, 0.00, 0.00)) surface=(-11.10,1.04,-7.14)
+  seat sun-10(sun) seat=(-10.57,-6.40) face=((-1.00, 0.00, 0.00)) surface=(-11.10,1.04,-6.40)
+  seat sun-11(sun) seat=(-10.57,-5.65) face=((-1.00, 0.00, 0.00)) surface=(-11.10,1.04,-5.65)
+  seat sun-12(sun) seat=(-10.57,-4.91) face=((-1.00, 0.00, 0.00)) surface=(-11.10,1.04,-4.91)
+  seat round1-1(round) seat=(-3.19,-5.18) face=((0.71, 0.00, 0.71)) surface=(-3.00,0.77,-4.99)
+  seat round1-2(round) seat=(-2.32,-5.18) face=((-0.71, 0.00, 0.71)) surface=(-2.51,0.77,-4.99)
+  seat round1-3(round) seat=(-2.32,-4.31) face=((-0.71, 0.00, -0.71)) surface=(-2.51,0.77,-4.50)
+  seat round1-4(round) seat=(-3.19,-4.31) face=((0.71, 0.00, -0.71)) surface=(-3.00,0.77,-4.50)
+  seat round2-1(round) seat=(-7.58,-8.80) face=((-1.00, 0.00, 0.00)) surface=(-8.00,0.77,-8.80)
+  seat round2-2(round) seat=(-8.82,-8.80) face=((1.00, 0.00, 0.00)) surface=(-8.40,0.77,-8.80)
+  seat round2-3(round) seat=(-8.20,-9.42) face=((0.00, 0.00, 1.00)) surface=(-8.20,0.77,-9.00)
+  seat round3-1(round) seat=(-7.58,-7.24) face=((-1.00, 0.00, 0.00)) surface=(-8.00,0.77,-7.24)
+  seat round3-2(round) seat=(-8.82,-7.24) face=((1.00, 0.00, 0.00)) surface=(-8.40,0.77,-7.24)
+  seat round4-1(round) seat=(-7.58,-5.68) face=((-1.00, 0.00, 0.00)) surface=(-8.00,0.77,-5.68)
+  seat round4-2(round) seat=(-8.82,-5.68) face=((1.00, 0.00, 0.00)) surface=(-8.40,0.77,-5.68)
+  seat round4-3(round) seat=(-8.20,-5.06) face=((0.00, 0.00, -1.00)) surface=(-8.20,0.77,-5.48)
+  seat meeting-1(meeting) seat=(-1.76,-6.30) face=((-1.00, 0.00, 0.00)) surface=(-2.36,0.86,-6.43)
+  seat meeting-2(meeting) seat=(-3.75,-6.30) face=((1.00, 0.00, 0.00)) surface=(-3.15,0.86,-6.43)
+  seat meeting-3(meeting) seat=(-1.76,-7.00) face=((-1.00, 0.00, 0.00)) surface=(-2.43,0.86,-7.00)
+  seat meeting-4(meeting) seat=(-3.75,-7.00) face=((1.00, 0.00, 0.00)) surface=(-3.08,0.86,-7.00)
+  seat meeting-5(meeting) seat=(-1.76,-7.70) face=((-1.00, 0.00, 0.00)) surface=(-2.36,0.86,-7.58)
+  seat meeting-6(meeting) seat=(-3.75,-7.70) face=((1.00, 0.00, 0.00)) surface=(-3.15,0.86,-7.58)
+seat interact: reach=1.30m nearestFree=yes
+scene saved: Assets/Scenes/Main.unity (screenshots via PlayCapture)

@@ -137,6 +137,38 @@ public static class PlayTest
         EditorApplication.EnterPlaymode();
     }
 
+    /// <summary>
+    /// 04 票自动化验收入口：座位解析 + 坐下/起身流程。
+    /// 用法：Unity.exe -batchmode -executeMethod PlayTest.RunSeat（不要加 -quit）
+    /// </summary>
+    public static void RunSeat()
+    {
+        EditorSceneManager.OpenScene("Assets/Scenes/Main.unity");
+
+        foreach (var rig in Object.FindObjectsByType<ScreenshotRig>(FindObjectsSortMode.None))
+            rig.enabled = false;
+
+        var motor = Object.FindFirstObjectByType<CoffeeShop.Player.PlayerMotor>();
+        var router = Object.FindFirstObjectByType<CoffeeShop.Controls.PlayerInputRouter>();
+        var seating = Object.FindFirstObjectByType<CoffeeShop.Seating.SeatingManager>();
+        var seatAct = Object.FindFirstObjectByType<CoffeeShop.Seating.SeatInteraction>();
+        if (motor == null || router == null || seating == null || seatAct == null)
+        {
+            Debug.LogError($"[SEAT] missing refs motor={motor} router={router} seating={seating} interact={seatAct}");
+            EditorApplication.Exit(2);
+            return;
+        }
+
+        var test = new GameObject("SeatFlowTest").AddComponent<CoffeeShop.Testing.SeatFlowTest>();
+        test.player = motor;
+        test.router = router;
+        test.seating = seating;
+        test.seatAct = seatAct;
+
+        Debug.Log($"[SEAT] {seating.Describe()}");
+        EditorApplication.EnterPlaymode();
+    }
+
     static Renderer FindRenderer(GameObject root, string name)
     {
         if (root == null) return null;

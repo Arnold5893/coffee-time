@@ -141,6 +141,15 @@ public static class ProjectSetup
             // 左上那扇常闭门（Door_locked）反过来 —— 它就是整体一件，必须烘，才能把门洞堵住。
             var skipExact = new[] { "Door_entrance" };
             int colliderCount = 0;
+
+            // 诊断：横向两个轴都"大"的对象，用来确认斜墙的实际包围盒尺寸
+            foreach (var r in shop.GetComponentsInChildren<Renderer>(true))
+            {
+                var s = r.bounds.size;
+                if (s.x > 1.5f && s.z > 1.5f)
+                    report.AppendLine($"  big-xz {r.name} size=({s.x:F2},{s.y:F2},{s.z:F2})");
+            }
+
             foreach (var mf in shop.GetComponentsInChildren<MeshFilter>(true))
             {
                 var mesh = mf.sharedMesh;
@@ -157,6 +166,16 @@ public static class ProjectSetup
                 float bottomWorld = rend != null ? rend.bounds.min.y : mf.transform.TransformPoint(lb.center).y - lb.extents.y * Mathf.Abs(ls.y);
                 if (bottomWorld > 2.2f) continue;                                  // 头顶以上
                 if (lb.size.x * Mathf.Abs(ls.x) < 0.10f && lb.size.z * Mathf.Abs(ls.z) < 0.10f) continue;  // 细杆
+
+                // 斜置的整面墙（东北角斜窗那段）按轴对齐包围盒烘，盒子会从一个墙角铺到另一个墙角，
+                // 把阳光区一半的通道封死——实测 6 个窗边座位连起身站位都找不到。
+                // 这类"又长又宽又立着"的网格改用沿主轴旋转的 OBB。
+                if (rend != null && NeedsOrientedBox(rend.bounds))
+                {
+                    BakeOrientedBox(go, mf, mesh, shop.transform);
+                    colliderCount++;
+                    continue;
+                }
 
                 var bc = go.AddComponent<BoxCollider>();
                 bc.center = lb.center;
@@ -329,10 +348,10 @@ public static class ProjectSetup
             var visual = new GameObject("Visual").transform;
             visual.SetParent(playerGO.transform, false);
 
-            GameObject Prim(PrimitiveType type, Vector3 localPos, Vector3 scale, Material mat)
+            GameObject Prim(PrimitiveType type, Vector3 localPos, Vector3 scale, Material mat, string name)
             {
                 var g = GameObject.CreatePrimitive(type);
-                g.name = "PlayerVisual_" + type;
+                g.name = name;
                 g.transform.SetParent(visual, false);
                 g.transform.localPosition = localPos;
                 g.transform.localScale = scale;
@@ -341,10 +360,10 @@ public static class ProjectSetup
                 g.GetComponent<Renderer>().sharedMaterial = mat;
                 return g;
             }
-            Prim(PrimitiveType.Capsule, new Vector3(0f, 0.42f, 0f), new Vector3(0.34f, 0.42f, 0.34f), matBody);  // 腿
-            Prim(PrimitiveType.Capsule, new Vector3(0f, 1.04f, 0f), new Vector3(0.44f, 0.40f, 0.38f), matBody);  // 身
-            Prim(PrimitiveType.Sphere, new Vector3(0f, 1.50f, 0f), new Vector3(0.26f, 0.28f, 0.26f), matSkin);   // 头
-            Prim(PrimitiveType.Cube, new Vector3(0f, 1.12f, 0.185f), new Vector3(0.13f, 0.15f, 0.03f), matSkin); // 朝向标
+            Prim(PrimitiveType.Capsule, new Vector3(0f, 0.42f, 0f), new Vector3(0.34f, 0.42f, 0.34f), matBody, "PlayerVisual_Legs");   // 腿（坐下时收起来）
+            Prim(PrimitiveType.Capsule, new Vector3(0f, 1.04f, 0f), new Vector3(0.44f, 0.40f, 0.38f), matBody, "PlayerVisual_Body");   // 身
+            Prim(PrimitiveType.Sphere, new Vector3(0f, 1.50f, 0f), new Vector3(0.26f, 0.28f, 0.26f), matSkin, "PlayerVisual_Head");    // 头
+            Prim(PrimitiveType.Cube, new Vector3(0f, 1.12f, 0.185f), new Vector3(0.13f, 0.15f, 0.03f), matSkin, "PlayerVisual_Facing"); // 朝向标
 
             var charCtl = playerGO.AddComponent<CharacterController>();
             charCtl.height = 1.66f;
@@ -450,6 +469,27 @@ public static class ProjectSetup
                 }
             }
 
+            // 7.6 座位系统（04 票）：配置驱动，场景里逐把椅子解析出坐下点/朝向/桌面点。
+            //     配置只写"绑哪个对象、朝哪边"，坐标全部现算，家具挪位后不用改 JSON。
+            const string seatCfg = "Assets/Resources/Config/seats.json";
+            if (File.Exists(seatCfg)) AssetDatabase.ImportAsset(seatCfg, ImportAssetOptions.ForceUpdate);
+
+            var seatGO = new GameObject("Seating");
+            var seating = seatGO.AddComponent<CoffeeShop.Seating.SeatingManager>();
+            seating.shopRoot = shop.transform;
+            seating.Build();                       // 编辑期先解析一次，好把结果写进报告
+            report.AppendLine("seating: " + seating.Describe());
+            foreach (var s in seating.Seats)
+                report.AppendLine("  seat " + s);
+            if (seating.Missing.Count > 0)
+                report.AppendLine("seating missing anchors: " + string.Join(", ", seating.Missing));
+            foreach (var err in seating.Errors) report.AppendLine("seating config error: " + err);
+
+            var seatInteract = playerGO.AddComponent<CoffeeShop.Seating.SeatInteraction>();
+            seatInteract.Bind(seating, motor, router, visual);
+            report.AppendLine($"seat interact: reach={seatInteract.reachRadius:F2}m " +
+                              $"nearestFree={(seating.NearestFree(spawn, 99f) != null ? "yes" : "no")}");
+
             var audioListener = camGO.GetComponent<AudioListener>();
             if (audioListener == null) camGO.AddComponent<AudioListener>();
 
@@ -518,6 +558,74 @@ public static class ProjectSetup
             File.WriteAllText("setup_report.txt", "EXCEPTION: " + e + "\n\n" + report);
             EditorApplication.Exit(2);
         }
+    }
+
+    /// <summary>
+    /// 判断一个网格是否"斜着摆的大件"：横向两个轴都超过 1.8m、且立着有一定高度。
+    /// 店里只有东北角那段斜窗墙符合（斜边使 AABB 面积远大于实际墙体，4.49×4.43 的包围盒
+    /// 对应实际只有 5.5m 长、0.6m 厚的墙）。
+    /// </summary>
+    static bool NeedsOrientedBox(Bounds worldBounds)
+    {
+        var s = worldBounds.size;
+        return s.x > 1.8f && s.z > 1.8f && s.y > 1.5f && s.y < 6f;
+    }
+
+    /// <summary>
+    /// 沿网格顶点主方向烘一个旋转的 BoxCollider。
+    /// 主方向用水平面内顶点的协方差主轴（PCA）求，不需要知道墙的走向。
+    /// 碰撞体挂在 FBX 根下而不是原节点下——子节点带 100 倍缩放，挂进去尺寸会翻百倍。
+    /// </summary>
+    static void BakeOrientedBox(GameObject go, MeshFilter mf, Mesh mesh, Transform root)
+    {
+        var verts = mesh.vertices;
+        int n = verts.Length;
+        if (n < 3) return;
+
+        var w = new Vector3[n];
+        for (int i = 0; i < n; i++) w[i] = mf.transform.TransformPoint(verts[i]);
+
+        Vector3 min = w[0], max = w[0];
+        Vector2 mean = Vector2.zero;
+        for (int i = 0; i < n; i++)
+        {
+            min = Vector3.Min(min, w[i]);
+            max = Vector3.Max(max, w[i]);
+            mean += new Vector2(w[i].x, w[i].z);
+        }
+        mean /= n;
+
+        float sxx = 0f, sxz = 0f, szz = 0f;
+        for (int i = 0; i < n; i++)
+        {
+            float dx = w[i].x - mean.x, dz = w[i].z - mean.y;
+            sxx += dx * dx; sxz += dx * dz; szz += dz * dz;
+        }
+        float theta = 0.5f * Mathf.Atan2(2f * sxz, sxx - szz);
+        Vector3 axis = new Vector3(Mathf.Cos(theta), 0f, Mathf.Sin(theta));
+        Vector3 perp = Vector3.Cross(Vector3.up, axis);
+
+        float a0 = float.MaxValue, a1 = float.MinValue, b0 = float.MaxValue, b1 = float.MinValue;
+        for (int i = 0; i < n; i++)
+        {
+            float a = Vector3.Dot(w[i], axis);
+            float b = Vector3.Dot(w[i], perp);
+            a0 = Mathf.Min(a0, a); a1 = Mathf.Max(a1, a);
+            b0 = Mathf.Min(b0, b); b1 = Mathf.Max(b1, b);
+        }
+
+        Vector3 center = axis * ((a0 + a1) * 0.5f)
+                       + perp * ((b0 + b1) * 0.5f)
+                       + Vector3.up * ((min.y + max.y) * 0.5f);
+
+        var colGO = new GameObject(go.name + "_ObbCollider");
+        colGO.layer = go.layer;
+        colGO.transform.SetParent(root, true);
+        colGO.transform.SetPositionAndRotation(center, Quaternion.LookRotation(axis, Vector3.up));
+        var bc = colGO.AddComponent<BoxCollider>();
+        // LookRotation(axis) 让局部 +Z 对齐 axis、+X 对齐 perp
+        bc.size = new Vector3(b1 - b0, max.y - min.y, a1 - a0);
+        Debug.Log($"[collider] OBB for {go.name}: size={bc.size} axis={axis}");
     }
 
     /// <summary>

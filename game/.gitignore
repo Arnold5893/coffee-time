@@ -19,6 +19,8 @@
 # 批处理验证产物（验收证据存档在 ../.scratch/）
 setup_report.txt
 setup_screenshot_*.png
+seat_flow.txt
+editmode_results.xml
 
 # 系统
 .DS_Store

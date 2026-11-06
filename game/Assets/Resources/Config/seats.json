@@ -1,0 +1,45 @@
+{
+  "version": 1,
+  "note": "座位配置（04 票 / FR-SEAT-01）。这里只声明语义：绑哪个场景对象、朝哪边、桌面在多远。具体世界坐标、朝向向量、坐下点、站立点、桌面点位全部在运行时由 SeatingManager 从场景几何解析，家具挪位后不会失效。faceDir 描述相对店内的世界方向：店内主通道在 -Z 一侧，斜窗在东北角。",
+  "seats": [
+    { "id": "bar-1", "zone": "bar", "kind": "barStool", "anchor": "Bar_Stool_1", "faceTarget": "Bar_Counter", "seatHeight": 0.66, "surfaceHeight": 1.05 },
+    { "id": "bar-2", "zone": "bar", "kind": "barStool", "anchor": "Bar_Stool_2", "faceTarget": "Bar_Counter", "seatHeight": 0.66, "surfaceHeight": 1.05 },
+    { "id": "bar-3", "zone": "bar", "kind": "barStool", "anchor": "Bar_Stool_3", "faceTarget": "Bar_Counter", "seatHeight": 0.66, "surfaceHeight": 1.05 },
+
+    { "id": "sun-1", "zone": "sun", "kind": "barStool", "anchor": "Sun_Stool_D1", "faceDir": "SW", "seatHeight": 0.66, "surfaceForward": 0.42, "surfaceHeight": 1.04 },
+    { "id": "sun-2", "zone": "sun", "kind": "barStool", "anchor": "Sun_Stool_D2", "faceDir": "SW", "seatHeight": 0.66, "surfaceForward": 0.42, "surfaceHeight": 1.04 },
+    { "id": "sun-3", "zone": "sun", "kind": "barStool", "anchor": "Sun_Stool_D3", "faceDir": "SW", "seatHeight": 0.66, "surfaceForward": 0.42, "surfaceHeight": 1.04 },
+    { "id": "sun-4", "zone": "sun", "kind": "barStool", "anchor": "Sun_Stool_D4", "faceDir": "SW", "seatHeight": 0.66, "surfaceForward": 0.42, "surfaceHeight": 1.04 },
+    { "id": "sun-5", "zone": "sun", "kind": "barStool", "anchor": "Sun_Stool_D5", "faceDir": "SW", "seatHeight": 0.66, "surfaceForward": 0.42, "surfaceHeight": 1.04, "standOffset": 0.30 },
+    { "id": "sun-6", "zone": "sun", "kind": "barStool", "anchor": "Sun_Stool_D6", "faceDir": "SW", "seatHeight": 0.66, "surfaceForward": 0.42, "surfaceHeight": 1.04, "standOffset": 0.30 },
+    { "id": "sun-7", "zone": "sun", "kind": "barStool", "anchor": "Sun_Stool_E7", "faceDir": "W", "seatHeight": 0.66, "surfaceForward": 0.55, "surfaceHeight": 1.04 },
+    { "id": "sun-8", "zone": "sun", "kind": "barStool", "anchor": "Sun_Stool_E8", "faceDir": "W", "seatHeight": 0.66, "surfaceForward": 0.55, "surfaceHeight": 1.04 },
+    { "id": "sun-9", "zone": "sun", "kind": "barStool", "anchor": "Sun_Stool_E9", "faceDir": "W", "seatHeight": 0.66, "surfaceForward": 0.55, "surfaceHeight": 1.04 },
+    { "id": "sun-10", "zone": "sun", "kind": "barStool", "anchor": "Sun_Stool_E10", "faceDir": "W", "seatHeight": 0.66, "surfaceForward": 0.55, "surfaceHeight": 1.04 },
+    { "id": "sun-11", "zone": "sun", "kind": "barStool", "anchor": "Sun_Stool_E11", "faceDir": "W", "seatHeight": 0.66, "surfaceForward": 0.55, "surfaceHeight": 1.04 },
+    { "id": "sun-12", "zone": "sun", "kind": "barStool", "anchor": "Sun_Stool_E12", "faceDir": "W", "seatHeight": 0.66, "surfaceForward": 0.55, "surfaceHeight": 1.04 },
+
+    { "id": "round1-1", "zone": "round", "kind": "armchair", "anchor": "Round1_Chair_0", "faceTarget": "Round_Table_1", "seatHeight": 0.45 },
+    { "id": "round1-2", "zone": "round", "kind": "armchair", "anchor": "Round1_Chair_1", "faceTarget": "Round_Table_1", "seatHeight": 0.45 },
+    { "id": "round1-3", "zone": "round", "kind": "armchair", "anchor": "Round1_Chair_2", "faceTarget": "Round_Table_1", "seatHeight": 0.45 },
+    { "id": "round1-4", "zone": "round", "kind": "armchair", "anchor": "Round1_Chair_3", "faceTarget": "Round_Table_1", "seatHeight": 0.45 },
+
+    { "id": "round2-1", "zone": "round", "kind": "armchair", "anchor": "Round2_Chair_0", "faceTarget": "Round_Table_2", "seatHeight": 0.45 },
+    { "id": "round2-2", "zone": "round", "kind": "armchair", "anchor": "Round2_Chair_1", "faceTarget": "Round_Table_2", "seatHeight": 0.45 },
+    { "id": "round2-3", "zone": "round", "kind": "armchair", "anchor": "Round2_Chair_2", "faceTarget": "Round_Table_2", "seatHeight": 0.45 },
+
+    { "id": "round3-1", "zone": "round", "kind": "armchair", "anchor": "Round3_Chair_0", "faceTarget": "Round_Table_3", "seatHeight": 0.45 },
+    { "id": "round3-2", "zone": "round", "kind": "armchair", "anchor": "Round3_Chair_1", "faceTarget": "Round_Table_3", "seatHeight": 0.45 },
+
+    { "id": "round4-1", "zone": "round", "kind": "armchair", "anchor": "Round4_Chair_0", "faceTarget": "Round_Table_4", "seatHeight": 0.45 },
+    { "id": "round4-2", "zone": "round", "kind": "armchair", "anchor": "Round4_Chair_1", "faceTarget": "Round_Table_4", "seatHeight": 0.45 },
+    { "id": "round4-3", "zone": "round", "kind": "armchair", "anchor": "Round4_Chair_2", "faceTarget": "Round_Table_4", "seatHeight": 0.45 },
+
+    { "id": "meeting-1", "zone": "meeting", "kind": "armchair", "anchor": "Meeting_Chair_0_-1", "faceTarget": "Meeting_Table", "seatHeight": 0.45 },
+    { "id": "meeting-2", "zone": "meeting", "kind": "armchair", "anchor": "Meeting_Chair_0_1", "faceTarget": "Meeting_Table", "seatHeight": 0.45 },
+    { "id": "meeting-3", "zone": "meeting", "kind": "armchair", "anchor": "Meeting_Chair_1_-1", "faceTarget": "Meeting_Table", "seatHeight": 0.45 },
+    { "id": "meeting-4", "zone": "meeting", "kind": "armchair", "anchor": "Meeting_Chair_1_1", "faceTarget": "Meeting_Table", "seatHeight": 0.45 },
+    { "id": "meeting-5", "zone": "meeting", "kind": "armchair", "anchor": "Meeting_Chair_2_-1", "faceTarget": "Meeting_Table", "seatHeight": 0.45 },
+    { "id": "meeting-6", "zone": "meeting", "kind": "armchair", "anchor": "Meeting_Chair_2_1", "faceTarget": "Meeting_Table", "seatHeight": 0.45 }
+  ]
+}
