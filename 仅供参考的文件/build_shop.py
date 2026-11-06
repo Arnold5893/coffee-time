@@ -13,9 +13,13 @@ REFS = os.path.join(ROOT, "refs")
 os.makedirs(TEX, exist_ok=True)
 
 # ---------------- 可调参数 ----------------
-S = 1.5 / 147          # 平面图 1 大格(147px) ≈ 1.5 m —— 量到真实尺寸后改这里
+SCALE = 1.25           # 2026-11-06 店面整体放大 25%（用户决策）：原比例下
+                       # 圆桌组 1.2m 过道 / 阳光区斜窗吧凳 / 平面图所有座位互相排斥，无解
+S = 1.5 / 147 * SCALE  # 平面图 1 大格(147px) ≈ 1.5 m × 整体放大系数
 H = 4.5                # 黑色格栅吊顶高度
 T = 0.2                # 墙厚
+# 06 票：前柜（含收银/吧凳/吊架/吊灯/低吊顶）整体北移，使前后柜通道 = 1.20m
+BAR_SHIFT = 1.20 - ((1360 - 1255) * S - 0.75)
 random.seed(7)
 
 
@@ -497,20 +501,21 @@ for s, kind in zip(SEGS, WALL_TYPE):
 
 # ---- 白色跌级吊顶 + 筒灯 ----
 b = B("Ceiling_Soffits")
-SOFFITS = [  # x0,x1,y0,y1
+SOFFITS = [  # x0,x1,y0,y1（按原比例给出，随 SCALE 一起放大）
     (1.8, 3.0, 1.95, 12.6),
     (5.3, 6.5, 1.95, 9.0),
     (0.1, 7.0, 7.9, 8.9),
 ]
+SOFFITS = [tuple(v * SCALE for v in s) for s in SOFFITS]
 DOWN = []
 for x0, x1, y0, y1 in SOFFITS:
     b.box((x1 - x0, y1 - y0, 0.55), ((x0 + x1) / 2, (y0 + y1) / 2, H - 0.275), M_CEIL)
-for y in np.arange(2.9, 12.6, 1.9):
-    DOWN.append((2.4, y))
-for y in np.arange(2.9, 9.0, 1.9):
-    DOWN.append((5.9, y))
-for x in (0.9, 4.2):
-    DOWN.append((x, 8.4))
+for y in np.arange(2.9 * SCALE, 12.6 * SCALE, 1.9 * SCALE):
+    DOWN.append((2.4 * SCALE, y))
+for y in np.arange(2.9 * SCALE, 9.0 * SCALE, 1.9 * SCALE):
+    DOWN.append((5.9 * SCALE, y))
+for x in (0.9 * SCALE, 4.2 * SCALE):
+    DOWN.append((x, 8.4 * SCALE))
 for x, y in DOWN:
     b.cyl(0.065, 0.01, (x, y, H - 0.555), M_DOWN, seg=16)
 b.finish(COLLS["Ceiling"])
@@ -519,15 +524,16 @@ for i, (x, y) in enumerate(DOWN):
 
 # ---- 吧台区: 低吊顶 + 木饰面门头 ----
 bx0, bx1 = P(270, 0)[0], P(920, 0)[0]
-by1 = P(0, 1180)[1]
+by1 = P(0, 1180)[1] + BAR_SHIFT + 0.16   # 低吊顶随前柜北移，并盖住台面前沿
+BARDL_Y = by1 - 0.62                     # 吧台筒灯落在柜台正上方
 b = B("Bar_Ceiling")
 b.box((bx1 - bx0, by1 - 0.1, 0.05), ((bx0 + bx1) / 2, (by1 + 0.1) / 2, 3.2), M_CEIL)
 b.box((bx1 - bx0, 0.08, H - 3.2), ((bx0 + bx1) / 2, by1 - 0.04, (H + 3.2) / 2), M_WOODP)
 for x in np.arange(bx0 + 0.9, bx1 - 0.5, 1.6):
-    b.cyl(0.06, 0.01, (x, 0.95, 3.17), M_DOWN, seg=16)
+    b.cyl(0.06, 0.01, (x, BARDL_Y, 3.17), M_DOWN, seg=16)
 b.finish(COLLS["Ceiling"])
 for i, x in enumerate(np.arange(bx0 + 0.9, bx1 - 0.5, 1.6)):
-    add_light("BarDownlight_%d" % i, 'SPOT', (x, 0.95, 3.15), 70, size=0.06)
+    add_light("BarDownlight_%d" % i, 'SPOT', (x, BARDL_Y, 3.15), 70, size=0.06)
 
 # =====================================================================
 #                              家具
@@ -639,28 +645,43 @@ def mushroom_chair(name, loc, rot, bar=False, info=None, coll="Furniture"):
 
 
 def armchair(name, loc, rot, info=None):
-    """曲木矮凳 (photos/矮凳子.jpg)，正面 +Y
+    """曲木桶形矮凳 (photos/矮凳子.jpg)，正面 +Y
 
-    结构：布艺圆垫座面 + 木底托；一条弯曲胶合板带从一侧前腿起，经扶手绕到靠背
-    （顶边中高两端低的弧线），再下到另一侧前腿直落到地；背面底部有一圈矮围板。
+    照实拍重建的五件式结构：
+      ① 四条方形微收腿，下端外撇 2cm —— 旧版只有两条宽板"前腿"、背面悬空，是主要错处；
+      ② 座下一圈曲木裙板（收进座面内侧）+ 木质座底托；
+      ③ 上小下大的鼓形包布坐垫，顶面铺蓝白花布垫；
+      ④ 一条弯曲胶合板带：从右侧扶手绕过背面回到左侧扶手（开口朝 +Y），
+         顶边在靠背中点拱起 10cm、底边在靠背中点下探 7cm，板带在背面最深；
+      ⑤ 板带两端各接一块平板扶手，扶手前端坐到前腿顶端。
     """
     b = B(name)
-    # 布艺圆凳 + 木底托
-    b.cyl(0.27, 0.13, (0, 0.02, 0.385), M_FABRIC, seg=32, scale=(1.0, 0.92, 1))
-    b.cyl(0.29, 0.04, (0, 0.02, 0.30), M_WOOD, seg=32, scale=(1.0, 0.92, 1))
-    # 曲木靠背扶手带：165°→375° 绕过背面(-Y)，开口朝正面 +Y；
-    # 顶边从两端扶手 0.63 拱起到靠背中 0.76，底边从 0.56 降到靠背中 0.44
-    b.band(0.305, math.radians(165), math.radians(375), 0.03, M_WOOD, 16,
-           lambda t: 0.63 + 0.13 * max(0.0, -math.sin(t)),
-           lambda t: 0.56 - 0.12 * max(0.0, -math.sin(t)),
-           center=(0, 0.01))
+    RB = 0.305                    # 靠背带中径
+    ZF = 0.34                     # 座底托顶面（坐垫从这里往上）
+    SH = 0.45                     # 坐垫面高
+    PAD_Z = 0.585                 # 扶手板面高
+    # ① 四条方腿（下端外撇）
     for sx in (-1, 1):
-        b.box((0.09, 0.05, 0.62), (sx * 0.295, 0.09, 0.31), M_WOOD)       # 前腿（宽板腿直落到地）
-        b.box((0.085, 0.22, 0.03), (sx * 0.30, 0.17, 0.625), M_WOOD)      # 扶手平板（带端向前伸出）
-    # 背面底部弧形矮围板
-    b.arc(0.28, math.radians(205), math.radians(335), 0.09, 0.07, 0.025, M_WOOD, n=6, center=(0, 0.01))
-    if random.random() < 0.6:
-        b.box((0.4, 0.38, 0.012), (0, 0.04, 0.455), M_CUSHION, (0, 0, random.uniform(-0.3, 0.3)))
+        b.beam((sx * 0.245, 0.199, PAD_Z), (sx * 0.252, 0.216, 0.0), 0.045, M_WOOD)   # 前腿直通扶手
+        b.beam((sx * 0.234, -0.194, ZF), (sx * 0.252, -0.216, 0.0), 0.042, M_WOOD)    # 后腿
+    # ② 座下曲木裙板 + 座底托
+    b.band(0.282, 0.0, 2 * math.pi, 0.026, M_WOOD, 32,
+           lambda t: 0.355, lambda t: 0.245)
+    b.cyl(0.29, 0.04, (0, 0, ZF - 0.02), M_WOOD, seg=36)
+    # ③ 鼓形包布坐垫
+    b.cyl(0.275, 0.075, (0, 0, ZF + 0.0375), M_FABRIC, seg=36, r2=0.264)
+    b.cyl(0.265, 0.025, (0, 0, ZF + 0.085), M_FABRIC, seg=32, r2=0.252)
+    # ④ 弯曲胶合板靠背扶手带（开口朝 +Y，两端落到扶手高度）
+    b.band(RB, math.radians(158), math.radians(382), 0.03, M_WOOD, 18,
+           lambda t: 0.60 + 0.10 * max(0.0, -math.sin(t)),
+           lambda t: 0.455 - 0.07 * max(0.0, -math.sin(t)))
+    # ⑤ 平板扶手 + 横档
+    for sx in (-1, 1):
+        b.box((0.095, 0.235, 0.028), (sx * 0.258, 0.105, PAD_Z), M_WOOD)
+        b.box((0.026, 0.36, 0.026), (sx * 0.243, 0.0, 0.215), M_WOOD)   # 侧横档
+    b.box((0.43, 0.026, 0.026), (0, 0.207, 0.195), M_WOOD)              # 前横档
+    if random.random() < 0.75:
+        b.box((0.40, 0.37, 0.012), (0, 0.02, ZF + 0.105), M_CUSHION, (0, 0, random.uniform(-0.3, 0.3)))
     return b.finish(COLLS["Furniture"], loc, rot, info)
 
 
@@ -790,43 +811,43 @@ for k, m in enumerate(M_PAINT[:3]):
     b.box((0.03, 0.62, 0.48), (P(160, 0)[0] + 0.02, yc, 2.75), M_WOOD)
     b.img_plane(0.58, 0.44, MX((P(160, 0)[0] + 0.04, yc, 2.75), (0, 0, math.pi / 2)), m)
     b.finish(COLLS["Decor"], info=("墙上的油画", "店里挂着的风景油画。"))
-# --- 多人桌 1 ---
-c = P(366, 723)
+# --- 多人桌 1 ---（较平面图北移 ~0.9m：会议桌北上后保持 0.3m 间隙）
+c = P(366, 650)
 oval_table("Group_Table_1", (*c, 0), math.pi / 2, info=("多人桌 1", "椭圆桌配两张双人沙发，可坐 4 人。"))
 for sx in (-1, 1):
     sp = (c[0] + sx * SOFA_OFF, c[1])
     loveseat("Group_Sofa_1_%d" % sx, (*sp, 0), face_to(sp, c))
-# --- 会议桌 ---
-c = P(366, 898)
+# --- 会议桌 ---（较平面图北移 ~1.1m：给圆桌 1 让位；与多人桌 1 留 0.3m）
+c = P(366, 811)
 conference_table("Meeting_Table", (*c, 0), math.pi / 2,
                  info=("会议桌", "1.8 米原木长桌，可坐 6 人，适合小组讨论或自习。"))
-for k, py in enumerate((830, 898, 966)):
+for k, py in enumerate((866, 811, 756)):
     for sx, px in ((-1, 287), (1, 445)):
         sp = P(px, py)
         armchair("Meeting_Chair_%d_%d" % (k, sx), (*sp, 0), face_to(sp, (c[0], sp[1])))
-# --- 圆桌 1 ---
-c = P(366, 1075)
+# --- 圆桌 1 ---（前柜北移后，这一组原位置会压进吧台；南凳留 0.3m 到吧凳）
+c = P(366, 988)
 round_table("Round_Table_1", (*c, 0), info=("圆桌 1", "三脚原木小圆桌，配弧形扶手椅。"))
 for k in range(4):
     a = math.pi / 4 + k * math.pi / 2
-    sp = (c[0] + 0.62 * math.cos(a), c[1] + 0.62 * math.sin(a))
+    sp = (c[0] + 0.63 * math.cos(a), c[1] + 0.63 * math.sin(a))
     armchair("Round1_Chair_%d" % k, (*sp, 0), face_to(sp, c))
-# --- 多人桌 2、3 ---（整组向北 +0.8m：原位置沙发与吧台凳边距仅 0.47m，太挤）
-for no, (px, py) in ((2, (608, 662)), (3, (608, 899))):
+# --- 多人桌 2、3 ---（较平面图西移 0.22m：与圆桌组留 1.0m 过道）
+for no, (px, py) in ((2, (588, 662)), (3, (588, 899))):
     c = P(px, py)
     oval_table("Group_Table_%d" % no, (*c, 0), 0, info=("多人桌 %d" % no, "椭圆桌配两张双人沙发，可坐 4 人。"))
     for sy in (-1, 1):
         sp = (c[0], c[1] + sy * SOFA_OFF)
         loveseat("Group_Sofa_%d_%d" % (no, sy), (*sp, 0), face_to(sp, c))
-# --- 圆桌 2/3/4 ---
-for no, py in ((2, 768), (3, 890), (4, 1015)):
-    c = P(824, py)
+# --- 圆桌 2/3/4 ---（较平面图西移 0.4m：让出阳光区斜窗吧凳；台距沿用平面图 1.56m）
+for no, py in ((2, 670), (3, 792), (4, 915)):
+    c = P(793, py)
     round_table("Round_Table_%d" % no, (*c, 0), info=("圆桌 %d" % no, "三脚原木小圆桌，配弧形扶手椅。"))
-    seats = [(-0.62, 0), (0.62, 0)]
+    seats = [(-0.63, 0), (0.63, 0)]
     if no == 2:
-        seats.append((0, 0.62))
+        seats.append((0, 0.63))
     if no == 4:
-        seats.append((0, -0.62))
+        seats.append((0, -0.63))
     for k, (dx, dy) in enumerate(seats):
         sp = (c[0] + dx, c[1] + dy)
         armchair("Round%d_Chair_%d" % (no, k), (*sp, 0), face_to(sp, c))
@@ -848,6 +869,8 @@ for k, py in enumerate((683, 741, 800, 858, 917, 975)):
 # =====================================================================
 xa, ya = P(278, 1255)
 xb, yb = P(826, 1180)
+ya += BAR_SHIFT          # 前柜北移（06 票）：后柜前沿 0.74 → 通道 1.21m
+yb += BAR_SHIFT
 BAR_L = xb - xa
 BAR_C = ((xa + xb) / 2, (ya + yb) / 2)
 b = B("Bar_Counter")
@@ -894,9 +917,9 @@ b.box((0.3, 0.02, 0.22), (0, -0.06, Hc + 0.17), M_BLACK, (math.radians(15), 0, 0
 b.img_plane(0.27, 0.19, MX((0, -0.045, Hc + 0.17), (math.radians(15), 0, math.pi)), M_LCD)
 b.finish(COLLS["Bar"], (cx, BAR_C[1] - 0.05, 0), 0, info=("收银台", "扫码 / 刷卡点单。"))
 
-# 吧台凳 1-3
+# 吧台凳 1-3（随前柜一起北移）
 for k, px in enumerate((518, 615, 711)):
-    p = P(px, 1150)
+    p = (P(px, 1150)[0], P(px, 1150)[1] + BAR_SHIFT)
     mushroom_chair("Bar_Stool_%d" % (k + 1), (*p, 0), math.pi, bar=True, coll="Bar",
                    info=("吧台 %d 号座" % (k + 1), "坐在这里可以看咖啡师做咖啡。"))
 
@@ -1165,7 +1188,7 @@ pumpkin_lamp("Pendant_Entrance_Big", (P(250, 600)[0], P(250, 600)[1], 3.0), a=0.
              info=("入口大吊灯", "进门第一眼看到的环形木片吊灯。"))
 # 吧台小花朵吊灯
 b = B("Pendant_Bar_Flower")
-lp = (P(800, 1300)[0], P(800, 1300)[1], 2.3)
+lp = (P(800, 1300)[0], P(800, 1300)[1] + BAR_SHIFT, 2.3)
 b.cyl(0.002, 0.88, (0, 0, 0.46), M_BRASS, seg=6, smooth=False)
 for k in range(8):
     a = k * math.pi / 4
@@ -1203,10 +1226,26 @@ def plant(name, loc, kind, seed):
         b.cyl(0.25, 0.6, (0, 0, 0.3), M_POT, seg=4, r2=0.31, rot=(0, 0, math.pi / 4), smooth=False)
         b.cyl(0.21, 0.02, (0, 0, 0.59), M_SOIL, seg=4, rot=(0, 0, math.pi / 4), smooth=False)
         soil = 0.6
+    elif kind == "small":  # 桌间小盆栽（0.86m 桌缝专用，冠幅 ~0.35m 不越桌沿）
+        b.cyl(0.13, 0.26, (0, 0, 0.13), M_POTGRAY, seg=20, r2=0.15)
+        b.cyl(0.135, 0.02, (0, 0, 0.265), M_SOIL, seg=20)
+        soil = 0.27
     else:
         b.cyl(0.22, 0.55, (0, 0, 0.275), M_POTGRAY if seed % 2 else M_POT, seg=24, r2=0.24)
         b.cyl(0.22, 0.02, (0, 0, 0.54), M_SOIL, seg=24)
         soil = 0.55
+    if kind == "small":  # 矮丛：叶片短、向上散开
+        for k in range(9):
+            yaw = rng.uniform(0, 2 * math.pi)
+            lean = rng.uniform(0.1, 0.6)
+            Ls = rng.uniform(0.16, 0.24)
+            top = Vector((math.cos(yaw) * math.sin(lean) * Ls, math.sin(yaw) * math.sin(lean) * Ls,
+                          soil + math.cos(lean) * Ls))
+            b.beam((0, 0, soil), top, 0.008, M_STEM)
+            m = MX(top, (rng.uniform(-0.3, 0.3), -rng.uniform(0.5, 1.0), yaw))
+            b.prism(leaf_pts(0.2, 0.09), 0.003, rng.choice(M_LEAF), m)
+        return b.finish(COLLS["Plants"], loc, rng.uniform(0, 6.28),
+                        ("桌间小盆栽", "圆桌之间摆的小盆绿植，冠幅不越过桌沿。"))
     if kind == "bird":  # 天堂鸟/竹芋
         for k in range(rng.randint(9, 13)):
             yaw = rng.uniform(0, 2 * math.pi)
@@ -1243,8 +1282,14 @@ def plant(name, loc, kind, seed):
     return b.finish(COLLS["Plants"], loc, rng.uniform(0, 6.28), ("绿植", "店里到处是老板养的绿植：天堂鸟、发财树、龟背竹……"))
 
 
-PLANTS = [((405, 500), "bird"), ((595, 325), "tree"), ((497, 440), "monstera"), ((608, 500), "bird"),
-          ((704, 855), "bird"), ((820, 830), "bird"), ((820, 950), "bird"), ((1028, 1075), "monstera")]
+# 圆桌之间原摆了三盆天堂鸟：台间距只有 0.4m，盆径 0.5m 且叶片展开 0.7m，
+# 必然压进两侧矮凳（截图 3 的错处）。本轮把这三盆移走，只在吧台东端留一盆。
+# 另：多人桌 1 北上后原位置被沙发占住，第 1 盆改到书墙前（x0.85, y4.5）。
+# 圆桌之间（台距 1.56m 留出 0.86m 缝）恢复平面图上的桌间绿植，用紧凑的龟背竹，
+# 叶片不越过凳背；书墙前一盆发财树，靠墙不占过道。
+PLANTS = [((224, 976), "tree"), ((793, 854), "small"), ((793, 731), "small"),
+          ((595, 325), "tree"), ((497, 440), "monstera"), ((608, 500), "bird"),
+          ((1028, 1075), "monstera")]
 for i, ((px, py), kind) in enumerate(PLANTS):
     plant("Plant_%d" % i, (*P(px, py), 0), kind, i * 13 + 1)
 

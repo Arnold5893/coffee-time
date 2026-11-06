@@ -68,7 +68,9 @@ Status: ready-for-agent
 
 ### 资产与场景（来自 asset-route 地图决策）
 
-- 场景：`coffee_shop.blend` → FBX（嵌纹理）→ Unity → Extract Textures → 转 URP；按 06 票结论把前柜北移 ~0.9m（通道 ≥1.2m），吧凳/Bar_Rack/吊灯随移。
+- 场景：`coffee_shop.blend` → FBX（嵌纹理）→ Unity → Extract Textures → 转 URP。
+  - 06 票的前柜北移已固化进 Blender 源文件（`BAR_SHIFT`，通道实测 1.20m），Unity `ProjectSetup` 的自动平移降级为幂等守卫（已达标则 shift=0）。
+  - 2026-11-06 追加：店面整体放大 25%（`SCALE`，约 11.6×15.9m）。原因：原比例下圆桌组 1.2m 过道、阳光区斜窗吧凳、平面图座位三者互斥且无解（详见 fix-03 提交说明）。
 - 角色：Quaternius Universal Base Characters（CC0），竖切用默认外观即可，不做角色创建界面。
 - 动画：Mixamo 剪辑（走路/坐下/打字/idle）＋ Mecanim Humanoid retarget；吧台按住类动作用程序化 IK；端杯行走＝走路＋上半身 IK 遮罩。
 - 纹理源文件：`仅供参考的文件/textures/`（已从 GLB 抢救）。

@@ -18,3 +18,9 @@
 - 截图管线：URP 不支持 Camera.Render()，改走 Play 模式 RenderTexture（必须 ARGBHalf，否则 URP 跳过后处理）；验收图存于 `.scratch/vertical-slice/acceptance/01/`
 - `BuildScript.BuildWindows` 批处理构建通过（`game/Builds/Windows/CoffeeTime.exe`）
 - 已知留待后续：验证用基线光照偏亮（ambient 0.25 + 直射 0.8），三时段氛围光照属后续票据；`downlight` 材质自发光 30x HDR，正式灯光方案时统一处理
+
+**2026-11-06 修正（fix-03，场景几何）**
+
+- 前柜北移改为**固化进 Blender 源文件**（`build_shop.py` 的 `BAR_SHIFT`），Unity `ProjectSetup` 的自动平移降级为幂等守卫（已达标时 shift=0）。原因：位移只存在于 Unity 脚本时，Blender 视图与渲染结果不一致，圆桌被吧凳顶穿却查不出来。
+- 店面整体放大 25%（`SCALE`，约 11.6×15.9m / 184㎡）。原比例下"圆桌组 1.2m 过道 / 阳光区 12 个斜窗吧凳 / 平面图座位数"三者互斥，无解。
+- 验收图：`.scratch/vertical-slice/acceptance/fix-03/`
