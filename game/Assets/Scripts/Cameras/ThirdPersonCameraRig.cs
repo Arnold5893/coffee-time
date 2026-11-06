@@ -55,6 +55,8 @@ namespace CoffeeShop.Cameras
             pitchCurrent = pitch;
             yaw = initialYaw;
             currentYaw = initialYaw;
+            // 门外地台围挡是纯逻辑碰撞体（没有可见几何），镜头不该被它顶住
+            obstructionMask = obstructionMask.value & ~LayerMask.GetMask("Boundary");
         }
 
         void Update()

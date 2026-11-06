@@ -34,7 +34,11 @@ namespace CoffeeShop.Controls
                     UnityEngine.Input.GetAxisRaw("Mouse Y") * LookSensitivity * (InvertY ? 1f : -1f));
             }
 
-            return new PlayerIntent { Move = move, Look = look };
+            // 左键交互：光标已锁定时是"点一下"；未锁定时这一次点击同时用于锁定光标，
+            // 所以也当交互发出去（否则玩家要点两下才能开门）。右键旋转视角，不参与交互。
+            bool interact = UnityEngine.Input.GetMouseButtonDown(0);
+
+            return new PlayerIntent { Move = move, Look = look, Interact = interact };
         }
 
         static void HandleCursorLock()

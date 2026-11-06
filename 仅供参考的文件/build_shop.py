@@ -140,6 +140,7 @@ def mat(name, color=(0.8, 0.8, 0.8), rough=0.5, metal=0.0, img=None, tile=1.0,
 M_WOOD = mat("wood", img=TX["wood"], rough=0.45, tile=0.8)
 M_WOODP = mat("wood_panel", img=TX["wood"], rough=0.6, tile=1.6)
 M_FLOOR = mat("granite_floor", img=TX["granite"], rough=0.25, tile=0.8)
+M_PORCH = mat("porch_paving", (0.44, 0.43, 0.41), 0.85, tile=0.6)
 M_GRID = mat("ceiling_grid", img=TX["grid"], rough=0.8, tile=0.15)
 M_WHITE = mat("white_paint", (0.86, 0.84, 0.79), 0.85)
 M_CEIL = mat("white_ceiling", (0.90, 0.89, 0.86), 0.9)
@@ -456,23 +457,43 @@ def build_window_wall(b, s, counter, rng):
             s.box(b, tm - 0.45, tm + 0.45, 0.0, 0.015, 0.15, 0.7, M_GRILLE)
 
 
-def build_door(b, s, double, lightbox):
+def build_door_frame(b, s):
+    """门洞的固定部分：上亮子玻璃 + 上横档 + 两侧立框。
+    可开合的门扇单独成对象（见 build_door_leaf），方便 Unity 里绕铰链旋转。"""
     dz = 2.45
-    # 门洞两侧/上方玻璃 + 铝框
     s.box(b, 0, s.L, -0.11, -0.09, dz, H, M_DOORGLASS)
     s.box(b, 0, s.L, -0.13, -0.07, dz - 0.04, dz + 0.04, M_ALU)
     s.box(b, -0.04, 0.04, -0.13, -0.07, 0, H, M_ALU)
     s.box(b, s.L - 0.04, s.L + 0.04, -0.13, -0.07, 0, H, M_ALU)
-    leaves = 2 if double else 1
-    lw = s.L / leaves
-    for k in range(leaves):
-        t0 = k * lw
-        s.box(b, t0 + 0.02, t0 + lw - 0.02, -0.11, -0.09, 0.02, dz - 0.04, M_DOORGLASS)
-        s.box(b, t0 + 0.02, t0 + lw - 0.02, -0.12, -0.08, 0.0, 0.08, M_ALU)
-        # 木质长拉手 (照片中门上的竖向木把手)
-        hx = t0 + (lw - 0.12 if k == 0 else 0.12)
-        for d in (0.0, -0.2):
-            s.box(b, hx - 0.025, hx + 0.025, d - 0.05, d + 0.0, 0.5, 1.9, M_WOOD)
+
+
+def build_door_leaf(name, s, hinge_t, sign, lw, dz=2.45):
+    """单扇玻璃门。对象原点放在铰链轴上，局部 +X 从铰链指向自由边，
+    局部 Z 向上 —— Unity 里直接绕本地 Z 轴转即可开合。
+    sign=+1 表示门扇沿墙段 u 正方向展开，-1 表示反向。"""
+    b = B(name)
+    hgt = dz - 0.04                     # 玻璃高度（0.02 → 2.41）
+    gz = (0.02 + hgt + 0.02) / 2        # 玻璃中心 z
+    # 玻璃
+    b.box((lw - 0.08, 0.02, hgt), (lw / 2, 0.0, gz), M_DOORGLASS)
+    # 上下横档 + 两侧竖梃（铝）
+    b.box((lw - 0.04, 0.04, 0.08), (lw / 2, 0.0, 0.04), M_ALU)
+    b.box((lw - 0.04, 0.04, 0.06), (lw / 2, 0.0, dz - 0.07), M_ALU)
+    for x in (0.04, lw - 0.04):
+        b.box((0.04, 0.04, dz - 0.08), (x, 0.0, (0.08 + dz - 0.04) / 2), M_ALU)
+    # 木质长拉手（内外各一根）
+    for y in (0.055, -0.055):
+        b.box((0.05, 0.06, 1.40), (lw - 0.12, y, 1.20), M_WOOD)
+    loc = s.pt(hinge_t, -0.10, 0)
+    rotz = s.ang if sign > 0 else s.ang + math.pi
+    return b.finish(COLLS["Structure"], loc=loc, rotz=rotz)
+
+
+def build_door_leaf_pair(kind, s):
+    """双开门：左扇铰链在 t=0，右扇铰链在 t=L，中间对开。"""
+    lw = s.L / 2
+    return (build_door_leaf("Door_%s_LeafL" % kind, s, 0.0, +1, lw),
+            build_door_leaf("Door_%s_LeafR" % kind, s, s.L, -1, lw))
 
 
 for s, kind in zip(SEGS, WALL_TYPE):
@@ -489,15 +510,27 @@ for s, kind in zip(SEGS, WALL_TYPE):
             ob["info_desc"] = "沙发区背靠大窗，窗台上摆着老板养的小绿植。"
     elif kind.startswith("door"):
         b = B("Door_%s" % kind)
-        build_door(b, s, True, kind == "door_left")
+        build_door_frame(b, s)
         ob = b.finish(COLLS["Structure"])
         ob["info_title"] = "入口" if kind == "door_left" else "侧门"
         ob["info_desc"] = "玻璃门配原木长拉手。" if kind == "door_left" else "通往另一侧走廊的玻璃门。"
+        build_door_leaf_pair(kind, s)
     else:
         b = B("Wall_%d" % SEGS.index(s))
         m = M_WOODP if kind.startswith("wood") else M_WHITE
         s.box(b, -T / 2, s.L + T / 2, -T, 0, 0, H, m)
         b.finish(COLLS["Structure"])
+
+# ---- 门外门廊地台（03 票：只做一块铺装平台，不做外立面）----
+PORCH = SEGS[WALL_TYPE.index("door_left")]      # 入口所在墙段
+PORCH_DEPTH = 2.80                              # 外挑深度（沿段法线向外）
+PORCH_MARGIN = 1.20                             # 门洞两侧各留出的宽度
+b = B("Porch")
+_t0, _t1 = -PORCH_MARGIN, PORCH.L + PORCH_MARGIN
+b.box((_t1 - _t0, PORCH_DEPTH, 0.15),
+      PORCH.pt((_t0 + _t1) / 2, -PORCH_DEPTH / 2, -0.075),
+      M_PORCH, (0, 0, PORCH.ang))
+b.finish(COLLS["Structure"], info=("门外", "店门口的一小块铺装地台。"))
 
 # ---- 白色跌级吊顶 + 筒灯 ----
 b = B("Ceiling_Soffits")

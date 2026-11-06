@@ -20,7 +20,8 @@ def inside(x, y):
     return c
 
 
-SKIP = ("Floor", "Ceiling", "Wall", "Door", "Window", "Brass_Frame", "Structure", "Blind")
+SKIP = ("Floor", "Ceiling", "Wall", "Door", "Window", "Brass_Frame", "Structure", "Blind",
+        "Porch")   # Porch 是门外地台，本就在地板多边形外
 bad = 0
 for ob in bpy.data.objects:
     if ob.type != 'MESH' or ob.name.startswith(SKIP):

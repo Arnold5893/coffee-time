@@ -31,6 +31,12 @@ namespace CoffeeShop.Cameras
         readonly Dictionary<Material, Material> cloneCache = new Dictionary<Material, Material>();
         static readonly RaycastHit[] hits = new RaycastHit[32];
 
+        void Awake()
+        {
+            // 门外地台围挡是没有渲染器的逻辑碰撞体，不参与遮挡淡化判定
+            occluderMask = occluderMask.value & ~LayerMask.GetMask("Boundary");
+        }
+
         public float FadedAlpha
         {
             get => fadedAlpha;

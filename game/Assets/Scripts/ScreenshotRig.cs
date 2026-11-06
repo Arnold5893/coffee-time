@@ -28,11 +28,18 @@ public class ScreenshotRig : MonoBehaviour
     public CoffeeShop.Cameras.ThirdPersonCameraRig followRig;
     public CoffeeShop.Cameras.CameraOcclusionFader fader;
     public Transform spawnPoint;
+    public Transform interiorPoint;
+
+    // 03 票：入口门
+    public CoffeeShop.Interaction.EntranceDoor door;
 
     IEnumerator Start()
     {
         var cam = Camera.main;
         cam.allowHDR = true;
+        // 批处理帧率可达上万，Time.deltaTime 小到 1e-4 会让门扇动画几十帧都转不动，
+        // 这里固定成 60fps 步长，截图才拍得到"开到位"的门。
+        Time.captureDeltaTime = 1f / 60f;
         // 静态机位截图期间关掉跟随镜头，免得 LateUpdate 把相机挪走
         if (followRig != null) followRig.enabled = false;
         // HDR 缓冲：URP 只在 HDR 目标上跑后处理（ACES），LDR RT 会被整个跳过
@@ -58,9 +65,10 @@ public class ScreenshotRig : MonoBehaviour
         // ---- 02 票验收：第三人称跟随镜头 + 遮挡淡化 ----
         if (followRig != null && player != null)
         {
-            // 跟随镜头构图：站回出生点，镜头按默认俯角跟住
-            player.Teleport(spawnPoint != null ? spawnPoint.position : player.transform.position,
-                            spawnPoint != null ? spawnPoint.rotation : player.transform.rotation);
+            // 跟随镜头构图：站到店内空位（出生点现在在门外，不能直接拿来拍店内构图）
+            Transform viewAt = interiorPoint != null ? interiorPoint : spawnPoint;
+            player.Teleport(viewAt != null ? viewAt.position : player.transform.position,
+                            viewAt != null ? viewAt.rotation : player.transform.rotation);
             followRig.enabled = true;
             followRig.RestoreDefaultView();
             for (int i = 0; i < 10; i++) yield return null;
@@ -90,7 +98,31 @@ public class ScreenshotRig : MonoBehaviour
             }
         }
 
+        // ---- 03 票验收：门外出生点 / 开门 ----
+        if (followRig != null && player != null && spawnPoint != null)
+        {
+            player.Teleport(spawnPoint.position, spawnPoint.rotation);
+            followRig.enabled = true;
+            followRig.RestoreDefaultView();
+            if (door != null) door.ForceClosed();
+            for (int i = 0; i < 12; i++) yield return null;
+            yield return CaptureCurrent(cam, rt, "setup_screenshot_entrance.png");
+
+            if (door != null)
+            {
+                door.Open();
+                // 门扇 0.55s 开到位，按 60fps 步长等足 1.2 秒再拍
+                for (int i = 0; i < 72; i++) yield return null;
+                Debug.Log($"[rig] door state={door.Current} open={door.OpenAmount:F2} bells={door.BellCount}");
+                yield return CaptureCurrent(cam, rt, "setup_screenshot_entrance_open.png");
+                door.ForceClosed();
+                for (int i = 0; i < 4; i++) yield return null;
+            }
+        }
+
         // 全景前临时隐藏吊顶（完全位于 cutY 之上的渲染器），拍完恢复
+        // 静态机位必须先把跟随镜头关掉，否则它会在 LateUpdate 里把相机又拖回角色身后
+        if (followRig != null) followRig.enabled = false;
         const float cutY = 2.7f;
         var hidden = new System.Collections.Generic.List<Renderer>();
         foreach (var r in FindObjectsOfType<Renderer>())

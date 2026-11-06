@@ -47,10 +47,12 @@ public static class PlayTest
         test.backCounter = back != null ? back.bounds : new Bounds(Vector3.zero, Vector3.one);
         test.frontCounter = front != null ? front.bounds : test.backCounter;
 
-        // 起点：出生点 + 几条过道的中点（取两件家具的中点，天然落在通道里）
+        // 起点：店内空位（02 票）——出生点现在在门外（03 票），不能直接用作房间内锚点
+        var interior = GameObject.Find("InteriorAnchor");
         var spawn = GameObject.Find("PlayerSpawn");
         var candidates = new List<Vector3>();
-        if (spawn != null) candidates.Add(spawn.transform.position);
+        if (interior != null) candidates.Add(interior.transform.position);
+        else if (spawn != null) candidates.Add(spawn.transform.position);
         if (back != null && front != null)
         {
             var a = back.bounds.center; var b = front.bounds.center;
@@ -98,6 +100,40 @@ public static class PlayTest
         Debug.Log($"[SMOKE] anchors={test.anchors.Count} room={test.room.size} backMaxZ={test.backCounter.max.z:F2}");
 
         // 直接进 Play 模式：进程随后由测试自行退出，不经保存，Main.unity 不会被改写
+        EditorApplication.EnterPlaymode();
+    }
+
+    /// <summary>
+    /// 03 票自动化验收入口：进门流程状态机。
+    /// 用法：Unity.exe -batchmode -executeMethod PlayTest.RunEntry（不要加 -quit）
+    /// </summary>
+    public static void RunEntry()
+    {
+        EditorSceneManager.OpenScene("Assets/Scenes/Main.unity");
+
+        foreach (var rig in Object.FindObjectsByType<ScreenshotRig>(FindObjectsSortMode.None))
+            rig.enabled = false;
+
+        var motor = Object.FindFirstObjectByType<CoffeeShop.Player.PlayerMotor>();
+        var router = Object.FindFirstObjectByType<CoffeeShop.Controls.PlayerInputRouter>();
+        var door = Object.FindFirstObjectByType<CoffeeShop.Interaction.EntranceDoor>();
+        var camRig = Object.FindFirstObjectByType<CoffeeShop.Cameras.ThirdPersonCameraRig>();
+        var spawn = GameObject.Find("PlayerSpawn");
+        if (motor == null || router == null || door == null || spawn == null)
+        {
+            Debug.LogError($"[ENTRY] missing refs motor={motor} router={router} door={door} spawn={spawn}");
+            EditorApplication.Exit(2);
+            return;
+        }
+
+        var test = new GameObject("EntryFlowTest").AddComponent<CoffeeShop.Testing.EntryFlowTest>();
+        test.player = motor;
+        test.router = router;
+        test.door = door;
+        test.followRig = camRig;
+        test.spawnPoint = spawn.transform;
+
+        Debug.Log($"[ENTRY] doorCenter={door.doorCenter} interiorDir={door.interiorDir} spawn={spawn.transform.position}");
         EditorApplication.EnterPlaymode();
     }
 

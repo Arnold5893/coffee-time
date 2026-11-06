@@ -1,0 +1,23 @@
+spawnDepth=-1.55 (负值=在门外)
+  ok   出生点在门外地台上
+closedDoor: moved=1.17m depth=-0.38 state=Closed
+  ok   角色确实朝门走了
+  ok   门关着时被挡在门外，没有穿透
+cam=(4.47,3.15) aimScreen=(320,325) screen=(640,480) hit=True bell=1
+  dbgRay(mask=-257) hits Floor (layer 0, d=7.62m); clickTargets=[Door_door_left_LeafL Door_door_left_LeafR ]
+  ok   射线打到门并触发开门
+  ok   门铃响了一次
+open again while opening -> False bells=1
+  ok   开门过程中重复点击无副作用
+door open: amount=1.00 state=Open after=0.55s
+  ok   门扇开到 85°
+afterWalkIn: depth=3.25 hasEntered=True state=Closed
+  ok   玩家已越过门槛进店
+  ok   流程记录到已进店
+door closed: state=Closed amount=0.00 after=0.00s
+  ok   进店后门自动关闭
+reopen=True amount=0.00 bells=2
+  ok   第二次开门正常
+  ok   第二次开门门铃再响一次
+failures=0
+ENTRY RESULT: PASS

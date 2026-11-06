@@ -136,6 +136,9 @@ public static class ProjectSetup
             // 6.5 碰撞体烘焙（02 票）：按每个网格的局部包围盒烘一个 BoxCollider。
             //     跳过天花板以上与细杆件，避免吊灯/画框/挂杆把角色挡在过道里。
             var skipPrefix = new[] { "Ceiling", "Pendant", "Painting", "Lightbox", "Hood" };
+            // 门框是"环形"网格（两侧立框 + 上方亮子玻璃），按整体包围盒烘一个 box 会把整个门洞封死。
+            // 门扇是独立对象，各自有包围盒，不需要门框兜底。
+            var skipExact = new[] { "Door_door_left", "Door_door_right" };
             int colliderCount = 0;
             foreach (var mf in shop.GetComponentsInChildren<MeshFilter>(true))
             {
@@ -143,6 +146,7 @@ public static class ProjectSetup
                 if (mesh == null) continue;
                 var go = mf.gameObject;
                 if (skipPrefix.Any(p => go.name.StartsWith(p, System.StringComparison.Ordinal))) continue;
+                if (skipExact.Contains(go.name)) continue;
                 if (go.GetComponent<Collider>() != null) continue;
 
                 var lb = mesh.bounds;
@@ -215,46 +219,93 @@ public static class ProjectSetup
             RenderSettings.ambientIntensity = 0.25f;
             report.AppendLine("ambientIntensity set to 0.25 (interior baseline)");
 
-            var renderers = shop.GetComponentsInChildren<Renderer>();
+            // 门外地台（Porch）会把整体包围盒往店外拉，店面取景与居中照旧用店内包围盒
+            var renderers = shop.GetComponentsInChildren<Renderer>()
+                .Where(r => r.name != "Porch").ToArray();
             var bounds = renderers[0].bounds;
             foreach (var r in renderers) bounds.Encapsulate(r.bounds);
 
-            // 7.4 玩家角色 + 第三人称跟随镜头（02 票）
+            // 7.4 玩家角色 + 第三人称跟随镜头（02 票）+ 门外出生点（03 票）
             //     外观是程序化占位体，接 Quaternius 模型时整体替换 Player/Visual 子物体即可，
             //     角色控制与镜头代码不感知外观。
+            var leafLT = all.FirstOrDefault(t => t.name == "Door_door_left_LeafL");
+            var leafRT = all.FirstOrDefault(t => t.name == "Door_door_left_LeafR");
+            var doorFrameT = all.FirstOrDefault(t => t.name == "Door_door_left");
+            var porchT = all.FirstOrDefault(t => t.name == "Porch");
+
             Vector3 spawn = bounds.center; spawn.y = 0.06f;
             Vector3 facing = Vector3.forward;
-            var doors = all.Where(t => t.name.StartsWith("Door_") && t.GetComponent<Renderer>() != null).ToList();
-            if (doors.Count > 0)
+            Vector3 doorCenterW = bounds.center; doorCenterW.y = 0f;
+            Vector3 interiorDir = Vector3.forward;
+            Vector3 interiorAnchor = bounds.center; interiorAnchor.y = 0.06f;
+            float doorHalfWidth = 1.26f;
+
+            if (leafLT != null && leafRT != null)
             {
-                Bounds db = doors[0].GetComponent<Renderer>().bounds;
-                foreach (var d in doors) db.Encapsulate(d.GetComponent<Renderer>().bounds);
-                Vector3 doorC = db.center; doorC.y = 0f;
-                Vector3 inward = bounds.center - doorC; inward.y = 0f;
-                if (inward.sqrMagnitude > 1e-4f)
+                // 两扇门的铰链中点就是门洞中心
+                doorCenterW = (leafLT.position + leafRT.position) * 0.5f;
+                doorCenterW.y = 0f;
+                Vector3 leafSpan = leafRT.position - leafLT.position; leafSpan.y = 0f;
+                doorHalfWidth = leafSpan.magnitude * 0.5f;
+
+                // 门洞法线：垂直于门扇连线。取"从门往里走一步还在地板上"的那一侧，
+                // 不能拿整体包围盒中心减门心——店面是多边形，那个方向是斜的。
+                Vector3 nrm = Vector3.Cross(Vector3.up, leafSpan.normalized);
+                var floorR = all.FirstOrDefault(t => t.name == "Floor");
+                if (floorR != null && floorR.GetComponent<Renderer>() != null)
                 {
-                    inward.Normalize();
-                    facing = inward;
-                    Vector3 lateral = Vector3.Cross(Vector3.up, inward).normalized;
-                    // 从门内 1.2m 起，沿入店方向 + 左右偏移做一次小范围搜索，取第一块不压家具的空位
+                    Bounds floorBb = floorR.GetComponent<Renderer>().bounds;
+                    // 地板是零厚度的平面，y 必须取 0 才落在包围盒内
+                    Vector3 probe = doorCenterW + nrm * 0.8f; probe.y = floorBb.center.y;
+                    if (!floorBb.Contains(probe)) nrm = -nrm;
+                }
+
+                if (nrm.sqrMagnitude > 1e-4f)
+                {
+                    nrm.Normalize();
+                    interiorDir = nrm;
+                    facing = nrm;                          // 出生时正对着店门
+                    spawn = doorCenterW - nrm * 1.55f;     // 站在门外地台上
+                    spawn.y = 0.06f;
+                    report.AppendLine($"door normal={nrm} span={leafSpan.magnitude:F2}m");
+
+                    // 店内视点：从店面中心向外螺旋找一块不压家具的空位。
+                    // 不能贴着门口取（门两侧就是书墙，第三人称镜头会被顶到 1m 内，构图没法看）。
+                    var floorRO = all.FirstOrDefault(t => t.name == "Floor");
+                    Vector3 mid = floorRO != null && floorRO.GetComponent<Renderer>() != null
+                        ? floorRO.GetComponent<Renderer>().bounds.center
+                        : bounds.center;
+                    Vector3 midFlat = new Vector3(mid.x, 0.06f, mid.z);
+
                     Physics.SyncTransforms();
-                    spawn = doorC + inward * 1.2f; spawn.y = 0.06f;
                     bool found = false;
-                    for (float d = 1.2f; d <= 9.0f && !found; d += 0.2f)
+                    for (float rad = 0f; rad <= 4.0f && !found; rad += 0.30f)
                     {
-                        for (int k = 0; k < 7 && !found; k++)
+                        int steps = rad < 0.01f ? 1 : 8;
+                        for (int k = 0; k < steps && !found; k++)
                         {
-                            float lat = (k == 0) ? 0f : ((k % 2 == 1 ? 1f : -1f) * 0.45f * ((k + 1) / 2));
-                            Vector3 cand = doorC + inward * d + lateral * lat;
+                            float ang = k * Mathf.PI * 2f / steps;
+                            Vector3 cand = midFlat + new Vector3(Mathf.Cos(ang), 0f, Mathf.Sin(ang)) * rad;
                             Vector3 a = new Vector3(cand.x, 0.50f, cand.z);
                             Vector3 b = new Vector3(cand.x, 1.40f, cand.z);
                             if (Physics.CheckCapsule(a, b, 0.32f, ~0, QueryTriggerInteraction.Ignore)) continue;
-                            spawn = new Vector3(cand.x, 0.06f, cand.z);
-                            report.AppendLine($"spawn free at inward={d:F1}m lateral={lat:F2}m");
+                            interiorAnchor = new Vector3(cand.x, 0.06f, cand.z);
+                            report.AppendLine($"interior anchor at r={rad:F1}m ang={ang * Mathf.Rad2Deg:F0}deg");
                             found = true;
                         }
                     }
-                    if (!found) report.AppendLine("spawn free: NOT FOUND, using fallback");
+                    if (!found) report.AppendLine("interior anchor: NOT FOUND, using shop center");
+
+                    // 出生点自检：被门扇/墙压住就往外退
+                    for (float back = 0f; back <= 1.2f; back += 0.2f)
+                    {
+                        Vector3 p = doorCenterW - nrm * (1.55f + back); p.y = 0.06f;
+                        Vector3 a = new Vector3(p.x, 0.50f, p.z);
+                        Vector3 b = new Vector3(p.x, 1.40f, p.z);
+                        if (Physics.CheckCapsule(a, b, 0.32f, ~0, QueryTriggerInteraction.Ignore)) continue;
+                        spawn = p;
+                        break;
+                    }
                 }
             }
 
@@ -306,6 +357,8 @@ public static class ProjectSetup
 
             var spawnGO = new GameObject("PlayerSpawn");
             spawnGO.transform.SetPositionAndRotation(spawn, Quaternion.LookRotation(facing, Vector3.up));
+            var interiorGO = new GameObject("InteriorAnchor");
+            interiorGO.transform.SetPositionAndRotation(interiorAnchor, Quaternion.LookRotation(facing, Vector3.up));
 
             var router = playerGO.AddComponent<CoffeeShop.Controls.PlayerInputRouter>();
             var motor = playerGO.AddComponent<CoffeeShop.Player.PlayerMotor>();
@@ -319,12 +372,81 @@ public static class ProjectSetup
             fader.Bind(camGO.transform, playerGO.transform);
             report.AppendLine($"player spawn=({spawn.x:F2}, {spawn.z:F2}) facing=({facing.x:F2}, {facing.z:F2})");
 
+            // 7.5 入口门 + 门外地台围挡（03 票）
+            if (leafLT != null && leafRT != null)
+            {
+                var doorGO = new GameObject("EntranceDoor");
+                doorGO.transform.position = doorCenterW;
+                var door = doorGO.AddComponent<CoffeeShop.Interaction.EntranceDoor>();
+                door.leafL = leafLT;
+                door.leafR = leafRT;
+                door.doorCenter = doorCenterW;
+                door.interiorDir = interiorDir;
+                door.halfWidth = doorHalfWidth;
+                door.player = playerGO.transform;
+                door.Bind(router);
+
+                var targets = new System.Collections.Generic.List<Collider>();
+                foreach (var t in new[] { leafLT, leafRT, doorFrameT })
+                {
+                    if (t == null) continue;
+                    var c = t.GetComponent<Collider>();
+                    if (c != null) targets.Add(c);
+                }
+                door.clickTargets = targets.ToArray();
+
+                var bell = doorGO.AddComponent<AudioSource>();
+                bell.playOnAwake = false;
+                bell.spatialBlend = 1f;
+                bell.rolloffMode = AudioRolloffMode.Linear;
+                bell.minDistance = 2f;
+                bell.maxDistance = 30f;
+                door.bellSource = bell;
+                report.AppendLine($"entrance door: center=({doorCenterW.x:F2}, {doorCenterW.z:F2}) " +
+                                  $"halfWidth={doorHalfWidth:F2} clickTargets={targets.Count}");
+
+                // 门外地台三面不可见围挡：玩家不会从平台边缘掉进空场景。
+                // 放在独立的 Boundary 层：角色会撞上，但交互射线和镜头避让都跳过它。
+                if (porchT != null && porchT.GetComponent<Renderer>() != null)
+                {
+                    int boundaryLayer = EnsureLayer("Boundary");
+                    Bounds pb = porchT.GetComponent<Renderer>().bounds;
+                    Vector3 nDir = interiorDir.normalized;
+                    Vector3 lat = Vector3.Cross(Vector3.up, nDir).normalized;
+                    float extN = Mathf.Abs(nDir.x) * pb.extents.x + Mathf.Abs(nDir.z) * pb.extents.z;
+                    float extL = Mathf.Abs(lat.x) * pb.extents.x + Mathf.Abs(lat.z) * pb.extents.z;
+                    var guardGO = new GameObject("PorchBoundary");
+                    guardGO.layer = boundaryLayer;
+
+                    void Guard(Vector3 normal, Vector3 center, float width)
+                    {
+                        var g = new GameObject("guard");
+                        g.layer = boundaryLayer;
+                        g.transform.SetParent(guardGO.transform, false);
+                        g.transform.SetPositionAndRotation(center, Quaternion.LookRotation(normal, Vector3.up));
+                        var bc = g.AddComponent<BoxCollider>();
+                        bc.size = new Vector3(width, 3f, 0.2f);
+                    }
+                    Vector3 pc = pb.center; pc.y = 1.5f;
+                    Guard(nDir, pc - nDir * extN + nDir * 0.1f, extL * 2f);
+                    Guard(lat, pc + lat * extL, extN * 2f);
+                    Guard(-lat, pc - lat * extL, extN * 2f);
+                    report.AppendLine($"porch boundary guards=3 layer={boundaryLayer} " +
+                                      $"extentN={extN:F2} extentL={extL:F2}");
+                }
+            }
+
+            var audioListener = camGO.GetComponent<AudioListener>();
+            if (audioListener == null) camGO.AddComponent<AudioListener>();
+
             var rigGO = new GameObject("ScreenshotRig");
             var rig = rigGO.AddComponent<ScreenshotRig>();
             rig.player = motor;
             rig.followRig = follow;
             rig.fader = fader;
             rig.spawnPoint = spawnGO.transform;
+            rig.interiorPoint = interiorGO.transform;
+            rig.door = Object.FindFirstObjectByType<CoffeeShop.Interaction.EntranceDoor>();
             // 吧台机位：站在通道正中（两柜之间），沿吧台纵向（X）偏一点看过去，能同时看到前柜、通道、后柜
             var aisleCenter = (frontR.bounds.center + backR.bounds.center) * 0.5f;
             rig.camPosBar = aisleCenter + new Vector3(2.8f, 0.7f, 0f);
@@ -379,5 +501,36 @@ public static class ProjectSetup
             File.WriteAllText("setup_report.txt", "EXCEPTION: " + e + "\n\n" + report);
             EditorApplication.Exit(2);
         }
+    }
+
+    /// <summary>
+    /// 确保存在一个自定义层并返回层号（前 8 个是 Unity 内置层，不能动）。
+    /// 找不到空位就退回 Default(0)。
+    /// </summary>
+    static int EnsureLayer(string name)
+    {
+        var assets = AssetDatabase.LoadAllAssetsAtPath("ProjectSettings/TagManager.asset");
+        if (assets == null || assets.Length == 0) return 0;
+        var so = new SerializedObject(assets[0]);
+        var layers = so.FindProperty("layers");
+        if (layers == null) return 0;
+
+        for (int i = 8; i < layers.arraySize; i++)
+        {
+            var el = layers.GetArrayElementAtIndex(i);
+            if (el.stringValue == name) return i;
+        }
+        for (int i = 8; i < layers.arraySize; i++)
+        {
+            var el = layers.GetArrayElementAtIndex(i);
+            if (string.IsNullOrEmpty(el.stringValue))
+            {
+                el.stringValue = name;
+                so.ApplyModifiedProperties();
+                AssetDatabase.SaveAssets();
+                return i;
+            }
+        }
+        return 0;
     }
 }

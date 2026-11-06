@@ -10,15 +10,19 @@ namespace CoffeeShop.Controls
     {
         Vector2 move;
         Vector2 look;
+        bool interact;
 
         public void SetMove(Vector2 v) => move = v.sqrMagnitude > 1f ? v.normalized : v;
         public void AddLook(Vector2 deltaDegrees) => look += deltaDegrees;
-        public void Clear() { move = Vector2.zero; look = Vector2.zero; }
+        /// <summary>模拟一次点按交互（开门 / 点家具）。读完即消费。</summary>
+        public void PressInteract() => interact = true;
+        public void Clear() { move = Vector2.zero; look = Vector2.zero; interact = false; }
 
         public PlayerIntent Read()
         {
-            var intent = new PlayerIntent { Move = move, Look = look };
-            look = Vector2.zero;   // 增量读完即清零
+            var intent = new PlayerIntent { Move = move, Look = look, Interact = interact };
+            look = Vector2.zero;      // 增量读完即清零
+            interact = false;         // 边沿触发
             return intent;
         }
     }
