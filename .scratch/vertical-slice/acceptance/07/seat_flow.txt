@@ -1,0 +1,3 @@
+geometry: badFacing=0 badSurface=0 badStand=0 badSeat=0 cramped=4
+failures=0
+SEAT RESULT: PASS

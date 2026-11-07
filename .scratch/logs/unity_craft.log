@@ -1,0 +1,699 @@
+VBCSCompilerServerWatchdog: watching VBCSCompiler (PID 56248)
+[Licensing::Module] Trying to connect to existing licensing client channel...
+Built from '6000.3/respin/6000.3.28f1-21f78c3e21d1' branch; Version is '6000.3.28f1 (8f082d2fe476) revision 9373741'; Using compiler version '194234433'; Build Type 'Release'
+[Licensing::IpcConnector] Channel LicenseClient-zang doesn't exist
+OS: 'Windows 11  (10.0.22631) CoreCountrySpecific' Language: 'zh' Physical Memory: 32496 MB
+BatchMode: 1, IsHumanControllingUs: 0, StartBugReporterOnCrash: 0, Is64bit: 1
+System  architecture: x64
+Process architecture: x64
+Date: 2026-11-07T02:32:41Z
+[Licensing::Module] Successfully launched the LicensingClient (PId: 13356)
+Starting IPC server.
+[Licensing::IpcConnector] Successfully connected to: "LicenseClient-zang" at "2026-11-07T02:32:41.6628124Z"
+Waiting for clients to connect on \\.\pipe\Unity-LicenseClient-zang, press Ctrl-C to exit.
+[Licensing::Client] Code 10 while verifying Licensing Client signature (process Id: 13356, path: "D:/Unity/Editors/6000.3.28f1/Editor/Data/Resources/Licensing/Client/Unity.Licensing.Client.exe")
+[Licensing::Module] LicensingClient has failed validation; ignoring
+[Licensing::Client] Handshaking with LicensingClient:
+  Version:                 1.19.0+4cc3dda
+  Session Id:              9b33b6efc67240b3bee62a70abcc5243
+  Correlation Id:          22b79fb422bad7e75cb2a0c73d716fdb
+  External correlation Id: 1122641345789450684
+  Machine Id:              /Ditus4gdni536vwRntxT1mTlYk=
+[Licensing::Module] Successfully connected to LicensingClient on channel: "LicenseClient-zang" (connect: 0.16s, validation: 0.30s, handshake: 0.07s)
+[Licensing::IpcConnector] Successfully connected to: "LicenseClient-zang-notifications" at "2026-11-07T02:32:42.0307777Z"
+[Licensing::Module] Connected to LicensingClient (PId: 13356, launch time: 0.00, total connection time: 0.53s)
+[Licensing::Module] Error: Access token is unavailable; failed to update
+[Licensing::Client] Successfully resolved entitlement details
+[Licensing::Module] License group:
+  Id: 15669798182264-UnityPersXXXX
+  Product: Unity Personal
+  Type: Assigned
+  Expiration: Unlimited
+[Licensing::Client] Successfully updated license, isAsync: True, time: 0.00
+[Licensing::Client] Successfully resolved entitlement details
+[Licensing::Module] Licensing Background thread has ended after 0.55s
+
+COMMAND LINE ARGUMENTS:
+D:\Unity\Editors\6000.3.28f1\Editor\Unity.exe
+-batchmode
+-projectPath
+D:/coffee_shop/game
+-executeMethod
+PlayTest.RunCraft
+-logFile
+D:/coffee_shop/.scratch/logs/unity_craft.log
+Successfully changed project path to: D:/coffee_shop/game
+D:/coffee_shop/game
+[UnityMemory] Configuration Parameters - Can be set up in boot.config
+    "memorysetup-temp-allocator-size-nav-mesh-worker=65536"
+    "memorysetup-temp-allocator-size-audio-worker=65536"
+    "memorysetup-temp-allocator-size-gfx=262144"
+    "memorysetup-allocator-temp-initial-block-size-main=262144"
+    "memorysetup-allocator-temp-initial-block-size-worker=262144"
+    "memorysetup-temp-allocator-size-background-worker=32768"
+    "memorysetup-temp-allocator-size-job-worker=262144"
+    "memorysetup-temp-allocator-size-preload-manager=33554432"
+    "memorysetup-remapper-allocator-initial-capacity=32768"
+    "memorysetup-temp-allocator-size-gi-baking-worker=262144"
+    "memorysetup-temp-allocator-size-gi-baking-worker=262144"
+    "memorysetup-temp-allocator-size-gi-baking-worker=262144"
+    "memorysetup-temp-allocator-size-gi-baking-worker=262144"
+    "memorysetup-temp-allocator-size-gi-baking-worker=262144"
+    "memorysetup-bucket-allocator-granularity=16"
+    "memorysetup-bucket-allocator-bucket-count=8"
+    "memorysetup-bucket-allocator-block-size=33554432"
+    "memorysetup-bucket-allocator-block-count=8"
+    "memorysetup-main-allocator-block-size=16777216"
+    "memorysetup-thread-allocator-block-size=16777216"
+    "memorysetup-gfx-main-allocator-block-size=16777216"
+    "memorysetup-gfx-thread-allocator-block-size=16777216"
+    "memorysetup-cache-allocator-block-size=4194304"
+    "memorysetup-typetree-allocator-block-size=2097152"
+    "memorysetup-profiler-bucket-allocator-granularity=16"
+    "memorysetup-profiler-bucket-allocator-bucket-count=8"
+    "memorysetup-profiler-bucket-allocator-block-size=33554432"
+    "memorysetup-profiler-bucket-allocator-block-count=8"
+    "memorysetup-profiler-allocator-block-size=16777216"
+    "memorysetup-profiler-editor-allocator-block-size=1048576"
+    "memorysetup-temp-allocator-size-main=16777216"
+    "memorysetup-job-temp-allocator-block-size=2097152"
+    "memorysetup-job-temp-allocator-block-size-background=1048576"
+    "memorysetup-job-temp-allocator-reduction-small-platforms=262144"
+    "memorysetup-temp-allocator-size-cloud-worker=32768"
+Player connection [18860]  Target information:
+
+Player connection [18860]  * "[IP] 192.168.218.1 [Port] 55504 [Flags] 2 [Guid] 3456757772 [EditorId] 3456757772 [Version] 1048832 [Id] WindowsEditor(7,DESKTOP-8RF6KE4) [Debug] 1 [PackageName] WindowsEditor [ProjectName] Editor" 
+
+Player connection [18860]  * "[IP] 192.168.24.1 [Port] 55504 [Flags] 2 [Guid] 3456757772 [EditorId] 3456757772 [Version] 1048832 [Id] WindowsEditor(7,DESKTOP-8RF6KE4) [Debug] 1 [PackageName] WindowsEditor [ProjectName] Editor" 
+
+Player connection [18860]  * "[IP] 192.168.56.1 [Port] 55504 [Flags] 2 [Guid] 3456757772 [EditorId] 3456757772 [Version] 1048832 [Id] WindowsEditor(7,DESKTOP-8RF6KE4) [Debug] 1 [PackageName] WindowsEditor [ProjectName] Editor" 
+
+Player connection [18860]  * "[IP] 172.22.32.1 [Port] 55504 [Flags] 2 [Guid] 3456757772 [EditorId] 3456757772 [Version] 1048832 [Id] WindowsEditor(7,DESKTOP-8RF6KE4) [Debug] 1 [PackageName] WindowsEditor [ProjectName] Editor" 
+
+Player connection [18860]  * "[IP] 198.18.0.1 [Port] 55504 [Flags] 2 [Guid] 3456757772 [EditorId] 3456757772 [Version] 1048832 [Id] WindowsEditor(7,DESKTOP-8RF6KE4) [Debug] 1 [PackageName] WindowsEditor [ProjectName] Editor" 
+
+Player connection [18860]  * "[IP] 192.168.255.160 [Port] 55504 [Flags] 2 [Guid] 3456757772 [EditorId] 3456757772 [Version] 1048832 [Id] WindowsEditor(7,DESKTOP-8RF6KE4) [Debug] 1 [PackageName] WindowsEditor [ProjectName] Editor" 
+
+Player connection [18860] Host joined multi-casting on [225.0.0.222:54997]...
+Player connection [18860] Host joined alternative multi-casting on [225.0.0.222:34997]...
+Input System module state changed to: Initialized.
+[Physics::Module] Initialized fallback backend.
+[Physics::Module] Id: 0xdecafbad
+[Package Manager] Connected to IPC stream "Upm-47780" after 0.2 seconds.
+[Licensing::Client] Successfully resolved entitlement details
+Library Redirect Path: Library/
+[Physics::Module] Selected backend.
+[Physics::Module] Name: PhysX
+[Physics::Module] Id: 0xf2b8ea05
+[Physics::Module] SDK Version: 4.1.2
+[Physics::Module] Integration Version: 1.0.0
+[Physics::Module] Threading Mode: Multi-Threaded
+Refreshing native plugins compatible for Editor in 0.00 ms, found 0 plugins.
+Preloading 0 native plugins for Editor in 0.00 ms.
+Initialize engine version: 6000.3.28f1 (8f082d2fe476)
+[Subsystems] Discovering subsystems at path D:/Unity/Editors/6000.3.28f1/Editor/Data/Resources/UnitySubsystems
+[Subsystems] Discovering subsystems at path D:/coffee_shop/game/Assets
+GfxDevice: creating device client; kGfxThreadingModeNonThreaded
+d3d12: failed to query info queue interface (0x80004002).
+Direct3D:
+    Version:         Direct3D 12 [level 12.2]
+    Renderer:        NVIDIA GeForce RTX 4060 Laptop GPU (ID=0x28a0)
+    Vendor:          NVIDIA
+    VRAM:            7957 MB
+    App VRAM Budget: 7189 MB
+    Driver:          32.0.15.7283
+Initialize mono
+Mono path[0] = 'D:/Unity/Editors/6000.3.28f1/Editor/Data/Managed'
+Mono path[1] = 'D:/Unity/Editors/6000.3.28f1/Editor/Data/MonoBleedingEdge/lib/mono/unityjit-win32'
+Mono config path = 'D:/Unity/Editors/6000.3.28f1/Editor/Data/MonoBleedingEdge/etc'
+Using monoOptions --debugger-agent=transport=dt_socket,embedding=1,server=y,suspend=n,address=127.0.0.1:56780
+Using cacheserver namespaces - metadata:defaultmetadata, artifacts:defaultartifacts
+Using cacheserver namespaces - metadata:defaultmetadata, artifacts:defaultartifacts
+ImportWorker Server TCP listen port: 0
+AcceleratorClientConnectionCallback - disconnected - :0
+Begin MonoManager ReloadAssembly
+Registering precompiled unity dll's ...
+Register platform support module: D:/Unity/Editors/6000.3.28f1/Editor/Data/PlaybackEngines/WindowsStandaloneSupport/UnityEditor.WindowsStandalone.Extensions.dll
+[Licensing::Client] Successfully resolved entitlement details
+Register platform support module: D:/Unity/Editors/6000.3.28f1/Editor/Data/PlaybackEngines/AndroidPlayer/UnityEditor.Android.Extensions.dll
+Registered in 0.006357 seconds.
+- Loaded All Assemblies, in  0.414 seconds
+Native extension for Android target not found
+Native extension for WindowsStandalone target not found
+Package Manager log level set to [2]
+ScheduleIndexationOnStartup MainProcess:False IndexOnStartup:False
+Mono: successfully reloaded assembly
+- Finished resetting the current domain, in  0.360 seconds
+Domain Reload Profiling: 774ms
+	BeginReloadAssembly (167ms)
+		ExecutionOrderSort (0ms)
+		DisableScriptedObjects (0ms)
+		BackupInstance (0ms)
+		ReleaseScriptingObjects (0ms)
+		CreateAndSetChildDomain (4ms)
+	RebuildCommonClasses (34ms)
+	RebuildNativeTypeToScriptingClass (11ms)
+	initialDomainReloadingComplete (41ms)
+	LoadAllAssembliesAndSetupDomain (161ms)
+		LoadAssemblies (164ms)
+		RebuildTransferFunctionScriptingTraits (0ms)
+		AnalyzeDomain (157ms)
+			TypeCache.Refresh (155ms)
+				TypeCache.ScanAssembly (143ms)
+			BuildScriptInfoCaches (0ms)
+			ResolveRequiredComponents (1ms)
+	FinalizeReload (360ms)
+		ReleaseScriptCaches (0ms)
+		RebuildScriptCaches (0ms)
+		SetupLoadedEditorAssemblies (325ms)
+			LogAssemblyErrors (0ms)
+			InitializePlatformSupportModulesInManaged (47ms)
+			SetLoadedEditorAssemblies (4ms)
+			BeforeProcessingInitializeOnLoad (72ms)
+			ProcessInitializeOnLoadAttributes (119ms)
+			ProcessInitializeOnLoadMethodAttributes (84ms)
+			AfterProcessingInitializeOnLoad (0ms)
+			EditorAssembliesLoaded (0ms)
+		ExecutionOrderSort2 (0ms)
+		AwakeInstancesAfterBackupRestoration (0ms)
+[Licensing::Client] Successfully resolved entitlement details
+Application.AssetDatabase Initial Refresh Start
+[Package Manager] Restoring resolved packages state from cache
+[Licensing::Client] Successfully resolved entitlement details
+[Package Manager] Registered 50 packages:
+  Packages from [https://packages.unity.com]:
+    com.unity.searcher@4.9.5 (location: D:\coffee_shop\game\Library\PackageCache\com.unity.searcher@a463122f2c00)
+    com.unity.burst@1.8.31 (location: D:\coffee_shop\game\Library\PackageCache\com.unity.burst@bfa84123c21a)
+    com.unity.mathematics@1.3.3 (location: D:\coffee_shop\game\Library\PackageCache\com.unity.mathematics@19a9377c4ffa)
+    com.unity.collections@2.7.1 (location: D:\coffee_shop\game\Library\PackageCache\com.unity.collections@88d5bf65ce66)
+    com.unity.nuget.mono-cecil@1.11.6 (location: D:\coffee_shop\game\Library\PackageCache\com.unity.nuget.mono-cecil@ecb9724e46ff)
+    com.unity.test-framework.performance@3.5.0 (location: D:\coffee_shop\game\Library\PackageCache\com.unity.test-framework.performance@8b56083ec0f0)
+  Built-in packages:
+    com.unity.multiplayer.center@1.0.1 (location: D:\coffee_shop\game\Library\PackageCache\com.unity.multiplayer.center@f01f4ba8d00a)
+    com.unity.modules.accessibility@1.0.0 (location: D:\coffee_shop\game\Library\PackageCache\com.unity.modules.accessibility)
+    com.unity.modules.adaptiveperformance@1.0.0 (location: D:\coffee_shop\game\Library\PackageCache\com.unity.modules.adaptiveperformance)
+    com.unity.modules.ai@1.0.0 (location: D:\coffee_shop\game\Library\PackageCache\com.unity.modules.ai)
+    com.unity.modules.androidjni@1.0.0 (location: D:\coffee_shop\game\Library\PackageCache\com.unity.modules.androidjni)
+    com.unity.modules.animation@1.0.0 (location: D:\coffee_shop\game\Library\PackageCache\com.unity.modules.animation)
+    com.unity.modules.assetbundle@1.0.0 (location: D:\coffee_shop\game\Library\PackageCache\com.unity.modules.assetbundle)
+    com.unity.modules.audio@1.0.0 (location: D:\coffee_shop\game\Library\PackageCache\com.unity.modules.audio)
+    com.unity.modules.cloth@1.0.0 (location: D:\coffee_shop\game\Library\PackageCache\com.unity.modules.cloth)
+    com.unity.modules.director@1.0.0 (location: D:\coffee_shop\game\Library\PackageCache\com.unity.modules.director)
+    com.unity.modules.imageconversion@1.0.0 (location: D:\coffee_shop\game\Library\PackageCache\com.unity.modules.imageconversion)
+    com.unity.modules.imgui@1.0.0 (location: D:\coffee_shop\game\Library\PackageCache\com.unity.modules.imgui)
+    com.unity.modules.jsonserialize@1.0.0 (location: D:\coffee_shop\game\Library\PackageCache\com.unity.modules.jsonserialize)
+    com.unity.modules.particlesystem@1.0.0 (location: D:\coffee_shop\game\Library\PackageCache\com.unity.modules.particlesystem)
+    com.unity.modules.physics@1.0.0 (location: D:\coffee_shop\game\Library\PackageCache\com.unity.modules.physics)
+    com.unity.modules.physics2d@1.0.0 (location: D:\coffee_shop\game\Library\PackageCache\com.unity.modules.physics2d)
+    com.unity.modules.screencapture@1.0.0 (location: D:\coffee_shop\game\Library\PackageCache\com.unity.modules.screencapture)
+    com.unity.modules.terrain@1.0.0 (location: D:\coffee_shop\game\Library\PackageCache\com.unity.modules.terrain)
+    com.unity.modules.terrainphysics@1.0.0 (location: D:\coffee_shop\game\Library\PackageCache\com.unity.modules.terrainphysics)
+    com.unity.modules.tilemap@1.0.0 (location: D:\coffee_shop\game\Library\PackageCache\com.unity.modules.tilemap)
+    com.unity.modules.ui@1.0.0 (location: D:\coffee_shop\game\Library\PackageCache\com.unity.modules.ui)
+    com.unity.modules.uielements@1.0.0 (location: D:\coffee_shop\game\Library\PackageCache\com.unity.modules.uielements)
+    com.unity.modules.umbra@1.0.0 (location: D:\coffee_shop\game\Library\PackageCache\com.unity.modules.umbra)
+    com.unity.modules.unityanalytics@1.0.0 (location: D:\coffee_shop\game\Library\PackageCache\com.unity.modules.unityanalytics)
+    com.unity.modules.unitywebrequest@1.0.0 (location: D:\coffee_shop\game\Library\PackageCache\com.unity.modules.unitywebrequest)
+    com.unity.modules.unitywebrequestassetbundle@1.0.0 (location: D:\coffee_shop\game\Library\PackageCache\com.unity.modules.unitywebrequestassetbundle)
+    com.unity.modules.unitywebrequestaudio@1.0.0 (location: D:\coffee_shop\game\Library\PackageCache\com.unity.modules.unitywebrequestaudio)
+    com.unity.modules.unitywebrequesttexture@1.0.0 (location: D:\coffee_shop\game\Library\PackageCache\com.unity.modules.unitywebrequesttexture)
+    com.unity.modules.unitywebrequestwww@1.0.0 (location: D:\coffee_shop\game\Library\PackageCache\com.unity.modules.unitywebrequestwww)
+    com.unity.modules.vectorgraphics@1.0.0 (location: D:\coffee_shop\game\Library\PackageCache\com.unity.modules.vectorgraphics)
+    com.unity.modules.vehicles@1.0.0 (location: D:\coffee_shop\game\Library\PackageCache\com.unity.modules.vehicles)
+    com.unity.modules.video@1.0.0 (location: D:\coffee_shop\game\Library\PackageCache\com.unity.modules.video)
+    com.unity.modules.vr@1.0.0 (location: D:\coffee_shop\game\Library\PackageCache\com.unity.modules.vr)
+    com.unity.modules.wind@1.0.0 (location: D:\coffee_shop\game\Library\PackageCache\com.unity.modules.wind)
+    com.unity.modules.xr@1.0.0 (location: D:\coffee_shop\game\Library\PackageCache\com.unity.modules.xr)
+    com.unity.render-pipelines.universal@17.3.0 (location: D:\coffee_shop\game\Library\PackageCache\com.unity.render-pipelines.universal@029be7ffa662)
+    com.unity.test-framework@1.6.0 (location: D:\coffee_shop\game\Library\PackageCache\com.unity.test-framework@bd7f943e9647)
+    com.unity.ugui@2.0.0 (location: D:\coffee_shop\game\Library\PackageCache\com.unity.ugui@44a561608371)
+    com.unity.ext.nunit@2.0.5 (location: D:\coffee_shop\game\Library\PackageCache\com.unity.ext.nunit@d8c07649098d)
+    com.unity.render-pipelines.core@17.3.0 (location: D:\coffee_shop\game\Library\PackageCache\com.unity.render-pipelines.core@3424017a4ec3)
+    com.unity.shadergraph@17.3.0 (location: D:\coffee_shop\game\Library\PackageCache\com.unity.shadergraph@d526115bb944)
+    com.unity.render-pipelines.universal-config@17.0.3 (location: D:\coffee_shop\game\Library\PackageCache\com.unity.render-pipelines.universal-config@8dc1aab4af1d)
+    com.unity.modules.subsystems@1.0.0 (location: D:\coffee_shop\game\Library\PackageCache\com.unity.modules.subsystems)
+    com.unity.modules.hierarchycore@1.0.0 (location: D:\coffee_shop\game\Library\PackageCache\com.unity.modules.hierarchycore)
+[Subsystems] No new subsystems found in resolved package list.
+[Package Manager] Done registering packages in 0.06 seconds
+[ScriptCompilation] Requested script compilation because: Assetdatabase observed changes in script compilation related files
+info: Microsoft.Hosting.Lifetime[14]
+      Now listening on: http://localhost:80
+info: Microsoft.Hosting.Lifetime[0]
+      Application started. Press Ctrl+C to shut down.
+info: Microsoft.Hosting.Lifetime[0]
+      Hosting environment: Production
+info: Microsoft.Hosting.Lifetime[0]
+      Content root path: D:\coffee_shop\game\
+info: Microsoft.AspNetCore.Hosting.Diagnostics[1]
+      Request starting HTTP/2 POST http://ilpp/UnityILPP.PostProcessing/Ping application/grpc -
+info: Microsoft.AspNetCore.Routing.EndpointMiddleware[0]
+      Executing endpoint 'gRPC - /UnityILPP.PostProcessing/Ping'
+info: Microsoft.AspNetCore.Routing.EndpointMiddleware[1]
+      Executed endpoint 'gRPC - /UnityILPP.PostProcessing/Ping'
+info: Microsoft.AspNetCore.Hosting.Diagnostics[2]
+      Request finished HTTP/2 POST http://ilpp/UnityILPP.PostProcessing/Ping application/grpc - - 200 - application/grpc 36.1221ms
+Starting: D:\Unity\Editors\6000.3.28f1\Editor\Data\Tools\BuildPipeline\bee_backend.exe --ipc --defer-dag-verification --dagfile="Library/Bee/1900b0aE.dag" --continue-on-failure --profile="Library/Bee/backend1.traceevents" ScriptAssemblies
+WorkingDir: D:/coffee_shop/game
+DisplayProgressbar: Compiling Scripts
+info: Microsoft.AspNetCore.Hosting.Diagnostics[1]
+      Request starting HTTP/2 POST http://ilpp/UnityILPP.PostProcessing/ConfigurePostProcessors application/grpc -
+info: Microsoft.AspNetCore.Routing.EndpointMiddleware[0]
+      Executing endpoint 'gRPC - /UnityILPP.PostProcessing/ConfigurePostProcessors'
+warn: Unity.ILPP.Runner.PostProcessingAssemblyLoadContext[0]
+      Assembly system.runtime.interopservices.windowsruntime has duplicate hint path. Ignoring "D:\Unity\Editors\6000.3.28f1\Editor\Data\UnityReferenceAssemblies\unity-4.8-api\Facades\System.Runtime.InteropServices.WindowsRuntime.dll" in favor of "D:\Unity\Editors\6000.3.28f1\Editor\Data\NetStandard\Extensions\2.0.0\System.Runtime.InteropServices.WindowsRuntime.dll"
+warn: Unity.ILPP.Runner.PostProcessingAssemblyLoadContext[0]
+      Assembly system.componentmodel.composition has duplicate hint path. Ignoring "D:\Unity\Editors\6000.3.28f1\Editor\Data\UnityReferenceAssemblies\unity-4.8-api\System.ComponentModel.Composition.dll" in favor of "D:\Unity\Editors\6000.3.28f1\Editor\Data\NetStandard\compat\2.1.0\shims\netfx\System.ComponentModel.Composition.dll"
+info: Unity.ILPP.Runner.PostProcessingAssemblyLoadContext[0]
+      Resolved Unity.Burst.Cecil, Version=0.11.6.0, Culture=neutral, PublicKeyToken=50cebf1cceb9d05e with Library\PackageCache\com.unity.burst@bfa84123c21a\Unity.Burst.CodeGen\Unity.Burst.Cecil.dll
+info: Unity.ILPP.Runner.PostProcessingAssemblyLoadContext[0]
+      Resolved Mono.Cecil, Version=0.11.5.0, Culture=neutral, PublicKeyToken=50cebf1cceb9d05e with Library\PackageCache\com.unity.nuget.mono-cecil@ecb9724e46ff\Mono.Cecil.dll
+info: Microsoft.AspNetCore.Routing.EndpointMiddleware[1]
+      Executed endpoint 'gRPC - /UnityILPP.PostProcessing/ConfigurePostProcessors'
+info: Microsoft.AspNetCore.Hosting.Diagnostics[2]
+      Request finished HTTP/2 POST http://ilpp/UnityILPP.PostProcessing/ConfigurePostProcessors application/grpc - - 200 - application/grpc 36.1043ms
+info: Microsoft.AspNetCore.Hosting.Diagnostics[1]
+      Request starting HTTP/2 POST http://ilpp/UnityILPP.PostProcessing/PostProcessAssembly application/grpc -
+info: Microsoft.AspNetCore.Routing.EndpointMiddleware[0]
+      Executing endpoint 'gRPC - /UnityILPP.PostProcessing/PostProcessAssembly'
+info: Unity.ILPP.Runner.PostProcessingPipeline[0]
+      Processing assembly Library/Bee/artifacts/1900b0aE.dag/CoffeeShop.Runtime.dll, with 139 defines and 267 references
+info: Unity.ILPP.Runner.PostProcessingPipeline[0]
+      processors: Unity.Jobs.CodeGen.JobsILPostProcessor, zzzUnity.Burst.CodeGen.BurstILPostProcessor
+info: Unity.ILPP.Runner.PostProcessingPipeline[0]
+      running Unity.Jobs.CodeGen.JobsILPostProcessor
+info: Unity.ILPP.Runner.PostProcessingPipeline[0]
+      running zzzUnity.Burst.CodeGen.BurstILPostProcessor
+info: Microsoft.AspNetCore.Hosting.Diagnostics[1]
+      Request starting HTTP/2 POST http://ilpp/UnityILPP.PostProcessing/PostProcessAssembly application/grpc -
+info: Microsoft.AspNetCore.Routing.EndpointMiddleware[0]
+      Executing endpoint 'gRPC - /UnityILPP.PostProcessing/PostProcessAssembly'
+info: Microsoft.AspNetCore.Hosting.Diagnostics[1]
+      Request starting HTTP/2 POST http://ilpp/UnityILPP.PostProcessing/PostProcessAssembly application/grpc -
+info: Microsoft.AspNetCore.Routing.EndpointMiddleware[0]
+      Executing endpoint 'gRPC - /UnityILPP.PostProcessing/PostProcessAssembly'
+info: Unity.ILPP.Runner.PostProcessingPipeline[0]
+      Processing assembly Library/Bee/artifacts/1900b0aE.dag/CoffeeShop.Tests.EditMode.dll, with 137 defines and 272 references
+info: Unity.ILPP.Runner.PostProcessingPipeline[0]
+      processors: Unity.Jobs.CodeGen.JobsILPostProcessor, zzzUnity.Burst.CodeGen.BurstILPostProcessor
+info: Unity.ILPP.Runner.PostProcessingPipeline[0]
+      Processing assembly Library/Bee/artifacts/1900b0aE.dag/CoffeeShop.Editor.dll, with 137 defines and 277 references
+info: Unity.ILPP.Runner.PostProcessingPipeline[0]
+      processors: Unity.Jobs.CodeGen.JobsILPostProcessor, zzzUnity.Burst.CodeGen.BurstILPostProcessor
+info: Unity.ILPP.Runner.PostProcessingPipeline[0]
+      running Unity.Jobs.CodeGen.JobsILPostProcessor
+info: Unity.ILPP.Runner.PostProcessingPipeline[0]
+      running zzzUnity.Burst.CodeGen.BurstILPostProcessor
+info: Unity.ILPP.Runner.PostProcessingPipeline[0]
+      running Unity.Jobs.CodeGen.JobsILPostProcessor
+info: Unity.ILPP.Runner.PostProcessingPipeline[0]
+      running zzzUnity.Burst.CodeGen.BurstILPostProcessor
+info: Microsoft.AspNetCore.Routing.EndpointMiddleware[1]
+      Executed endpoint 'gRPC - /UnityILPP.PostProcessing/PostProcessAssembly'
+info: Microsoft.AspNetCore.Routing.EndpointMiddleware[1]
+      Executed endpoint 'gRPC - /UnityILPP.PostProcessing/PostProcessAssembly'
+info: Microsoft.AspNetCore.Hosting.Diagnostics[2]
+      Request finished HTTP/2 POST http://ilpp/UnityILPP.PostProcessing/PostProcessAssembly application/grpc - - 200 - application/grpc 6.6375ms
+info: Microsoft.AspNetCore.Routing.EndpointMiddleware[1]
+      Executed endpoint 'gRPC - /UnityILPP.PostProcessing/PostProcessAssembly'
+info: Microsoft.AspNetCore.Hosting.Diagnostics[2]
+      Request finished HTTP/2 POST http://ilpp/UnityILPP.PostProcessing/PostProcessAssembly application/grpc - - 200 - application/grpc 5.6904ms
+info: Microsoft.AspNetCore.Hosting.Diagnostics[2]
+      Request finished HTTP/2 POST http://ilpp/UnityILPP.PostProcessing/PostProcessAssembly application/grpc - - 200 - application/grpc 18.6423ms
+Assets\Scripts\ScreenshotRig.cs(62,19): warning CS0618: 'Object.FindObjectOfType<T>()' is obsolete: 'Object.FindObjectOfType has been deprecated. Use Object.FindFirstObjectByType instead or if finding any instance is acceptable the faster Object.FindAnyObjectByType'
+Assets\Scripts\ScreenshotRig.cs(89,31): warning CS0618: 'Object.FindObjectsOfType<T>()' is obsolete: 'Object.FindObjectsOfType has been deprecated. Use Object.FindObjectsByType instead which lets you decide whether you need the results sorted or not.  FindObjectsOfType sorts the results by InstanceID but if you do not need this using FindObjectSortMode.None is considerably faster.'
+Assets\Scripts\ScreenshotRig.cs(264,27): warning CS0618: 'Object.FindObjectsOfType<T>()' is obsolete: 'Object.FindObjectsOfType has been deprecated. Use Object.FindObjectsByType instead which lets you decide whether you need the results sorted or not.  FindObjectsOfType sorts the results by InstanceID but if you do not need this using FindObjectSortMode.None is considerably faster.'
+Total cache size 46195264
+Total cache size after purge 46195264, took 00:00:00.0543081
+ExitCode: 0 Duration: 1s479ms
+[479/600    0s] ILPP-Configuration Library/ilpp-configuration.nevergeneratedoutput
+[588/600    1s] Csc Library/Bee/artifacts/1900b0aE.dag/CoffeeShop.Runtime.dll (+2 others)
+Assets\Scripts\ScreenshotRig.cs(62,19): warning CS0618: 'Object.FindObjectOfType<T>()' is obsolete: 'Object.FindObjectOfType has been deprecated. Use Object.FindFirstObjectByType instead or if finding any instance is acceptable the faster Object.FindAnyObjectByType'
+
+Assets\Scripts\ScreenshotRig.cs(89,31): warning CS0618: 'Object.FindObjectsOfType<T>()' is obsolete: 'Object.FindObjectsOfType has been deprecated. Use Object.FindObjectsByType instead which lets you decide whether you need the results sorted or not.  FindObjectsOfType sorts the results by InstanceID but if you do not need this using FindObjectSortMode.None is considerably faster.'
+
+Assets\Scripts\ScreenshotRig.cs(264,27): warning CS0618: 'Object.FindObjectsOfType<T>()' is obsolete: 'Object.FindObjectsOfType has been deprecated. Use Object.FindObjectsByType instead which lets you decide whether you need the results sorted or not.  FindObjectsOfType sorts the results by InstanceID but if you do not need this using FindObjectSortMode.None is considerably faster.'
+[591/600    0s] ILPostProcess Library/Bee/artifacts/1900b0aE.dag/post-processed/CoffeeShop.Editor.dll (+pdb)
+Processing assembly Library/Bee/artifacts/1900b0aE.dag/CoffeeShop.Editor.dll, with 137 defines and 277 references
+
+processors: Unity.Jobs.CodeGen.JobsILPostProcessor, zzzUnity.Burst.CodeGen.BurstILPostProcessor
+
+running Unity.Jobs.CodeGen.JobsILPostProcessor
+
+running zzzUnity.Burst.CodeGen.BurstILPostProcessor
+[592/600    0s] ILPostProcess Library/Bee/artifacts/1900b0aE.dag/post-processed/CoffeeShop.Runtime.dll (+pdb)
+Processing assembly Library/Bee/artifacts/1900b0aE.dag/CoffeeShop.Runtime.dll, with 139 defines and 267 references
+
+processors: Unity.Jobs.CodeGen.JobsILPostProcessor, zzzUnity.Burst.CodeGen.BurstILPostProcessor
+
+running Unity.Jobs.CodeGen.JobsILPostProcessor
+
+running zzzUnity.Burst.CodeGen.BurstILPostProcessor
+[593/600    0s] ILPostProcess Library/Bee/artifacts/1900b0aE.dag/post-processed/CoffeeShop.Tests.EditMode.dll (+pdb)
+Processing assembly Library/Bee/artifacts/1900b0aE.dag/CoffeeShop.Tests.EditMode.dll, with 137 defines and 272 references
+
+processors: Unity.Jobs.CodeGen.JobsILPostProcessor, zzzUnity.Burst.CodeGen.BurstILPostProcessor
+
+running Unity.Jobs.CodeGen.JobsILPostProcessor
+
+running zzzUnity.Burst.CodeGen.BurstILPostProcessor
+[598/600    0s] CopyFiles Library/ScriptAssemblies/CoffeeShop.Runtime.dll
+[599/600    0s] CopyFiles Library/ScriptAssemblies/CoffeeShop.Runtime.pdb
+*** Tundra build success (1.37 seconds), 7 items updated, 600 evaluated
+AssetDatabase: script compilation time: 1.905396s
+Begin MonoManager ReloadAssembly
+- Loaded All Assemblies, in  0.506 seconds
+Refreshing native plugins compatible for Editor in 0.00 ms, found 0 plugins.
+Native extension for Android target not found
+Native extension for WindowsStandalone target not found
+ScheduleIndexationOnStartup MainProcess:True IndexOnStartup:True
+Mono: successfully reloaded assembly
+- Finished resetting the current domain, in  2.063 seconds
+Domain Reload Profiling: 2569ms
+	BeginReloadAssembly (193ms)
+		ExecutionOrderSort (0ms)
+		DisableScriptedObjects (37ms)
+		BackupInstance (0ms)
+		ReleaseScriptingObjects (0ms)
+		CreateAndSetChildDomain (34ms)
+	RebuildCommonClasses (36ms)
+	RebuildNativeTypeToScriptingClass (13ms)
+	initialDomainReloadingComplete (20ms)
+	LoadAllAssembliesAndSetupDomain (244ms)
+		LoadAssemblies (224ms)
+		RebuildTransferFunctionScriptingTraits (0ms)
+		AnalyzeDomain (105ms)
+			TypeCache.Refresh (71ms)
+				TypeCache.ScanAssembly (63ms)
+			BuildScriptInfoCaches (24ms)
+			ResolveRequiredComponents (8ms)
+	FinalizeReload (2063ms)
+		ReleaseScriptCaches (0ms)
+		RebuildScriptCaches (0ms)
+		SetupLoadedEditorAssemblies (1904ms)
+			LogAssemblyErrors (0ms)
+			InitializePlatformSupportModulesInManaged (25ms)
+			SetLoadedEditorAssemblies (3ms)
+			BeforeProcessingInitializeOnLoad (116ms)
+			ProcessInitializeOnLoadAttributes (1624ms)
+			ProcessInitializeOnLoadMethodAttributes (135ms)
+			AfterProcessingInitializeOnLoad (1ms)
+			EditorAssembliesLoaded (0ms)
+		ExecutionOrderSort2 (0ms)
+		AwakeInstancesAfterBackupRestoration (18ms)
+Refreshing native plugins compatible for Editor in 0.00 ms, found 0 plugins.
+Preloading 0 native plugins for Editor in 0.00 ms.
+Asset Pipeline Refresh (id=cae34b8a7ff809348bd30bb15989a8ab): Total: 5.156 seconds - Initiated by InitialRefreshV2(ForceSynchronousImport)
+	Summary:
+		Imports: total=0 (actual=0, local cache=0, cache server=0)
+		Asset DB Process Time: managed=0 ms, native=2471 ms
+		Asset DB Callback time: managed=181 ms, native=64 ms
+		Scripting: domain reloads=1, domain reload time=507 ms, compile time=1908 ms, other=23 ms
+		Project Asset Count: scripts=788, non-scripts=1539
+		Asset File Changes: new=0, changed=2, moved=0, deleted=0
+		Scan Filter Count: 0
+	InvokeCustomDependenciesCallbacks: 0.001ms
+	InvokePackagesCallback: 59.582ms
+	ApplyChangesToAssetFolders: 0.537ms
+	Scan: 112.773ms
+	OnSourceAssetsModified: 0.891ms
+	CategorizeAssetsWithTransientArtifact: 17.534ms
+	ProcessAssetsWithTransientArtifactChanges: 31.556ms
+	CategorizeAssets: 34.220ms
+	ImportOutOfDateAssets: 2068.348ms (158.479ms without children)
+		CompileScripts: 1907.508ms
+		ReloadNativeAssets: 0.025ms
+		UnloadImportedAssets: 1.605ms
+		EnsureUptoDateAssetsAreRegisteredWithGuidPM: 0.344ms
+		InitializingProgressBar: 0.000ms
+		PostProcessAllAssetNotificationsAddChangedAssets: 0.001ms
+		OnDemandSchedulerStart: 0.387ms
+	PostProcessAllAssets: 182.607ms
+	Hotreload: 4.240ms
+	GatherAllCurrentPrimaryArtifactRevisions: 0.002ms
+	UnloadStreamsBegin: 2.141ms
+	PersistCurrentRevisions: 0.082ms
+	UnloadStreamsEnd: 0.001ms
+	GenerateScriptTypeHashes: 2.722ms
+	Untracked: 2641.506ms
+
+Application.AssetDatabase Initial Refresh End
+Launched and connected shader compiler UnityShaderCompiler.exe after 0.02 seconds
+Scanning for USB devices : 1.557ms
+Initializing Unity extensions:
+[MODES] ModeService[none].Initialize
+[MODES] ModeService[none].LoadModes
+[MODES] Loading mode Default (0) for mode-current-id-game
+Unloading 19 Unused Serialized files (Serialized files now loaded: 0)
+Unloading 3265 unused Assets / (3.7 MB). Loaded Objects now: 4124.
+Memory consumption went from 174.0 MB to 170.2 MB.
+Total: 7.093800 ms (FindLiveObjects: 0.251900 ms CreateObjectMapping: 0.131900 ms MarkObjects: 5.592600 ms  DeleteObjects: 1.115100 ms)
+
+Opening scene 'Assets/Scenes/Main.unity'
+Unloading 2 Unused Serialized files (Serialized files now loaded: 0)
+Loaded scene 'Assets/Scenes/Main.unity'
+	Deserialize:            13.898 ms
+	Integration:            137.574 ms
+	Integration of assets:  0.093 ms
+	Thread Wait Time:       -0.004 ms
+	Total Operation Time:   151.561 ms
+Unloading 1 unused Assets / (0.5 KB). Loaded Objects now: 4985.
+Memory consumption went from 169.5 MB to 169.5 MB.
+Total: 5.956100 ms (FindLiveObjects: 0.192600 ms CreateObjectMapping: 0.057800 ms MarkObjects: 5.686300 ms  DeleteObjects: 0.018300 ms)
+
+[CRAFT] station=(-6.12, 0.95, -1.35) size=(2.00, 1.90, 1.14) work=(-6.12, 0.98, -0.90) sku=classic-latte
+UnityEngine.Debug:ExtractStackTraceNoAlloc (byte*,int,string)
+UnityEngine.StackTraceUtility:ExtractStackTrace ()
+UnityEngine.DebugLogHandler:Internal_Log (UnityEngine.LogType,UnityEngine.LogOption,string,UnityEngine.Object)
+UnityEngine.DebugLogHandler:LogFormat (UnityEngine.LogType,UnityEngine.Object,string,object[])
+UnityEngine.Logger:Log (UnityEngine.LogType,object)
+UnityEngine.Debug:Log (object)
+PlayTest:RunCraft () (at Assets/Editor/PlayTest.cs:200)
+
+(Filename: Assets/Editor/PlayTest.cs Line: 200)
+
+[Project] Loading completed in 11.109 seconds
+	Project init time: 				9.180 seconds
+		Template init time: 		0.000 seconds
+		Package Manager init time: 		0.244 seconds
+		Asset Database init time: 		0.469 seconds
+		Global illumination init time: 	0.004 seconds
+		Assemblies load time: 			0.790 seconds
+		Unity extensions init time: 	0.005 seconds
+		Asset Database refresh time: 	5.156 seconds
+	Scene opening time: 			1.100 seconds
+##utp:{"type":"ProjectInfo","version":2,"phase":"Immediate","time":1794018772584,"processId":47780,"projectLoad":11.1090389,"projectInit":9.1804278,"templateInit":0.0,"packageManagerInit":0.2438746,"assetDatabaseInit":0.468761,"globalIlluminationInit":0.0035088,"assembliesLoad":0.7899881,"unityExtensionsInit":0.0053423,"assetDatabaseRefresh":5.1561314,"sceneOpening":1.100289}
+##utp:{"type":"EditorInfo","version":2,"phase":"Immediate","time":1794018772584,"processId":47780,"editorVersion":"6000.3.28f1 (8f082d2fe476)","branch":"6000.3/respin/6000.3.28f1-21f78c3e21d1","buildType":"Release","platform":"Windows"}
+Reloading assemblies for play mode.
+Reloading assemblies after forced synchronous recompile.
+Begin MonoManager ReloadAssembly
+- Loaded All Assemblies, in  0.456 seconds
+Refreshing native plugins compatible for Editor in 0.00 ms, found 0 plugins.
+Native extension for Android target not found
+Native extension for WindowsStandalone target not found
+ScheduleIndexationOnStartup MainProcess:True IndexOnStartup:True
+Mono: successfully reloaded assembly
+- Finished resetting the current domain, in  0.547 seconds
+Domain Reload Profiling: 1004ms
+	BeginReloadAssembly (290ms)
+		ExecutionOrderSort (0ms)
+		DisableScriptedObjects (27ms)
+		BackupInstance (0ms)
+		ReleaseScriptingObjects (0ms)
+		CreateAndSetChildDomain (157ms)
+	RebuildCommonClasses (30ms)
+	RebuildNativeTypeToScriptingClass (11ms)
+	initialDomainReloadingComplete (17ms)
+	LoadAllAssembliesAndSetupDomain (109ms)
+		LoadAssemblies (102ms)
+		RebuildTransferFunctionScriptingTraits (0ms)
+		AnalyzeDomain (89ms)
+			TypeCache.Refresh (5ms)
+				TypeCache.ScanAssembly (0ms)
+			BuildScriptInfoCaches (60ms)
+			ResolveRequiredComponents (22ms)
+	FinalizeReload (547ms)
+		ReleaseScriptCaches (0ms)
+		RebuildScriptCaches (0ms)
+		SetupLoadedEditorAssemblies (334ms)
+			LogAssemblyErrors (0ms)
+			InitializePlatformSupportModulesInManaged (22ms)
+			SetLoadedEditorAssemblies (3ms)
+			BeforeProcessingInitializeOnLoad (108ms)
+			ProcessInitializeOnLoadAttributes (136ms)
+			ProcessInitializeOnLoadMethodAttributes (63ms)
+			AfterProcessingInitializeOnLoad (1ms)
+			EditorAssembliesLoaded (0ms)
+		ExecutionOrderSort2 (0ms)
+		AwakeInstancesAfterBackupRestoration (23ms)
+Asset Pipeline Refresh (id=23e56d8459401be4b892d0c32c4d37f4): Total: 1.102 seconds - Initiated by StopAssetImportingV2(ForceSynchronousImport | ForceDomainReload)
+	Summary:
+		Imports: total=0 (actual=0, local cache=0, cache server=0)
+		Asset DB Process Time: managed=0 ms, native=617 ms
+		Asset DB Callback time: managed=21 ms, native=0 ms
+		Scripting: domain reloads=1, domain reload time=461 ms, compile time=1 ms, other=0 ms
+		Project Asset Count: scripts=788, non-scripts=1539
+		Asset File Changes: new=0, changed=0, moved=0, deleted=0
+		Scan Filter Count: 0
+	InvokeCustomDependenciesCallbacks: 0.001ms
+	InvokePackagesCallback: 0.822ms
+	ApplyChangesToAssetFolders: 0.204ms
+	Scan: 0.000ms
+	OnSourceAssetsModified: 0.001ms
+	CategorizeAssetsWithTransientArtifact: 0.002ms
+	ProcessAssetsWithTransientArtifactChanges: 1.571ms
+	CategorizeAssets: 29.688ms
+	ImportOutOfDateAssets: 550.148ms (546.389ms without children)
+		CompileScripts: 1.132ms
+		CollectScriptTypesHashes: 1.277ms
+		ReloadNativeAssets: 0.742ms
+		UnloadImportedAssets: 0.072ms
+		EnsureUptoDateAssetsAreRegisteredWithGuidPM: 0.300ms
+		InitializingProgressBar: 0.000ms
+		PostProcessAllAssetNotificationsAddChangedAssets: 0.000ms
+		OnDemandSchedulerStart: 0.235ms
+	PostProcessAllAssets: 21.648ms
+	GatherAllCurrentPrimaryArtifactRevisions: 0.086ms
+	UnloadStreamsBegin: 0.133ms
+	PersistCurrentRevisions: 0.077ms
+	UnloadStreamsEnd: 0.001ms
+	GenerateScriptTypeHashes: 3.406ms
+	Untracked: 497.957ms
+
+The referenced script (Unknown) on this Behaviour is missing!
+The referenced script (Unknown) on this Behaviour is missing!
+The referenced script (Unknown) on this Behaviour is missing!
+The referenced script (Unknown) on this Behaviour is missing!
+The referenced script (Unknown) on this Behaviour is missing!
+The referenced script (Unknown) on this Behaviour is missing!
+The referenced script (Unknown) on this Behaviour is missing!
+The referenced script (Unknown) on this Behaviour is missing!
+The referenced script (Unknown) on this Behaviour is missing!
+The referenced script (Unknown) on this Behaviour is missing!
+The referenced script (Unknown) on this Behaviour is missing!
+The referenced script (Unknown) on this Behaviour is missing!
+The referenced script (Unknown) on this Behaviour is missing!
+The referenced script (Unknown) on this Behaviour is missing!
+[seat] prompt UI ready font=Microsoft YaHei scale=0.004 size=(300.00, 76.00) canvasRenderer=True
+UnityEngine.Debug:ExtractStackTraceNoAlloc (byte*,int,string)
+UnityEngine.StackTraceUtility:ExtractStackTrace ()
+UnityEngine.DebugLogHandler:Internal_Log (UnityEngine.LogType,UnityEngine.LogOption,string,UnityEngine.Object)
+UnityEngine.DebugLogHandler:LogFormat (UnityEngine.LogType,UnityEngine.Object,string,object[])
+UnityEngine.Logger:Log (UnityEngine.LogType,object)
+UnityEngine.Debug:Log (object)
+CoffeeShop.Seating.SeatInteraction:CreatePrompt () (at Assets/Scripts/Seating/SeatInteraction.cs:284)
+CoffeeShop.Seating.SeatInteraction:Awake () (at Assets/Scripts/Seating/SeatInteraction.cs:81)
+
+(Filename: Assets/Scripts/Seating/SeatInteraction.cs Line: 284)
+
+Loaded scene 'Temp/__Backupscenes/0.backup'
+	Deserialize:            12.568 ms
+	Integration:            386.950 ms
+	Integration of assets:  3.141 ms
+	Thread Wait Time:       -0.006 ms
+	Total Operation Time:   402.653 ms
+[MODES] ModeService[none].Initialize
+[MODES] ModeService[none].LoadModes
+Start Indexing on Editor startup
+ArgumentOutOfRangeException: Index was out of range. Must be non-negative and less than the size of the collection.
+Parameter name: index
+  at System.Collections.Generic.List`1[T].get_Item (System.Int32 index) [0x00009] in <b2ed3aa968d84284a17b07ec9195055c>:0 
+  at UnityEditor.Search.SearchDatabase+<EnumerateAll>d__83.MoveNext () [0x00106] in <458832ba6c564b1a9019773a983b57af>:0 
+  at System.Linq.Enumerable.TryGetFirst[TSource] (System.Collections.Generic.IEnumerable`1[T] source, System.Boolean& found) [0x00045] in <81c5c8bf15b24e768953dea9073a410f>:0 
+  at System.Linq.Enumerable.First[TSource] (System.Collections.Generic.IEnumerable`1[T] source) [0x00000] in <81c5c8bf15b24e768953dea9073a410f>:0 
+  at UnityEditor.Search.SearchDatabase.GetDefaultSearchDatabase () [0x00006] in <458832ba6c564b1a9019773a983b57af>:0 
+  at UnityEditor.Search.SearchInit.IndexationOnStartup () [0x0000c] in <458832ba6c564b1a9019773a983b57af>:0 
+  at UnityEditor.EditorApplication.Internal_CallDelayFunctions () [0x0002c] in <c11b84dc4d8b474bb659a85e84285eaa>:0 
+
+Created GICache directory at C:/Users/zang/AppData/LocalLow/Unity/Caches/GiCache. Took: 0.018s, timestamps: [12.710 - 12.729]
+[Licensing::Client] Successfully resolved entitlement details
+[CRAFT]
+follow: fov=60.0 dist=3.60 pitch=35
+  ok   站在工位中心算在范围内
+  ok   沿吧台走开 0.7m 就不在工位范围内
+  ok   越过通道边线（柜台里）不算在工位
+  ok   站到工位就出「开始制作」提示
+  ok   还没按交互时界面不打开
+  ok   按交互进入制作界面
+  ok   输入切到界面模式（光标可点、不再发世界交互）
+  ok   制作期间走路锁住（原地近景）
+  ok   界面拿到了 CraftSession
+  ok   近景切入 0.87s（≤3s，FR-MOV-05）
+  ok   视野收窄 60° → 42°
+  ok   距离收紧 3.60m → 2.25m
+  ok   近景机位仍在吧台内侧通道里（z 偏差 0.41m）
+  camera at (-8.03,2.34,-0.94) work=(-6.12, 0.98, -0.90)
+  ok   第一步是放置原语 → 出热点按钮
+  ok   放置热点 2 个
+  ok   发错原语的请求不改变步骤（NFR-05：UI 只发请求）
+  ok   放错位置会停下来等玩家决定
+  ok   判偏立刻发出反馈事件
+  ok   判偏有即时红闪（FR-EVAL-03，界面上没有任何文字评级）
+  ok   重做后回到这一步重新放
+  ok   放到萃取口下才对
+  ok   磨豆是按住原语 → 出进度条
+  ok   按住期间进度涨满（2.52s）
+  ok   按够了松手就过
+  ok   压粉是点击原语
+  ok   点一下没压到位 → 判偏
+  ok   按够 0.4 秒才过
+  ok   萃取是等待原语，不需要按
+  ok   等待 6.0s 自动完成萃取
+  ok   取杯点一下就走
+  ok   加奶按够 2 秒
+  ok   最后一步做完自动出杯
+  ok   两处偏差都重做了 → 整杯评价 错误 0/3（0%）→ Good
+  session: classic-latte 第8/7步[完毕] mode=Done 进度=0% 偏差=2 挡=0 已出杯
+  ok   出杯 1.1s 后自动收起界面
+  ok   镜头回到跟随构图
+  ok   视野恢复 60.0°（跟随 60.0°）
+  ok   距离恢复 3.60m
+  ok   退出后走路恢复
+  ok   再次按交互可以重开（配方是新的，从第一步开始）
+  ok   新一次制作从第一步开始
+  ok   按取消直接退出
+  ok   输入模式还原
+  aisle walk: moved=1.83m from=(-5.52,-1.35) to=(-7.34,-1.35)
+  ok   在吧台内侧通道里走了 1.83m（不被柜台卡住）
+  ok   走完仍在通道里（z 偏差 0.00m）
+failures=0
+CRAFT RESULT: PASS
+UnityEngine.Debug:ExtractStackTraceNoAlloc (byte*,int,string)
+UnityEngine.StackTraceUtility:ExtractStackTrace ()
+UnityEngine.DebugLogHandler:Internal_Log (UnityEngine.LogType,UnityEngine.LogOption,string,UnityEngine.Object)
+UnityEngine.DebugLogHandler:LogFormat (UnityEngine.LogType,UnityEngine.Object,string,object[])
+UnityEngine.Logger:Log (UnityEngine.LogType,object)
+UnityEngine.Debug:Log (object)
+CoffeeShop.Testing.CraftFlowTest:Finish (string) (at Assets/Scripts/Testing/CraftFlowTest.cs:220)
+CoffeeShop.Testing.CraftFlowTest/<Start>d__7:MoveNext () (at Assets/Scripts/Testing/CraftFlowTest.cs:201)
+UnityEngine.SetupCoroutine:InvokeMoveNext (System.Collections.IEnumerator,intptr)
+
+(Filename: Assets/Scripts/Testing/CraftFlowTest.cs Line: 220)
+
+Killing ADB server in 2.0983558 seconds.
+[Physics::Module] Cleanup current backend.
+[Physics::Module] Id: 0xf2b8ea05
+Input System module state changed to: ShutdownInProgress.
+Input System polling thread exited.
+Input System module state changed to: Shutdown.
+[Licensing::IpcConnector] LicenseClient-zang-notifications channel disconnected successfully.
+[Licensing::IpcConnector] LicenseClient-zang channel disconnected successfully.
+AcceleratorClientConnectionCallback - disconnected - :0
+Shut down.
+Cleanup mono
+abort_threads: Failed aborting id: 00000000000088F8, mono_thread_manage will ignore it
+
+abort_threads: Failed aborting id: 000000000000C974, mono_thread_manage will ignore it
+
+abort_threads: Failed aborting id: 000000000000D35C, mono_thread_manage will ignore it
+
+abort_threads: Failed aborting id: 00000000000088F8, mono_thread_manage will ignore it
+
+abort_threads: Failed aborting id: 000000000000C974, mono_thread_manage will ignore it
+
+abort_threads: Failed aborting id: 000000000000D35C, mono_thread_manage will ignore it
+
+debugger-agent: Unable to listen on 5052
+Checking for leaked weakptr:
+  Found no leaked weakptrs.
+[Package Manager] Server process was shutdown
+##utp:{"type":"MemoryLeaks","version":2,"phase":"Immediate","time":1794018777644,"processId":47780,"allocatedMemory":12466118,"memoryLabels":[{"Default":29313},{"Permanent":15236},{"NewDelete":69211},{"Thread":4237960},{"Manager":37373},{"VertexData":8},{"Geometry":816},{"Texture":296},{"Shader":80499},{"Material":24},{"GfxDevice":57936},{"Animation":392},{"Audio":2664},{"FreeType":8},{"FontEngine":736},{"Physics":1970},{"Physics2D":16},{"Serialization":488},{"Input":14984},{"JobScheduler":33024},{"TextLib":280},{"Mono":32},{"MonoCode":64},{"ScriptingNativeRuntime":155060},{"BaseObject":1621200},{"Resource":1336},{"Renderer":3000},{"Transform":4685},{"File":3933},{"WebCam":616},{"Culling":32},{"Terrain":11394},{"Wind":24},{"STL":40},{"String":18554},{"DynamicArray":95877},{"HashMap":88464},{"Utility":2661910},{"Curl":2675},{"PoolAlloc":2152},{"AI":80},{"TypeTree":13861},{"ScriptManager":512},{"RuntimeInitializeOnLoadManager":64},{"SpriteAtlas":112},{"GI":7792},{"Director":8240},{"CloudService":8776},{"WebRequest":552},{"VR":48034},{"SceneManager":504},{"Video":208},{"LazyScriptCache":32},{"Camera":17},{"Secure":2377},{"SerializationCache":1576},{"APIUpdating":10320},{"Subsystems":336},{"VirtualTexturing":57888},{"StaticSafetyDebugInfo":278528},{"Analytics":640},{"Hierarchy":608},{"CoreStats":13112},{"Identifiers":6480},{"Gui":96},{"EditorUtility":109169},{"VersionControl":4},{"Undo":947},{"AssetDatabase":2583059},{"EditorGi":328},{"UnityConnect":29232},{"Upm":1896},{"AssetCompliance":64},{"DrivenProperties":72},{"LocalIPC":258},{"ProfilerEditor":9746},{"CoreBusinessMetrics":3496},{"Licensing":12756},{"AssetReference":32},{"IPCStream":32}]}

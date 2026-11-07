@@ -7,7 +7,7 @@
       "name": "经典拿铁",
       "line": "latte",
       "steps": [
-        { "id": "cup",    "name": "取杯放到萃取口下", "primitive": "click",  "judged": false },
+        { "id": "cup",    "name": "取杯放到萃取口下", "primitive": "place",  "judged": false, "options": ["萃取口", "台面"], "correct": "萃取口", "cost": 1.0 },
         { "id": "grind",  "name": "磨豆",             "primitive": "hold",   "judged": true,  "param": 2.5, "cost": 3.0 },
         { "id": "tamp",   "name": "压粉",             "primitive": "click",  "judged": true,  "param": 0.4, "cost": 1.5 },
         { "id": "extract","name": "萃取",             "primitive": "wait",   "judged": false, "param": 6.0, "cost": 6.0, "gate": "tamp" },
@@ -21,7 +21,7 @@
       "name": "生椰拿铁",
       "line": "latte",
       "steps": [
-        { "id": "cup",      "name": "取杯放到萃取口下", "primitive": "click",  "judged": false },
+        { "id": "cup",      "name": "取杯放到萃取口下", "primitive": "place",  "judged": false, "options": ["萃取口", "台面"], "correct": "萃取口", "cost": 1.0 },
         { "id": "grind",    "name": "磨豆",             "primitive": "hold",   "judged": true,  "param": 2.5, "cost": 3.0 },
         { "id": "tamp",     "name": "压粉",             "primitive": "click",  "judged": true,  "param": 0.4, "cost": 1.5 },
         { "id": "extract",  "name": "萃取",             "primitive": "wait",   "judged": false, "param": 6.0, "cost": 6.0, "gate": "tamp" },
@@ -36,7 +36,7 @@
       "name": "桂花拿铁",
       "line": "latte",
       "steps": [
-        { "id": "cup",     "name": "取杯放到萃取口下", "primitive": "click",  "judged": false },
+        { "id": "cup",     "name": "取杯放到萃取口下", "primitive": "place",  "judged": false, "options": ["萃取口", "台面"], "correct": "萃取口", "cost": 1.0 },
         { "id": "grind",   "name": "磨豆",             "primitive": "hold",   "judged": true,  "param": 2.5, "cost": 3.0 },
         { "id": "tamp",    "name": "压粉",             "primitive": "click",  "judged": true,  "param": 0.4, "cost": 1.5 },
         { "id": "extract", "name": "萃取",             "primitive": "wait",   "judged": false, "param": 6.0, "cost": 6.0, "gate": "tamp" },
@@ -51,7 +51,7 @@
       "name": "焦糖玛奇朵",
       "line": "latte",
       "steps": [
-        { "id": "cup",     "name": "取杯放到萃取口下", "primitive": "click",  "judged": false },
+        { "id": "cup",     "name": "取杯放到萃取口下", "primitive": "place",  "judged": false, "options": ["萃取口", "台面"], "correct": "萃取口", "cost": 1.0 },
         { "id": "grind",   "name": "磨豆",             "primitive": "hold",   "judged": true,  "param": 2.5, "cost": 3.0 },
         { "id": "tamp",    "name": "压粉",             "primitive": "click",  "judged": true,  "param": 0.4, "cost": 1.5 },
         { "id": "extract", "name": "萃取",             "primitive": "wait",   "judged": false, "param": 6.0, "cost": 6.0, "gate": "tamp" },

@@ -13,6 +13,7 @@ namespace CoffeeShop.Controls
 
         [SerializeField] Device device = Device.KeyboardMouse;
         [SerializeField] bool suppressed;
+        bool uiMode;
 
         public Device CurrentDevice => device;
         public VirtualJoystickInputSource Virtual { get; } = new VirtualJoystickInputSource();
@@ -35,11 +36,25 @@ namespace CoffeeShop.Controls
             if (suppressed) Virtual.Clear();
         }
 
+        /// <summary>
+        /// 界面模式（07 票）：进入制作 UI 时打开——光标可见可点、不再发世界交互，
+        /// 走路输入清零（角色停在工位），视野仍允许右键微调。PC 与移动端语义一致。
+        /// </summary>
+        public void SetUiMode(bool on)
+        {
+            uiMode = on;
+            if (active is KeyboardMouseInputSource kb) kb.UiMode = on;
+            if (on) Virtual.Clear();
+        }
+
+        public bool UiMode => uiMode;
+
         void Apply()
         {
             active = device == Device.KeyboardMouse
                 ? (IPlayerInputSource)new KeyboardMouseInputSource()
                 : Virtual;
+            if (active is KeyboardMouseInputSource kb) kb.UiMode = uiMode;
         }
 
         void Update()

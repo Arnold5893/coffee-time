@@ -39,6 +39,9 @@ public class ScreenshotRig : MonoBehaviour
     public Vector3 camPosBack;
     public Vector3 camLookBack;
 
+    // 07 票：吧台工位与制作界面
+    public CoffeeShop.Bar.BarStation barStation;
+
     IEnumerator Start()
     {
         var cam = Camera.main;
@@ -191,10 +194,68 @@ public class ScreenshotRig : MonoBehaviour
             }
         }
 
+        // ---- 07 票验收：吧台工位近景 + 五原语制作界面 ----
+        if (barStation != null && barStation.panel != null && player != null && followRig != null)
+        {
+            var panel = barStation.panel;
+            Vector3 workDir = barStation.workPoint - barStation.center;
+            workDir.y = 0f;
+            player.Teleport(barStation.GroundPoint,
+                            Quaternion.LookRotation(workDir.sqrMagnitude > 1e-4f ? workDir.normalized : Vector3.forward,
+                                                    Vector3.up));
+            followRig.enabled = true;
+            followRig.RestoreDefaultView();
+            // 通道只有 1.2m 宽：镜头站在人正后方会顶进前柜、整屏都是后背。
+            // 沿通道轴摆机位，才看得到"人站在工位上 + 吧台 + 咖啡机"。
+            Vector3 aisleSide = new Vector3(-workDir.z, 0f, workDir.x).normalized;
+            followRig.SetYawPitch(Mathf.Atan2(-aisleSide.x, -aisleSide.z) * Mathf.Rad2Deg, 30f);
+            for (int i = 0; i < 10; i++) yield return null;
+            yield return CaptureCurrent(cam, rt, "setup_screenshot_bar_prompt.png");
+
+            bool entered = barStation.Enter();
+            for (int i = 0; i < 60; i++) yield return null;     // 0.9s 近景过渡（60fps 下 54 帧就到位）
+            var craft = panel.Session;
+            Debug.Log($"[rig] craft enter={entered} active={barStation.Active} focus={followRig.FocusProgress:F2} " +
+                      $"fov={followRig.CurrentFov:F1} dist={followRig.CurrentDistance:F2} " +
+                      $"step={(craft != null ? craft.Describe() : "null")}");
+
+            if (craft != null)
+            {
+                // 第一步是"放置"原语：点正确的热点（萃取口）→ 走到"磨豆"（按住型），
+                // 按到一半拍一张带进度的近景
+                panel.PickOption(0);
+                for (int i = 0; i < 3; i++) yield return null;
+
+                // 按住磨豆，攒到一半先拍一张（界面每帧刷新，拍之前要等一帧让进度上屏）
+                panel.PressDown();
+                for (int i = 0; i < 25; i++) craft.Tick(0.05f);   // 1.25s / 2.5s
+                for (int i = 0; i < 3; i++) yield return null;
+                Debug.Log($"[rig] progress {panel.ProgressDebug}");
+                yield return CaptureCurrent(cam, rt, "setup_screenshot_bar_focus.png");
+
+                // 继续按到满 → 松手结算（这一步做对）
+                while (craft.Progress01 < 1f) craft.Tick(0.05f);
+                panel.PressUp();
+                for (int i = 0; i < 3; i++) yield return null;
+
+                // 压粉要按 0.4 秒，只点一下 → 判偏：红闪 + 闷响，界面上没有任何文字评级
+                panel.TapAction(0.06f);
+                for (int i = 0; i < 2; i++) yield return null;
+                Debug.Log($"[rig] craft deviation flash={panel.FlashAmount:F2} " +
+                          $"feedback={panel.LastFeedback} dev={craft.Deviations} step={craft.StepId} mode={craft.Mode}");
+                yield return CaptureCurrent(cam, rt, "setup_screenshot_bar_deviation.png");
+            }
+
+            barStation.Exit();
+            for (int i = 0; i < 45; i++) yield return null;      // 0.6s 退出过渡
+            Debug.Log($"[rig] craft exit focus={followRig.FocusProgress:F2} fov={followRig.CurrentFov:F1} " +
+                      $"dist={followRig.CurrentDistance:F2} motor={player.ControllerEnabled}");
+            yield return CaptureCurrent(cam, rt, "setup_screenshot_bar_restored.png");
+        }
+
         // ---- 门口落脚区：阳光区长桌在 12 号凳后收头，门前留出空地 ----
         if (followRig != null) followRig.enabled = false;
         yield return Capture(cam, rt, camPosEntry, camLookEntry, "setup_screenshot_entry_corner.png");
-
         // 全景前临时隐藏吊顶（完全位于 cutY 之上的渲染器），拍完恢复
         // 静态机位必须先把跟随镜头关掉，否则它会在 LateUpdate 里把相机又拖回角色身后
         if (followRig != null) followRig.enabled = false;
@@ -241,10 +302,10 @@ public class ScreenshotRig : MonoBehaviour
         yield return null;
     }
 
-    // 看门狗：600 帧（约 10 秒渲染循环）内未完成也强制退出，避免批处理挂死
+    // 看门狗：900 帧（约 15 秒渲染循环）内未完成也强制退出，避免批处理挂死
     void Update()
     {
-        if (Time.frameCount > 600)
+        if (Time.frameCount > 900)
         {
             Debug.LogError("ScreenshotRig watchdog: timeout, force exit");
             Quit(3);

@@ -506,6 +506,51 @@ public static class ProjectSetup
             report.AppendLine($"seat interact: reach={seatInteract.reachRadius:F2}m " +
                               $"nearestFree={(seating.NearestFree(spawn, 99f) != null ? "yes" : "no")}");
 
+            // 7.7 吧台工位与制作界面（07 票）
+            //     工位位置全部从包围盒推：吧台内侧通道中心（两柜之间）+ 咖啡机的 X。
+            //     不写死世界坐标——FBX 根节点带 -90°X 与平移，Blender 坐标不等于 Unity 坐标。
+            CoffeeShop.Bar.BarStation builtStation = null;
+            var cmRenderer = all.FirstOrDefault(t => t.name == "Coffee_Machine")?.GetComponent<Renderer>();
+            if (cmRenderer != null)
+            {
+                var cmb = cmRenderer.bounds;
+                float aisleZ = (backR.bounds.min.z + frontR.bounds.max.z) * 0.5f;
+                float aisleWide = backR.bounds.min.z - frontR.bounds.max.z;
+                var stationCenter = new Vector3(cmb.center.x, 0.95f, aisleZ);
+
+                var stationGO = new GameObject("BarStation");
+                stationGO.transform.position = stationCenter;
+
+                var craftPanel = stationGO.AddComponent<CoffeeShop.Bar.CraftPanel>();
+                craftPanel.uiCamera = cam;
+
+                var station = stationGO.AddComponent<CoffeeShop.Bar.BarStation>();
+                station.center = stationCenter;
+                // 沿吧台 2m、垂直通道收到净宽以内（再宽就压进两侧柜体，站位判定会失效）
+                station.size = new Vector3(2.0f, 1.9f, Mathf.Max(0.90f, aisleWide - 0.06f));
+                // 近景注视点：咖啡机前沿与通道之间，台面高度
+                station.workPoint = new Vector3(cmb.center.x, 0.98f,
+                                                (cmb.center.z + aisleZ) * 0.5f);
+                station.motor = motor;
+                station.router = router;
+                station.camRig = follow;
+                station.panel = craftPanel;
+
+                // 界面要能点，必须有 EventSystem；场景里没有预制体，这里按需补一个
+                if (Object.FindFirstObjectByType<UnityEngine.EventSystems.EventSystem>() == null)
+                {
+                    var esGO = new GameObject("EventSystem");
+                    esGO.AddComponent<UnityEngine.EventSystems.EventSystem>();
+                    esGO.AddComponent<UnityEngine.EventSystems.StandaloneInputModule>();
+                }
+
+                report.AppendLine($"bar station: center=({stationCenter.x:F2},{stationCenter.z:F2}) " +
+                                  $"aisle={aisleWide:F2}m work=({station.workPoint.x:F2},{station.workPoint.z:F2}) " +
+                                  $"sku={station.sku}");
+
+                builtStation = station;
+            }
+
             var audioListener = camGO.GetComponent<AudioListener>();
             if (audioListener == null) camGO.AddComponent<AudioListener>();
 
@@ -517,6 +562,7 @@ public static class ProjectSetup
             rig.spawnPoint = spawnGO.transform;
             rig.interiorPoint = interiorGO.transform;
             rig.door = Object.FindFirstObjectByType<CoffeeShop.Interaction.EntranceDoor>();
+            rig.barStation = builtStation;
             // 门口落脚区机位：站在店内正对门 3.3m，一眼看到门、门口空地、以及阳光区长桌收头
             rig.camPosEntry = doorCenterW + interiorDir * 3.3f + Vector3.up * 1.6f;
             rig.camLookEntry = doorCenterW + Vector3.up * 0.85f;

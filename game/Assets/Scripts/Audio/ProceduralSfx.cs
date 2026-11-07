@@ -40,5 +40,50 @@ namespace CoffeeShop.Audio
             clip.SetData(data, 0);
             return clip;
         }
+
+        /// <summary>
+        /// 做偏了一步的"闷响"（07 票 / FR-EVAL-03）：低频砰 + 一小段噪声，"东西没弄对"的手感。
+        /// 只有声音和画面反馈，**没有任何文字评级**。
+        /// </summary>
+        public static AudioClip CraftThud()
+        {
+            const float dur = 0.26f;
+            int n = Mathf.CeilToInt(dur * Rate);
+            var data = new float[n];
+            var rng = new System.Random(7);
+            for (int i = 0; i < n; i++)
+            {
+                float t = i / (float)Rate;
+                float env = Mathf.Exp(-t * 16f);
+                float body = Mathf.Sin(2f * Mathf.PI * 96f * t * (1f - 0.35f * t));
+                float noise = (float)(rng.NextDouble() * 2.0 - 1.0) * Mathf.Exp(-t * 40f);
+                float fade = Mathf.Clamp01(t / 0.004f) * Mathf.Clamp01((dur - t) / 0.02f);
+                data[i] = Mathf.Clamp((0.55f * body + 0.35f * noise) * env * fade, -1f, 1f);
+            }
+            var clip = AudioClip.Create("CraftThud", n, 1, Rate, false);
+            clip.SetData(data, 0);
+            return clip;
+        }
+
+        /// <summary>出杯的"叮"（07 票）：比门铃短、亮，只提醒"这杯好了"。</summary>
+        public static AudioClip ServeDing()
+        {
+            const float dur = 0.55f;
+            int n = Mathf.CeilToInt(dur * Rate);
+            var data = new float[n];
+            for (int i = 0; i < n; i++)
+            {
+                float t = i / (float)Rate;
+                float env = Mathf.Exp(-t * 6.5f);
+                float s = Mathf.Sin(2f * Mathf.PI * 1568f * t)
+                        + 0.4f * Mathf.Sin(2f * Mathf.PI * 2093f * t)
+                        + 0.2f * Mathf.Sin(2f * Mathf.PI * 3136f * t);
+                float fade = Mathf.Clamp01(t / 0.006f) * Mathf.Clamp01((dur - t) / 0.02f);
+                data[i] = Mathf.Clamp(s * 0.22f * env * fade, -1f, 1f);
+            }
+            var clip = AudioClip.Create("ServeDing", n, 1, Rate, false);
+            clip.SetData(data, 0);
+            return clip;
+        }
     }
 }

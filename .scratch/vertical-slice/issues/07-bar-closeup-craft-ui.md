@@ -4,10 +4,73 @@
 
 **Blocked by:** 02 玩家移动与镜头、06 做饮品系统（领域层）
 
-**Status:** ready-for-agent
+**Status:** resolved
 
-- [ ] 原地近景切入 ≤3 秒、退出恢复（FR-MOV-05、NFR-03）
-- [ ] 五原语 UI 可完成一杯拿铁全流程（FR-MAKE-03）
-- [ ] 偏差有即时画面/音效反馈，无文字评级（FR-EVAL-03）
-- [ ] 玩家可在吧台内侧通道自由移动（配合 01 的通道拓宽）
-- [ ] UI 不直接改写业务数据，只发操作请求（NFR-05）
+- [x] 原地近景切入 ≤3 秒、退出恢复（FR-MOV-05、NFR-03）
+- [x] 五原语 UI 可完成一杯拿铁全流程（FR-MAKE-03）
+- [x] 偏差有即时画面/音效反馈，无文字评级（FR-EVAL-03）
+- [x] 玩家可在吧台内侧通道自由移动（配合 01 的通道拓宽）
+- [x] UI 不直接改写业务数据，只发操作请求（NFR-05）
+
+**结果（2026-11-07）：**
+
+四个新文件 + 两处接线：`Bar/BarStation.cs`、`Bar/CraftPanel.cs`、`Drinks/CraftSession.cs`、
+`Cameras/CameraFocus.cs`，以及 `ThirdPersonCameraRig` 的近景模式、输入层的界面模式。
+
+**A. 近景是"同一台相机换构图"，不是切固定机位（FR-MOV-05）**
+
+`CameraFocusState` 是纯计算：进度 0→1，时长 0.9s（构造时按 3s 上限截断，改配置也改不坏），
+距离 3.6→2.25m、俯角 35→32°、FOV 60→42°，**都走同一条 smoothstep 曲线**，所以没有硬切感。
+因为是同一台相机，镜头仍然跟着角色、仍然能被右键转动——这就是"非固定机位"。
+
+机位摆哪一侧是现算的：吧台内侧通道只有 1.2m 宽，站到人正后方会顶进前柜、整屏都是后背
+（第一版截图就是这个结果）。所以沿"人→工作点"的左右两侧各 SphereCast 一次，选没挡住的那侧；
+跟随点再朝工作点前移 0.42m、抬高 0.16m，把台面推到画面中间、把人让到边上。
+
+**B. 五原语对应五种控件，全部只发请求（NFR-05）**
+
+| 原语 | 控件 | 落到领域层 |
+| --- | --- | --- |
+| click | 圆形主按钮，指针按下→抬起 | `Click(按下时长)` |
+| hold | 同一个按钮按住不放 + 进度条 | `Hold(dt)` 攒、`Release()` 结算 |
+| select | 一排选项按钮 | `Choose(选项)` |
+| place | 一排热点按钮 | `Put(热点)` |
+| wait | 不用操作，进度条自己走 | `Await(dt)` |
+
+界面手里只有 `CraftSession`，没有 `DrinkMaker`、没有 `OrderBook`，也没有任何 setter：
+每个动作都是一次请求，被拒绝（`NotCurrent`/`Blocked`/`Served`）就只是被拒绝。
+测试里"当前是放置步时发 Choose"验证了状态一点没动（NFR-05）。
+
+**C. 判偏只有红闪 + 闷响，没有文字评级（FR-EVAL-03）**
+
+`DrinkMaker.StepFinished` 里 `Off` → 全屏红闪（0.45s 衰减）+ `ProceduralSfx.CraftThud()` 低频闷响，
+然后出「重做 / 继续」两个按钮（对应 7.9.4 的两个选择）。
+`CraftSession` 不向界面暴露 `DrinkQuality`，EditMode 用反射把这条钉住了。
+
+**D. 一处数据修正：取杯是"放置"不是"点击"**
+
+配方第一步"取杯放到萃取口下"原来是 `click`，但它本质是放置（FR-MAKE-03 里 place 的定义就是"放杯、上托盘"）。
+改成 `place` + 两个热点（萃取口 / 台面），错误的就是放到台面上。步骤数、判定步数都没变（7 步 / 判 3），
+06 的测试只是把"取杯"从 `Click()` 换成 `Put("萃取口")`。
+
+**E. 输入层**
+
+`PlayerIntent` 加 `Cancel`（PC Esc / 移动端返回）；`PlayerInputRouter.SetUiMode(bool)` 进界面时
+不锁光标、不发世界交互、走路清零，但保留右键转视角（近景仍可看）。
+`KeyboardMouseInputSource.UiMode` 与 `VirtualJoystickInputSource.PressCancel()` 一一对应，PC 与移动端同一套逻辑。
+
+**踩到的坑**
+
+1. 指针事件必须走 uGUI 的 `IPointerDownHandler/IPointerUpHandler`（鼠标与触屏同一条路），
+   场景里没有 EventSystem，`ProjectSetup` 按需补一个。
+2. `UiKit.TextButton` 建了 Text 却忘了赋值 → 按钮底色在、字是空的。截图里一眼看出来。
+3. 进度条一开始用改 `anchorMax` 控制宽度，读到的是 0：截图时序问题——测试脚本在一次
+   `yield` 里灌完进度，界面还没刷新就拍了。改成 `Image.fillAmount` 并**拍前等一帧**才稳定。
+4. 判"按住够不够"的阈值不能写 0.99：0.99×2.5s = 2.475s < 2.5s，照样判偏。
+   测试与截图都改成"顶到 1 才松手"。
+
+**验收**：EditMode **107/107**（07 新增 18：CraftSession 12 + CameraFocus 6）；
+`RunCraft` **PASS**（44 项：近景 0.87s、FOV 60→42、距离 3.6→2.25、五原语做完整杯、
+判偏红闪、退出后 FOV/距离恢复、通道内走 1.83m）；回归 `Run` `probes=48 deadEnds=0`、
+`RunEntry` `failures=0`、`RunSeat` `SEAT RESULT: PASS`（`bad*=0`，夹缝 4 全在白名单）。
+归档 `.scratch/vertical-slice/acceptance/07/`。

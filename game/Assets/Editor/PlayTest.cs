@@ -169,6 +169,38 @@ public static class PlayTest
         EditorApplication.EnterPlaymode();
     }
 
+    /// <summary>
+    /// 07 票自动化验收入口：吧台工位近景 + 五原语制作流程。
+    /// 用法：Unity.exe -batchmode -executeMethod PlayTest.RunCraft（不要加 -quit）
+    /// </summary>
+    public static void RunCraft()
+    {
+        EditorSceneManager.OpenScene("Assets/Scenes/Main.unity");
+
+        foreach (var rig in Object.FindObjectsByType<ScreenshotRig>(FindObjectsSortMode.None))
+            rig.enabled = false;
+
+        var motor = Object.FindFirstObjectByType<CoffeeShop.Player.PlayerMotor>();
+        var router = Object.FindFirstObjectByType<CoffeeShop.Controls.PlayerInputRouter>();
+        var camRig = Object.FindFirstObjectByType<CoffeeShop.Cameras.ThirdPersonCameraRig>();
+        var station = Object.FindFirstObjectByType<CoffeeShop.Bar.BarStation>();
+        if (motor == null || router == null || camRig == null || station == null)
+        {
+            Debug.LogError($"[CRAFT] missing refs motor={motor} router={router} cam={camRig} station={station}");
+            EditorApplication.Exit(2);
+            return;
+        }
+
+        var test = new GameObject("CraftFlowTest").AddComponent<CoffeeShop.Testing.CraftFlowTest>();
+        test.player = motor;
+        test.router = router;
+        test.followRig = camRig;
+        test.station = station;
+
+        Debug.Log($"[CRAFT] station={station.center} size={station.size} work={station.workPoint} sku={station.sku}");
+        EditorApplication.EnterPlaymode();
+    }
+
     static Renderer FindRenderer(GameObject root, string name)
     {
         if (root == null) return null;

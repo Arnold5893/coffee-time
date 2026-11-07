@@ -39,6 +39,9 @@ namespace CoffeeShop.Tests
             }
         }
 
+        /// <summary>取杯：配方里这一步是"放置"原语（把杯子放到萃取口下）。</summary>
+        static void Cup(DrinkMaker m) => m.Put("萃取口");
+
         static void FinishAll(DrinkMaker m)
         {
             int guard = 0;
@@ -67,7 +70,7 @@ namespace CoffeeShop.Tests
         public void 磨豆松早了算偏差_重做可以抹掉()
         {
             var m = new DrinkMaker(R("osmanthus-latte"));
-            m.Click();                       // 取杯
+            Cup(m);                       // 取杯
 
             Assert.AreEqual(MakeAction.InProgress, m.Hold(1.0f));
             Assert.AreEqual(MakeAction.Ok, m.Release(), "没按够也是完成这一步，只是带偏差");
@@ -91,7 +94,7 @@ namespace CoffeeShop.Tests
         public void 带着偏差继续会记一次错()
         {
             var m = new DrinkMaker(R("osmanthus-latte"));
-            m.Click();
+            Cup(m);
             m.Hold(1.0f);
             m.Release();
             Assert.IsTrue(m.Continue(), "带着偏差继续");
@@ -107,7 +110,7 @@ namespace CoffeeShop.Tests
         public void 选错风味算偏差()
         {
             var m = new DrinkMaker(R("osmanthus-latte"));
-            m.Click(); DoGood(m);            // 取杯、磨豆
+            Cup(m); DoGood(m);            // 取杯、磨豆
             DoGood(m);                       // 压粉
             DoGood(m);                       // 萃取
             DoGood(m);                       // 拿杯
@@ -124,7 +127,7 @@ namespace CoffeeShop.Tests
         public void 跳过必需的步骤就是缺步且直接非常差()
         {
             var m = new DrinkMaker(R("osmanthus-latte"));
-            m.Click(); DoGood(m); DoGood(m); DoGood(m); DoGood(m);   // 取杯 → 拿杯
+            Cup(m); DoGood(m); DoGood(m); DoGood(m); DoGood(m);   // 取杯 → 拿杯
             Assert.AreEqual("milk", m.Current.id);
             Assert.IsTrue(m.SkipCurrent(), "可以跳过");
 
@@ -140,7 +143,7 @@ namespace CoffeeShop.Tests
         public void 门槛只禁操作不判错()
         {
             var m = new DrinkMaker(R("osmanthus-latte"));
-            m.Click(); DoGood(m); DoGood(m);      // 取杯、磨豆、压粉 → 当前是萃取
+            Cup(m); DoGood(m); DoGood(m);      // 取杯、磨豆、压粉 → 当前是萃取
             Assert.AreEqual("extract", m.Current.id);
 
             Assert.IsTrue(m.SkipCurrent(), "把萃取跳掉");
@@ -152,7 +155,7 @@ namespace CoffeeShop.Tests
 
             // 补上萃取之后门槛就开了
             var m2 = new DrinkMaker(R("osmanthus-latte"));
-            m2.Click(); DoGood(m2); DoGood(m2);
+            Cup(m2); DoGood(m2); DoGood(m2);
             Assert.AreEqual(MakeAction.InProgress, m2.Await(1f));
             Assert.AreEqual(MakeAction.Ok, m2.Await(10f), "液流停下");
             Assert.AreEqual(MakeAction.Ok, m2.Click(1f), "这时候才拿得起杯子");
@@ -162,7 +165,7 @@ namespace CoffeeShop.Tests
         public void 可以提前出杯_没做的步骤算缺步()
         {
             var m = new DrinkMaker(R("osmanthus-latte"));
-            m.Click();
+            Cup(m);
             DoGood(m);                       // 只做完磨豆
             var rv = m.Serve();
 
@@ -176,7 +179,7 @@ namespace CoffeeShop.Tests
         public void 原语不符会被拒绝()
         {
             var m = new DrinkMaker(R("osmanthus-latte"));
-            m.Click();                       // 取杯
+            Cup(m);                       // 取杯
             Assert.AreEqual("grind", m.Current.id);
             Assert.AreEqual(MakeAction.NotCurrent, m.Click(1f), "磨豆是按住，不给点");
             Assert.AreEqual(MakeAction.NotCurrent, m.Choose("桂花"));
@@ -236,7 +239,7 @@ namespace CoffeeShop.Tests
         {
             // 经典拿铁没有风味步，判定 3 步（磨豆、压粉、加奶）
             var m = new DrinkMaker(R("classic-latte"));
-            m.Click();
+            Cup(m);
             if (errors >= 1) { m.Hold(0.4f); m.Release(); m.Continue(); } else DoGood(m);
             if (errors >= 2) { m.Click(0.05f); m.Continue(); } else DoGood(m);
             DoGood(m);   // 萃取
@@ -279,7 +282,7 @@ namespace CoffeeShop.Tests
         static DrinkReview MakeOsmanthusWithErrors(int errors)
         {
             var m = new DrinkMaker(R("osmanthus-latte"));
-            m.Click();                                                   // 取杯
+            Cup(m);                                                   // 取杯
             if (errors >= 1) { m.Hold(0.4f); m.Release(); m.Continue(); } else DoGood(m);   // 磨豆
             if (errors >= 2) { m.Click(0.05f); m.Continue(); } else DoGood(m);              // 压粉
             DoGood(m);                                                   // 萃取
