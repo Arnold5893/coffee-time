@@ -71,6 +71,9 @@ namespace CoffeeShop.Drinks
         public string StepName => maker.Current != null ? maker.Current.name : "";
         public MakePrimitive Primitive => maker.Current != null ? maker.Current.Primitive : MakePrimitive.Click;
 
+        /// <summary>当前步骤的 param：hold=达标秒数、click=按下达标秒数（0=点一下）、wait=等待秒数。</summary>
+        public float StepParam => maker.Current != null ? maker.Current.param : 0f;
+
         /// <summary>按住/等待型的进度 0–1。</summary>
         public float Progress01 => maker.Progress01;
 

@@ -1098,11 +1098,7 @@ for side in (-1, 1):
 for x in (0.33, -0.27, -0.36):
     b.cyl(0.045, 0.05, (x, 0.29, 0.51), M_BLACK, rot=(math.pi / 2, 0, 0), seg=20)
 b.cyl(0.04, 0.01, (0.25, -0.046, 0.24), M_BLACK, rot=(math.pi / 2, 0, 0), seg=20)
-# 顶部杯架 + 杯子
-for x in np.arange(-0.32, 0.33, 0.16):
-    b.beam((x, -0.2, 0.58), (x, -0.2, 0.78), 0.008, M_BLACK)
-    b.beam((x, 0.2, 0.58), (x, 0.2, 0.78), 0.008, M_BLACK)
-b.beam((-0.35, -0.2, 0.78), (0.35, -0.2, 0.78), 0.008, M_BLACK)
+# 顶部温杯（07 票返工：原「黑色杯架竖杆」实物不存在，且 8mm 细杆在 Unity 里读成悬浮黑线，已删除）
 for k, x in enumerate(np.arange(-0.27, 0.3, 0.135)):
     b.cyl(0.035, 0.07, (x, 0.05, 0.615), M_CUPGLASS, seg=14)
     if k % 2 == 0:
@@ -1336,16 +1332,7 @@ for f in (0.33, 0.67):
 pumpkin_lamp("Pendant_Entrance_Big", (P(250, 600)[0], P(250, 600)[1], 3.0), a=0.42, bh=0.12, t0=0.55, t1=2.55,
              n=48, w=0.09, cord_top=H - 0.55,
              info=("入口大吊灯", "进门第一眼看到的环形木片吊灯。"))
-# 吧台小花朵吊灯
-b = B("Pendant_Bar_Flower")
-lp = (P(800, 1300)[0], P(800, 1300)[1] + BAR_SHIFT, 2.3)
-b.cyl(0.002, 0.88, (0, 0, 0.46), M_BRASS, seg=6, smooth=False)
-for k in range(8):
-    a = k * math.pi / 4
-    b.box((0.12, 0.05, 0.004), (0.06 * math.cos(a), 0.06 * math.sin(a), -0.02), M_CERAMIC, (0.4, 0, a))
-b.sphere(0.04, (0, 0, -0.06), M_BULB, seg=12)
-b.finish(COLLS["Lighting"], lp)
-add_light("Pendant_Bar_Flower_Light", 'POINT', (lp[0], lp[1], lp[2] - 0.08), 25, color=(1.0, 0.75, 0.5))
+# 吧台小花朵吊灯（07 票返工：实景没有这盏灯，8 片陶瓷薄片在 Unity 里读成一团扇形纸片，已整件删除）
 
 # --- 入口灯箱 (门内侧上方) ---
 s = SEGS[11]

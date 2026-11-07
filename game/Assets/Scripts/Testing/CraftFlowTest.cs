@@ -99,33 +99,20 @@ namespace CoffeeShop.Testing
             panel.PickOption(1);    // 放到台面 = 放错
             Check(craft.Mode == CraftUiMode.Decide, "放错位置会停下来等玩家决定");
             Check(panel.LastFeedback == CraftFeedback.Deviation, "判偏立刻发出反馈事件");
-            Check(panel.FlashAmount > 0.5f, "判偏有即时红闪（FR-EVAL-03，界面上没有任何文字评级）");
+            log.AppendLine("  注：全屏红闪已按返工意见删除，判偏的画面反馈待重新设计（现在只有闷响 + 重做/继续）");
             panel.RetryStep();
             Check(craft.Mode == CraftUiMode.Place, "重做后回到这一步重新放");
             panel.PickOption(0);
             Check(craft.StepId == "grind", "放到萃取口下才对");
 
-            // 4.2 hold：磨豆（按住，进度条）
-            Check(craft.Mode == CraftUiMode.Hold, "磨豆是按住原语 → 出进度条");
-            panel.PressDown();
-            float holdT = 0f;
-            // 进度要顶到 1 才松手：0.99 就松手 = 差 0.025 秒，同样算偏差（这正是判定要的东西）
-            while (craft.Progress01 < 1f && holdT < 4f) { holdT += Time.deltaTime; yield return null; }
-            Check(craft.Progress01 >= 1f, $"按住期间进度涨满（{holdT:F2}s）");
-            panel.PressUp();
-            Check(craft.StepId == "tamp", "按够了松手就过");
+            // 4.2 hold / 4.3 click：交互已删，现在是占位按钮（点一下按配方 param 结算）
+            Check(craft.Mode == CraftUiMode.Hold, "磨豆是按住原语 → 出占位按钮");
+            panel.StubComplete();
+            Check(craft.StepId == "tamp", "占位点一下走完磨豆");
 
-            // 4.3 click：压粉（要按到位，点一下算偏）
-            Check(craft.Mode == CraftUiMode.Press, "压粉是点击原语");
-            panel.PressDown();
-            for (int i = 0; i < 2; i++) yield return null;
-            panel.PressUp();
-            Check(craft.Mode == CraftUiMode.Decide, "点一下没压到位 → 判偏");
-            panel.RetryStep();
-            panel.PressDown();
-            for (int i = 0; i < 30; i++) yield return null;   // 0.5s > 0.4s 门槛
-            panel.PressUp();
-            Check(craft.StepId == "extract", "按够 0.4 秒才过");
+            Check(craft.Mode == CraftUiMode.Press, "压粉是点击原语 → 出占位按钮");
+            panel.StubComplete();
+            Check(craft.StepId == "extract", "占位点一下走完压粉");
 
             // 4.4 wait：萃取（不用操作，进度自己走）
             Check(craft.Mode == CraftUiMode.Wait, "萃取是等待原语，不需要按");
@@ -134,22 +121,19 @@ namespace CoffeeShop.Testing
             Check(craft.StepId == "move", $"等待 {waitT:F1}s 自动完成萃取");
 
             // 4.5 后段：取杯（点击）→ 加奶（按住）→ 出杯（点击）
-            panel.TapAction(0.06f);
+            panel.StubComplete();
             Check(craft.StepId == "milk", "取杯点一下就走");
 
-            panel.PressDown();
-            float milkT = 0f;
-            while (craft.Progress01 < 1f && milkT < 4f) { milkT += Time.deltaTime; yield return null; }
-            panel.PressUp();
+            panel.StubComplete();
             Check(craft.StepId == "serve", "加奶按够 2 秒");
 
-            panel.TapAction(0.06f);
+            panel.StubComplete();
             for (int i = 0; i < 4; i++) yield return null;
 
             Check(craft.Maker.Served, "最后一步做完自动出杯");
             var review = craft.LastReview;
             Check(review != null && review.Quality == DrinkQuality.Good,
-                  $"两处偏差都重做了 → 整杯评价 {(review != null ? review.ToString() : "null")}");
+                  $"放错那次重做了 → 整杯评价 {(review != null ? review.ToString() : "null")}");
             log.AppendLine($"  session: {craft.Describe()}");
 
             // ---- 5. 出杯后自动收起，镜头恢复 -------------------------------

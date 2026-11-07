@@ -221,29 +221,26 @@ public class ScreenshotRig : MonoBehaviour
 
             if (craft != null)
             {
-                // 第一步是"放置"原语：点正确的热点（萃取口）→ 走到"磨豆"（按住型），
-                // 按到一半拍一张带进度的近景
-                panel.PickOption(0);
+                // 第一步是"放置"原语：先故意放错，拍一张判偏状态。
+                // 07 返工后这里**没有全屏红闪**了，只剩「重做 / 继续」+ 一声闷响。
+                panel.PickOption(1);
                 for (int i = 0; i < 3; i++) yield return null;
+                Debug.Log($"[rig] craft deviation feedback={panel.LastFeedback} dev={craft.Deviations} " +
+                          $"step={craft.StepId} mode={craft.Mode}");
+                yield return CaptureCurrent(cam, rt, "setup_screenshot_bar_deviation.png");
 
-                // 按住磨豆，攒到一半先拍一张（界面每帧刷新，拍之前要等一帧让进度上屏）
-                panel.PressDown();
-                for (int i = 0; i < 25; i++) craft.Tick(0.05f);   // 1.25s / 2.5s
-                for (int i = 0; i < 3; i++) yield return null;
-                Debug.Log($"[rig] progress {panel.ProgressDebug}");
+                // 重做 → 放对 → 走到"磨豆"，拍近景（click/hold 现在是占位按钮，交互待重做）
+                panel.RetryStep();
+                panel.PickOption(0);
+                for (int i = 0; i < 4; i++) yield return null;
+                Debug.Log($"[rig] focus state {panel.StateDebug}");
                 yield return CaptureCurrent(cam, rt, "setup_screenshot_bar_focus.png");
 
-                // 继续按到满 → 松手结算（这一步做对）
-                while (craft.Progress01 < 1f) craft.Tick(0.05f);
-                panel.PressUp();
-                for (int i = 0; i < 3; i++) yield return null;
-
-                // 压粉要按 0.4 秒，只点一下 → 判偏：红闪 + 闷响，界面上没有任何文字评级
-                panel.TapAction(0.06f);
+                panel.StubComplete();   // 磨豆（占位）
                 for (int i = 0; i < 2; i++) yield return null;
-                Debug.Log($"[rig] craft deviation flash={panel.FlashAmount:F2} " +
-                          $"feedback={panel.LastFeedback} dev={craft.Deviations} step={craft.StepId} mode={craft.Mode}");
-                yield return CaptureCurrent(cam, rt, "setup_screenshot_bar_deviation.png");
+                panel.StubComplete();   // 压粉（占位）
+                for (int i = 0; i < 2; i++) yield return null;
+                Debug.Log($"[rig] after stub {panel.StateDebug} stubClicks={panel.StubCompletes}");
             }
 
             barStation.Exit();

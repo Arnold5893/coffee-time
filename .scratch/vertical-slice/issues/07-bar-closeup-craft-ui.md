@@ -74,3 +74,32 @@
 判偏红闪、退出后 FOV/距离恢复、通道内走 1.83m）；回归 `Run` `probes=48 deadEnds=0`、
 `RunEntry` `failures=0`、`RunSeat` `SEAT RESULT: PASS`（`bad*=0`，夹缝 4 全在白名单）。
 归档 `.scratch/vertical-slice/acceptance/07/`。
+
+---
+
+## 返工（2026-11-07，老板验收后）
+
+**几何：删掉两处不存在的物件**（`build_shop.py`，仍走"唯一几何源"铁律）
+
+1. `Pendant_Bar_Flower` 整件删除（含 `Pendant_Bar_Flower_Light`）——实景没有这盏灯；
+   8 片陶瓷薄片在 Unity 里读成一团白色扇形纸片，挂在黑色吊线下面。
+2. `Coffee_Machine` 顶部杯架的黑色细杆全部删除（`b.beam` 竖杆 + 顶部横杆），**杯子留下**（杯子端正地坐在机顶，读得通）。
+   8mm 细杆在游戏视角里就是一堆悬浮黑线。
+
+导出流程补一条：`coffee_shop.fbx` 必须**手动复制**到 `game/Assets/Models/coffee_shop.fbx`，
+否则 Unity 用的还是上一版（这次差点拿旧模型验完收工）。
+
+**交互：两套都删了，等重新设计**
+
+- 「按住攒进度条」磨豆 → 删（老板：太拉胯）。
+- 「点一下压粉 + 全屏红闪」→ 删（老板：压粉做得不好，且不应该把屏幕变红）。
+- 连同 `PressDown/PressUp/TapAction`、进度条、`Flash` 全屏遮罩一起删除。
+- 现在 `click/hold` 步骤是**占位**：一个「完成这一步」按钮，直接按配方 `param` 结算，
+  只为保持流程跑通与回归不断；面板上写「交互重做中（占位）」。
+- **领域层不动**：`Recipe` 的五原语与 `hold=达标秒数 / click=按下达标秒数` 仍成立，
+  要换的是"玩家用什么动作产出这些秒数"。
+
+**判偏画面反馈**：全屏红闪已删，现在只有一声闷响 + 「重做 / 继续」。
+FR-EVAL-03 要求的"即时画面/音效反馈"目前只有音效，画面部分待新设计一起定。
+
+**回归**：`RunCraft` **PASS**（44 项，failures=0）、EditMode **107/107**。
