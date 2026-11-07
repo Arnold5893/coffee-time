@@ -175,6 +175,41 @@ namespace CoffeeShop.Tests
         }
 
         [Test]
+        public void 双人沙发是一椅两座()
+        {
+            var file = Load();
+            var sofas = file.seats.Where(s => s.zone == "sofa").ToList();
+            Assert.GreaterOrEqual(sofas.Count, 20, "10 张双人沙发各出 2 个座位");
+
+            // 同一个 anchor 必须正好出两个座位，且左右对称（否则两个人会坐同一点）
+            foreach (var g in sofas.GroupBy(s => s.anchor))
+            {
+                Assert.AreEqual(2, g.Count(), g.Key + " 应该有两个座位");
+                var offs = g.Select(s => s.lateralOffset).OrderBy(v => v).ToList();
+                Assert.Less(offs[0], 0f, g.Key + " 左边座位要往左偏");
+                Assert.Greater(offs[1], 0f, g.Key + " 右边座位要往右偏");
+                Assert.AreEqual(offs[0], -offs[1], 1e-4f, g.Key + " 两个座位要左右对称");
+                Assert.Greater(Mathf.Abs(offs[1]), 0.2f, g.Key + " 两个座位要真正分开");
+            }
+        }
+
+        [Test]
+        public void 横向偏移有合理上限()
+        {
+            var ok = new SeatConfigFile
+            {
+                seats = new[] { new SeatEntry { id = "a", zone = "sofa", anchor = "x", faceDir = "N", lateralOffset = 0.30f } },
+            };
+            Assert.IsEmpty(SeatConfig.Validate(ok));
+
+            var bad = new SeatConfigFile
+            {
+                seats = new[] { new SeatEntry { id = "a", zone = "sofa", anchor = "x", faceDir = "N", lateralOffset = 0.9f } },
+            };
+            Assert.IsNotEmpty(SeatConfig.Validate(bad), "偏到沙发外面去了应当报错");
+        }
+
+        [Test]
         public void 每个座位都指定了锚点与朝向依据()
         {
             var file = Load();

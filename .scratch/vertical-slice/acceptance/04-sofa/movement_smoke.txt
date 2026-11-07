@@ -1,0 +1,2 @@
+probes=48 deadEnds=0 outOfRoom=0
+SMOKE RESULT: PASS

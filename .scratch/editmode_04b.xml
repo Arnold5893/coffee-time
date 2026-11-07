@@ -1,0 +1,414 @@
+<?xml version="1.0" encoding="utf-8"?>
+<test-run id="2" testcasecount="61" result="Passed" total="61" passed="61" failed="0" inconclusive="0" skipped="0" asserts="0" engine-version="3.5.0.0" clr-version="4.0.30319.42000" start-time="2026-11-07 01:52:05Z" end-time="2026-11-07 01:52:05Z" duration="0.0679102">
+  <test-suite type="TestSuite" id="1000" name="game" fullname="game" runstate="Runnable" testcasecount="61" result="Passed" start-time="2026-11-07 01:52:05Z" end-time="2026-11-07 01:52:05Z" duration="0.067910" total="61" passed="61" failed="0" inconclusive="0" skipped="0" asserts="0">
+    <properties>
+      <property name="platform" value="EditMode" />
+    </properties>
+    <test-suite type="Assembly" id="1070" name="CoffeeShop.Tests.EditMode.dll" fullname="D:/coffee_shop/game/Library/ScriptAssemblies/CoffeeShop.Tests.EditMode.dll" runstate="Runnable" testcasecount="61" result="Passed" start-time="2026-11-07 01:52:05Z" end-time="2026-11-07 01:52:05Z" duration="0.062567" total="61" passed="61" failed="0" inconclusive="0" skipped="0" asserts="0">
+      <properties>
+        <property name="_PID" value="26128" />
+        <property name="_APPDOMAIN" value="Unity Child Domain" />
+        <property name="platform" value="EditMode" />
+        <property name="EditorOnly" value="True" />
+      </properties>
+      <test-suite type="TestSuite" id="1071" name="CoffeeShop" fullname="CoffeeShop" runstate="Runnable" testcasecount="61" result="Passed" start-time="2026-11-07 01:52:05Z" end-time="2026-11-07 01:52:05Z" duration="0.061994" total="61" passed="61" failed="0" inconclusive="0" skipped="0" asserts="0">
+        <properties />
+        <test-suite type="TestSuite" id="1072" name="Tests" fullname="CoffeeShop.Tests" runstate="Runnable" testcasecount="61" result="Passed" start-time="2026-11-07 01:52:05Z" end-time="2026-11-07 01:52:05Z" duration="0.061626" total="61" passed="61" failed="0" inconclusive="0" skipped="0" asserts="0">
+          <properties />
+          <test-suite type="TestFixture" id="1001" name="BossQueueTests" fullname="CoffeeShop.Tests.BossQueueTests" classname="CoffeeShop.Tests.BossQueueTests" runstate="Runnable" testcasecount="6" result="Passed" start-time="2026-11-07 01:52:05Z" end-time="2026-11-07 01:52:05Z" duration="0.026971" total="6" passed="6" failed="0" inconclusive="0" skipped="0" asserts="0">
+            <properties />
+            <test-case id="1003" name="做完自动送到客人当前座位" fullname="CoffeeShop.Tests.BossQueueTests.做完自动送到客人当前座位" methodname="做完自动送到客人当前座位" classname="CoffeeShop.Tests.BossQueueTests" runstate="Runnable" seed="1809703224" result="Passed" start-time="2026-11-07 01:52:05Z" end-time="2026-11-07 01:52:05Z" duration="0.012726" asserts="0">
+              <properties>
+                <property name="retryIteration" value="0" />
+                <property name="repeatIteration" value="0" />
+              </properties>
+            </test-case>
+            <test-case id="1007" name="单客闭环接上老板队列可以自己跑完" fullname="CoffeeShop.Tests.BossQueueTests.单客闭环接上老板队列可以自己跑完" methodname="单客闭环接上老板队列可以自己跑完" classname="CoffeeShop.Tests.BossQueueTests" runstate="Runnable" seed="1638628151" result="Passed" start-time="2026-11-07 01:52:05Z" end-time="2026-11-07 01:52:05Z" duration="0.003335" asserts="0">
+              <properties>
+                <property name="retryIteration" value="0" />
+                <property name="repeatIteration" value="0" />
+              </properties>
+            </test-case>
+            <test-case id="1005" name="客人还没落座时先挂着待送" fullname="CoffeeShop.Tests.BossQueueTests.客人还没落座时先挂着待送" methodname="客人还没落座时先挂着待送" classname="CoffeeShop.Tests.BossQueueTests" runstate="Runnable" seed="1119300115" result="Passed" start-time="2026-11-07 01:52:05Z" end-time="2026-11-07 01:52:05Z" duration="0.000320" asserts="0">
+              <properties>
+                <property name="retryIteration" value="0" />
+                <property name="repeatIteration" value="0" />
+              </properties>
+            </test-case>
+            <test-case id="1002" name="排队后要等够时间才做好" fullname="CoffeeShop.Tests.BossQueueTests.排队后要等够时间才做好" methodname="排队后要等够时间才做好" classname="CoffeeShop.Tests.BossQueueTests" runstate="Runnable" seed="742144225" result="Passed" start-time="2026-11-07 01:52:05Z" end-time="2026-11-07 01:52:05Z" duration="0.001393" asserts="0">
+              <properties>
+                <property name="retryIteration" value="0" />
+                <property name="repeatIteration" value="0" />
+              </properties>
+            </test-case>
+            <test-case id="1006" name="玩家做的单老板不代送" fullname="CoffeeShop.Tests.BossQueueTests.玩家做的单老板不代送" methodname="玩家做的单老板不代送" classname="CoffeeShop.Tests.BossQueueTests" runstate="Runnable" seed="1419806648" result="Passed" start-time="2026-11-07 01:52:05Z" end-time="2026-11-07 01:52:05Z" duration="0.000194" asserts="0">
+              <properties>
+                <property name="retryIteration" value="0" />
+                <property name="repeatIteration" value="0" />
+              </properties>
+            </test-case>
+            <test-case id="1004" name="玩家挑走的单老板不再做" fullname="CoffeeShop.Tests.BossQueueTests.玩家挑走的单老板不再做" methodname="玩家挑走的单老板不再做" classname="CoffeeShop.Tests.BossQueueTests" runstate="Runnable" seed="1563611396" result="Passed" start-time="2026-11-07 01:52:05Z" end-time="2026-11-07 01:52:05Z" duration="0.000191" asserts="0">
+              <properties>
+                <property name="retryIteration" value="0" />
+                <property name="repeatIteration" value="0" />
+              </properties>
+            </test-case>
+          </test-suite>
+          <test-suite type="TestFixture" id="1008" name="CustomerLoopTests" fullname="CoffeeShop.Tests.CustomerLoopTests" classname="CoffeeShop.Tests.CustomerLoopTests" runstate="Runnable" testcasecount="9" result="Passed" start-time="2026-11-07 01:52:05Z" end-time="2026-11-07 01:52:05Z" duration="0.006829" total="9" passed="9" failed="0" inconclusive="0" skipped="0" asserts="0">
+            <properties />
+            <test-case id="1009" name="单客完整闭环_进店点单落座等餐饮用离开" fullname="CoffeeShop.Tests.CustomerLoopTests.单客完整闭环_进店点单落座等餐饮用离开" methodname="单客完整闭环_进店点单落座等餐饮用离开" classname="CoffeeShop.Tests.CustomerLoopTests" runstate="Runnable" seed="1136721160" result="Passed" start-time="2026-11-07 01:52:05Z" end-time="2026-11-07 01:52:05Z" duration="0.001028" asserts="0">
+              <properties>
+                <property name="retryIteration" value="0" />
+                <property name="repeatIteration" value="0" />
+              </properties>
+            </test-case>
+            <test-case id="1011" name="客人不抢已占用座位" fullname="CoffeeShop.Tests.CustomerLoopTests.客人不抢已占用座位" methodname="客人不抢已占用座位" classname="CoffeeShop.Tests.CustomerLoopTests" runstate="Runnable" seed="1901028751" result="Passed" start-time="2026-11-07 01:52:05Z" end-time="2026-11-07 01:52:05Z" duration="0.000298" asserts="0">
+              <properties>
+                <property name="retryIteration" value="0" />
+                <property name="repeatIteration" value="0" />
+              </properties>
+            </test-case>
+            <test-case id="1010" name="客人只坐桌子不抢吧台凳" fullname="CoffeeShop.Tests.CustomerLoopTests.客人只坐桌子不抢吧台凳" methodname="客人只坐桌子不抢吧台凳" classname="CoffeeShop.Tests.CustomerLoopTests" runstate="Runnable" seed="1941482815" result="Passed" start-time="2026-11-07 01:52:05Z" end-time="2026-11-07 01:52:05Z" duration="0.000247" asserts="0">
+              <properties>
+                <property name="retryIteration" value="0" />
+                <property name="repeatIteration" value="0" />
+              </properties>
+            </test-case>
+            <test-case id="1016" name="客人提前离开时订单作废且座位放回" fullname="CoffeeShop.Tests.CustomerLoopTests.客人提前离开时订单作废且座位放回" methodname="客人提前离开时订单作废且座位放回" classname="CoffeeShop.Tests.CustomerLoopTests" runstate="Runnable" seed="594559498" result="Passed" start-time="2026-11-07 01:52:05Z" end-time="2026-11-07 01:52:05Z" duration="0.000406" asserts="0">
+              <properties>
+                <property name="retryIteration" value="0" />
+                <property name="repeatIteration" value="0" />
+              </properties>
+            </test-case>
+            <test-case id="1015" name="客人还没落座时订单做好也先不送" fullname="CoffeeShop.Tests.CustomerLoopTests.客人还没落座时订单做好也先不送" methodname="客人还没落座时订单做好也先不送" classname="CoffeeShop.Tests.CustomerLoopTests" runstate="Runnable" seed="2092194460" result="Passed" start-time="2026-11-07 01:52:05Z" end-time="2026-11-07 01:52:05Z" duration="0.000282" asserts="0">
+              <properties>
+                <property name="retryIteration" value="0" />
+                <property name="repeatIteration" value="0" />
+              </properties>
+            </test-case>
+            <test-case id="1013" name="座位空出来后等候的客人落座" fullname="CoffeeShop.Tests.CustomerLoopTests.座位空出来后等候的客人落座" methodname="座位空出来后等候的客人落座" classname="CoffeeShop.Tests.CustomerLoopTests" runstate="Runnable" seed="898690573" result="Passed" start-time="2026-11-07 01:52:05Z" end-time="2026-11-07 01:52:05Z" duration="0.000184" asserts="0">
+              <properties>
+                <property name="retryIteration" value="0" />
+                <property name="repeatIteration" value="0" />
+              </properties>
+            </test-case>
+            <test-case id="1012" name="无空位时一直等候_不离开不催促" fullname="CoffeeShop.Tests.CustomerLoopTests.无空位时一直等候_不离开不催促" methodname="无空位时一直等候_不离开不催促" classname="CoffeeShop.Tests.CustomerLoopTests" runstate="Runnable" seed="1861600441" result="Passed" start-time="2026-11-07 01:52:05Z" end-time="2026-11-07 01:52:05Z" duration="0.001277" asserts="0">
+              <properties>
+                <property name="retryIteration" value="0" />
+                <property name="repeatIteration" value="0" />
+              </properties>
+            </test-case>
+            <test-case id="1014" name="等餐期间不催促也不离开" fullname="CoffeeShop.Tests.CustomerLoopTests.等餐期间不催促也不离开" methodname="等餐期间不催促也不离开" classname="CoffeeShop.Tests.CustomerLoopTests" runstate="Runnable" seed="862860495" result="Passed" start-time="2026-11-07 01:52:05Z" end-time="2026-11-07 01:52:05Z" duration="0.000240" asserts="0">
+              <properties>
+                <property name="retryIteration" value="0" />
+                <property name="repeatIteration" value="0" />
+              </properties>
+            </test-case>
+            <test-case id="1017" name="阶段图与实现一致" fullname="CoffeeShop.Tests.CustomerLoopTests.阶段图与实现一致" methodname="阶段图与实现一致" classname="CoffeeShop.Tests.CustomerLoopTests" runstate="Runnable" seed="1040379209" result="Passed" start-time="2026-11-07 01:52:05Z" end-time="2026-11-07 01:52:05Z" duration="0.001052" asserts="0">
+              <properties>
+                <property name="retryIteration" value="0" />
+                <property name="repeatIteration" value="0" />
+              </properties>
+            </test-case>
+          </test-suite>
+          <test-suite type="TestFixture" id="1018" name="OrderDeliveryTests" fullname="CoffeeShop.Tests.OrderDeliveryTests" classname="CoffeeShop.Tests.OrderDeliveryTests" runstate="Runnable" testcasecount="6" result="Passed" start-time="2026-11-07 01:52:05Z" end-time="2026-11-07 01:52:05Z" duration="0.002030" total="6" passed="6" failed="0" inconclusive="0" skipped="0" asserts="0">
+            <properties />
+            <test-case id="1024" name="作废只影响该客人的单" fullname="CoffeeShop.Tests.OrderDeliveryTests.作废只影响该客人的单" methodname="作废只影响该客人的单" classname="CoffeeShop.Tests.OrderDeliveryTests" runstate="Runnable" seed="1206954724" result="Passed" start-time="2026-11-07 01:52:05Z" end-time="2026-11-07 01:52:05Z" duration="0.000346" asserts="0">
+              <properties>
+                <property name="retryIteration" value="0" />
+                <property name="repeatIteration" value="0" />
+              </properties>
+            </test-case>
+            <test-case id="1020" name="客人换了座位送达点跟着换" fullname="CoffeeShop.Tests.OrderDeliveryTests.客人换了座位送达点跟着换" methodname="客人换了座位送达点跟着换" classname="CoffeeShop.Tests.OrderDeliveryTests" runstate="Runnable" seed="1469169863" result="Passed" start-time="2026-11-07 01:52:05Z" end-time="2026-11-07 01:52:05Z" duration="0.000298" asserts="0">
+              <properties>
+                <property name="retryIteration" value="0" />
+                <property name="repeatIteration" value="0" />
+              </properties>
+            </test-case>
+            <test-case id="1021" name="客人还没落座就送不出去且订单停在待送" fullname="CoffeeShop.Tests.OrderDeliveryTests.客人还没落座就送不出去且订单停在待送" methodname="客人还没落座就送不出去且订单停在待送" classname="CoffeeShop.Tests.OrderDeliveryTests" runstate="Runnable" seed="485963923" result="Passed" start-time="2026-11-07 01:52:05Z" end-time="2026-11-07 01:52:05Z" duration="0.000179" asserts="0">
+              <properties>
+                <property name="retryIteration" value="0" />
+                <property name="repeatIteration" value="0" />
+              </properties>
+            </test-case>
+            <test-case id="1022" name="没有接到座位查询口时一律不交付" fullname="CoffeeShop.Tests.OrderDeliveryTests.没有接到座位查询口时一律不交付" methodname="没有接到座位查询口时一律不交付" classname="CoffeeShop.Tests.OrderDeliveryTests" runstate="Runnable" seed="1768369971" result="Passed" start-time="2026-11-07 01:52:05Z" end-time="2026-11-07 01:52:05Z" duration="0.000130" asserts="0">
+              <properties>
+                <property name="retryIteration" value="0" />
+                <property name="repeatIteration" value="0" />
+              </properties>
+            </test-case>
+            <test-case id="1023" name="订单簿按客人找单" fullname="CoffeeShop.Tests.OrderDeliveryTests.订单簿按客人找单" methodname="订单簿按客人找单" classname="CoffeeShop.Tests.OrderDeliveryTests" runstate="Runnable" seed="1143407980" result="Passed" start-time="2026-11-07 01:52:05Z" end-time="2026-11-07 01:52:05Z" duration="0.000117" asserts="0">
+              <properties>
+                <property name="retryIteration" value="0" />
+                <property name="repeatIteration" value="0" />
+              </properties>
+            </test-case>
+            <test-case id="1019" name="送达点等于客人当前座位" fullname="CoffeeShop.Tests.OrderDeliveryTests.送达点等于客人当前座位" methodname="送达点等于客人当前座位" classname="CoffeeShop.Tests.OrderDeliveryTests" runstate="Runnable" seed="411952617" result="Passed" start-time="2026-11-07 01:52:05Z" end-time="2026-11-07 01:52:05Z" duration="0.000106" asserts="0">
+              <properties>
+                <property name="retryIteration" value="0" />
+                <property name="repeatIteration" value="0" />
+              </properties>
+            </test-case>
+          </test-suite>
+          <test-suite type="TestFixture" id="1025" name="OrderStateMachineTests" fullname="CoffeeShop.Tests.OrderStateMachineTests" classname="CoffeeShop.Tests.OrderStateMachineTests" runstate="Runnable" testcasecount="18" result="Passed" start-time="2026-11-07 01:52:05Z" end-time="2026-11-07 01:52:05Z" duration="0.006984" total="18" passed="18" failed="0" inconclusive="0" skipped="0" asserts="0">
+            <properties />
+            <test-case id="1040" name="两人共饮一杯要喝满六口" fullname="CoffeeShop.Tests.OrderStateMachineTests.两人共饮一杯要喝满六口" methodname="两人共饮一杯要喝满六口" classname="CoffeeShop.Tests.OrderStateMachineTests" runstate="Runnable" seed="603963401" result="Passed" start-time="2026-11-07 01:52:05Z" end-time="2026-11-07 01:52:05Z" duration="0.000255" asserts="0">
+              <properties>
+                <property name="retryIteration" value="0" />
+                <property name="repeatIteration" value="0" />
+              </properties>
+            </test-case>
+            <test-case id="1028" name="主链七步可以一路走到底" fullname="CoffeeShop.Tests.OrderStateMachineTests.主链七步可以一路走到底" methodname="主链七步可以一路走到底" classname="CoffeeShop.Tests.OrderStateMachineTests" runstate="Runnable" seed="953659061" result="Passed" start-time="2026-11-07 01:52:05Z" end-time="2026-11-07 01:52:05Z" duration="0.000266" asserts="0">
+              <properties>
+                <property name="retryIteration" value="0" />
+                <property name="repeatIteration" value="0" />
+              </properties>
+            </test-case>
+            <test-case id="1038" name="交付必须带座位" fullname="CoffeeShop.Tests.OrderStateMachineTests.交付必须带座位" methodname="交付必须带座位" classname="CoffeeShop.Tests.OrderStateMachineTests" runstate="Runnable" seed="1567319056" result="Passed" start-time="2026-11-07 01:52:05Z" end-time="2026-11-07 01:52:05Z" duration="0.000153" asserts="0">
+              <properties>
+                <property name="retryIteration" value="0" />
+                <property name="repeatIteration" value="0" />
+              </properties>
+            </test-case>
+            <test-case id="1043" name="作废是兜底分支任何未完成状态都能走" fullname="CoffeeShop.Tests.OrderStateMachineTests.作废是兜底分支任何未完成状态都能走" methodname="作废是兜底分支任何未完成状态都能走" classname="CoffeeShop.Tests.OrderStateMachineTests" runstate="Runnable" seed="2058120804" result="Passed" start-time="2026-11-07 01:52:05Z" end-time="2026-11-07 01:52:05Z" duration="0.000612" asserts="0">
+              <properties>
+                <property name="retryIteration" value="0" />
+                <property name="repeatIteration" value="0" />
+              </properties>
+            </test-case>
+            <test-case id="1036" name="制作中不能直接交付也不能回头认领" fullname="CoffeeShop.Tests.OrderStateMachineTests.制作中不能直接交付也不能回头认领" methodname="制作中不能直接交付也不能回头认领" classname="CoffeeShop.Tests.OrderStateMachineTests" runstate="Runnable" seed="851842201" result="Passed" start-time="2026-11-07 01:52:05Z" end-time="2026-11-07 01:52:05Z" duration="0.000161" asserts="0">
+              <properties>
+                <property name="retryIteration" value="0" />
+                <property name="repeatIteration" value="0" />
+              </properties>
+            </test-case>
+            <test-case id="1039" name="单人一杯要喝满三口才算已饮用" fullname="CoffeeShop.Tests.OrderStateMachineTests.单人一杯要喝满三口才算已饮用" methodname="单人一杯要喝满三口才算已饮用" classname="CoffeeShop.Tests.OrderStateMachineTests" runstate="Runnable" seed="1326251254" result="Passed" start-time="2026-11-07 01:52:05Z" end-time="2026-11-07 01:52:05Z" duration="0.000173" asserts="0">
+              <properties>
+                <property name="retryIteration" value="0" />
+                <property name="repeatIteration" value="0" />
+              </properties>
+            </test-case>
+            <test-case id="1044" name="合法图与状态机实现一致" fullname="CoffeeShop.Tests.OrderStateMachineTests.合法图与状态机实现一致" methodname="合法图与状态机实现一致" classname="CoffeeShop.Tests.OrderStateMachineTests" runstate="Runnable" seed="1446154801" result="Passed" start-time="2026-11-07 01:52:05Z" end-time="2026-11-07 01:52:05Z" duration="0.000692" asserts="0">
+              <properties>
+                <property name="retryIteration" value="0" />
+                <property name="repeatIteration" value="0" />
+              </properties>
+            </test-case>
+            <test-suite type="ParameterizedMethod" id="1035" name="待办不能跳步" fullname="CoffeeShop.Tests.OrderStateMachineTests.待办不能跳步" classname="CoffeeShop.Tests.OrderStateMachineTests" runstate="Runnable" testcasecount="5" result="Passed" start-time="2026-11-07 01:52:05Z" end-time="2026-11-07 01:52:05Z" duration="0.001071" total="5" passed="5" failed="0" inconclusive="0" skipped="0" asserts="0">
+              <properties />
+              <test-case id="1030" name="待办不能跳步(Making)" fullname="CoffeeShop.Tests.OrderStateMachineTests.待办不能跳步(Making)" methodname="待办不能跳步" classname="CoffeeShop.Tests.OrderStateMachineTests" runstate="Runnable" seed="1954422690" result="Passed" start-time="2026-11-07 01:52:05Z" end-time="2026-11-07 01:52:05Z" duration="0.000309" asserts="0">
+                <properties>
+                  <property name="retryIteration" value="0" />
+                  <property name="repeatIteration" value="0" />
+                </properties>
+              </test-case>
+              <test-case id="1031" name="待办不能跳步(Ready)" fullname="CoffeeShop.Tests.OrderStateMachineTests.待办不能跳步(Ready)" methodname="待办不能跳步" classname="CoffeeShop.Tests.OrderStateMachineTests" runstate="Runnable" seed="1062528323" result="Passed" start-time="2026-11-07 01:52:05Z" end-time="2026-11-07 01:52:05Z" duration="0.000068" asserts="0">
+                <properties>
+                  <property name="retryIteration" value="0" />
+                  <property name="repeatIteration" value="0" />
+                </properties>
+              </test-case>
+              <test-case id="1032" name="待办不能跳步(Delivered)" fullname="CoffeeShop.Tests.OrderStateMachineTests.待办不能跳步(Delivered)" methodname="待办不能跳步" classname="CoffeeShop.Tests.OrderStateMachineTests" runstate="Runnable" seed="960696299" result="Passed" start-time="2026-11-07 01:52:05Z" end-time="2026-11-07 01:52:05Z" duration="0.000040" asserts="0">
+                <properties>
+                  <property name="retryIteration" value="0" />
+                  <property name="repeatIteration" value="0" />
+                </properties>
+              </test-case>
+              <test-case id="1033" name="待办不能跳步(Drunk)" fullname="CoffeeShop.Tests.OrderStateMachineTests.待办不能跳步(Drunk)" methodname="待办不能跳步" classname="CoffeeShop.Tests.OrderStateMachineTests" runstate="Runnable" seed="1925051000" result="Passed" start-time="2026-11-07 01:52:05Z" end-time="2026-11-07 01:52:05Z" duration="0.000035" asserts="0">
+                <properties>
+                  <property name="retryIteration" value="0" />
+                  <property name="repeatIteration" value="0" />
+                </properties>
+              </test-case>
+              <test-case id="1034" name="待办不能跳步(Done)" fullname="CoffeeShop.Tests.OrderStateMachineTests.待办不能跳步(Done)" methodname="待办不能跳步" classname="CoffeeShop.Tests.OrderStateMachineTests" runstate="Runnable" seed="538203695" result="Passed" start-time="2026-11-07 01:52:05Z" end-time="2026-11-07 01:52:05Z" duration="0.000045" asserts="0">
+                <properties>
+                  <property name="retryIteration" value="0" />
+                  <property name="repeatIteration" value="0" />
+                </properties>
+              </test-case>
+            </test-suite>
+            <test-case id="1026" name="新订单是待办且绑定客人" fullname="CoffeeShop.Tests.OrderStateMachineTests.新订单是待办且绑定客人" methodname="新订单是待办且绑定客人" classname="CoffeeShop.Tests.OrderStateMachineTests" runstate="Runnable" seed="149803580" result="Passed" start-time="2026-11-07 01:52:05Z" end-time="2026-11-07 01:52:05Z" duration="0.000148" asserts="0">
+              <properties>
+                <property name="retryIteration" value="0" />
+                <property name="repeatIteration" value="0" />
+              </properties>
+            </test-case>
+            <test-case id="1029" name="每一步都发一条领域事件且顺序正确" fullname="CoffeeShop.Tests.OrderStateMachineTests.每一步都发一条领域事件且顺序正确" methodname="每一步都发一条领域事件且顺序正确" classname="CoffeeShop.Tests.OrderStateMachineTests" runstate="Runnable" seed="1224831600" result="Passed" start-time="2026-11-07 01:52:05Z" end-time="2026-11-07 01:52:05Z" duration="0.000884" asserts="0">
+              <properties>
+                <property name="retryIteration" value="0" />
+                <property name="repeatIteration" value="0" />
+              </properties>
+            </test-case>
+            <test-case id="1041" name="没交付不能喝" fullname="CoffeeShop.Tests.OrderStateMachineTests.没交付不能喝" methodname="没交付不能喝" classname="CoffeeShop.Tests.OrderStateMachineTests" runstate="Runnable" seed="1031400322" result="Passed" start-time="2026-11-07 01:52:05Z" end-time="2026-11-07 01:52:05Z" duration="0.000136" asserts="0">
+              <properties>
+                <property name="retryIteration" value="0" />
+                <property name="repeatIteration" value="0" />
+              </properties>
+            </test-case>
+            <test-case id="1042" name="终态不再接受任何转换" fullname="CoffeeShop.Tests.OrderStateMachineTests.终态不再接受任何转换" methodname="终态不再接受任何转换" classname="CoffeeShop.Tests.OrderStateMachineTests" runstate="Runnable" seed="1098052653" result="Passed" start-time="2026-11-07 01:52:05Z" end-time="2026-11-07 01:52:05Z" duration="0.000133" asserts="0">
+              <properties>
+                <property name="retryIteration" value="0" />
+                <property name="repeatIteration" value="0" />
+              </properties>
+            </test-case>
+            <test-case id="1037" name="认领必须带身份" fullname="CoffeeShop.Tests.OrderStateMachineTests.认领必须带身份" methodname="认领必须带身份" classname="CoffeeShop.Tests.OrderStateMachineTests" runstate="Runnable" seed="457373119" result="Passed" start-time="2026-11-07 01:52:05Z" end-time="2026-11-07 01:52:05Z" duration="0.000115" asserts="0">
+              <properties>
+                <property name="retryIteration" value="0" />
+                <property name="repeatIteration" value="0" />
+              </properties>
+            </test-case>
+            <test-case id="1027" name="饮用人数只能是1或2" fullname="CoffeeShop.Tests.OrderStateMachineTests.饮用人数只能是1或2" methodname="饮用人数只能是1或2" classname="CoffeeShop.Tests.OrderStateMachineTests" runstate="Runnable" seed="1812477079" result="Passed" start-time="2026-11-07 01:52:05Z" end-time="2026-11-07 01:52:05Z" duration="0.000836" asserts="0">
+              <properties>
+                <property name="retryIteration" value="0" />
+                <property name="repeatIteration" value="0" />
+              </properties>
+            </test-case>
+          </test-suite>
+          <test-suite type="TestFixture" id="1059" name="SeatConfigTests" fullname="CoffeeShop.Tests.SeatConfigTests" classname="CoffeeShop.Tests.SeatConfigTests" runstate="Runnable" testcasecount="10" result="Passed" start-time="2026-11-07 01:52:05Z" end-time="2026-11-07 01:52:05Z" duration="0.014060" total="10" passed="10" failed="0" inconclusive="0" skipped="0" asserts="0">
+            <properties />
+            <test-case id="1063" name="双人沙发是一椅两座" fullname="CoffeeShop.Tests.SeatConfigTests.双人沙发是一椅两座" methodname="双人沙发是一椅两座" classname="CoffeeShop.Tests.SeatConfigTests" runstate="Runnable" seed="38330531" result="Passed" start-time="2026-11-07 01:52:05Z" end-time="2026-11-07 01:52:05Z" duration="0.006452" asserts="0">
+              <properties>
+                <property name="retryIteration" value="0" />
+                <property name="repeatIteration" value="0" />
+              </properties>
+            </test-case>
+            <test-case id="1061" name="座位id唯一" fullname="CoffeeShop.Tests.SeatConfigTests.座位id唯一" methodname="座位id唯一" classname="CoffeeShop.Tests.SeatConfigTests" runstate="Runnable" seed="1976875025" result="Passed" start-time="2026-11-07 01:52:05Z" end-time="2026-11-07 01:52:05Z" duration="0.000819" asserts="0">
+              <properties>
+                <property name="retryIteration" value="0" />
+                <property name="repeatIteration" value="0" />
+              </properties>
+            </test-case>
+            <test-case id="1066" name="座椅类型解析" fullname="CoffeeShop.Tests.SeatConfigTests.座椅类型解析" methodname="座椅类型解析" classname="CoffeeShop.Tests.SeatConfigTests" runstate="Runnable" seed="434605227" result="Passed" start-time="2026-11-07 01:52:05Z" end-time="2026-11-07 01:52:05Z" duration="0.000263" asserts="0">
+              <properties>
+                <property name="retryIteration" value="0" />
+                <property name="repeatIteration" value="0" />
+              </properties>
+            </test-case>
+            <test-case id="1067" name="座面高度按类型兜底" fullname="CoffeeShop.Tests.SeatConfigTests.座面高度按类型兜底" methodname="座面高度按类型兜底" classname="CoffeeShop.Tests.SeatConfigTests" runstate="Runnable" seed="917420356" result="Passed" start-time="2026-11-07 01:52:05Z" end-time="2026-11-07 01:52:05Z" duration="0.000218" asserts="0">
+              <properties>
+                <property name="retryIteration" value="0" />
+                <property name="repeatIteration" value="0" />
+              </properties>
+            </test-case>
+            <test-case id="1068" name="方向盘方向名解析" fullname="CoffeeShop.Tests.SeatConfigTests.方向盘方向名解析" methodname="方向盘方向名解析" classname="CoffeeShop.Tests.SeatConfigTests" runstate="Runnable" seed="24711252" result="Passed" start-time="2026-11-07 01:52:05Z" end-time="2026-11-07 01:52:05Z" duration="0.000991" asserts="0">
+              <properties>
+                <property name="retryIteration" value="0" />
+                <property name="repeatIteration" value="0" />
+              </properties>
+            </test-case>
+            <test-case id="1064" name="横向偏移有合理上限" fullname="CoffeeShop.Tests.SeatConfigTests.横向偏移有合理上限" methodname="横向偏移有合理上限" classname="CoffeeShop.Tests.SeatConfigTests" runstate="Runnable" seed="716486177" result="Passed" start-time="2026-11-07 01:52:05Z" end-time="2026-11-07 01:52:05Z" duration="0.002059" asserts="0">
+              <properties>
+                <property name="retryIteration" value="0" />
+                <property name="repeatIteration" value="0" />
+              </properties>
+            </test-case>
+            <test-case id="1065" name="每个座位都指定了锚点与朝向依据" fullname="CoffeeShop.Tests.SeatConfigTests.每个座位都指定了锚点与朝向依据" methodname="每个座位都指定了锚点与朝向依据" classname="CoffeeShop.Tests.SeatConfigTests" runstate="Runnable" seed="1008192241" result="Passed" start-time="2026-11-07 01:52:05Z" end-time="2026-11-07 01:52:05Z" duration="0.000571" asserts="0">
+              <properties>
+                <property name="retryIteration" value="0" />
+                <property name="repeatIteration" value="0" />
+              </properties>
+            </test-case>
+            <test-case id="1069" name="空配置被识别为错误" fullname="CoffeeShop.Tests.SeatConfigTests.空配置被识别为错误" methodname="空配置被识别为错误" classname="CoffeeShop.Tests.SeatConfigTests" runstate="Runnable" seed="356466360" result="Passed" start-time="2026-11-07 01:52:05Z" end-time="2026-11-07 01:52:05Z" duration="0.000269" asserts="0">
+              <properties>
+                <property name="retryIteration" value="0" />
+                <property name="repeatIteration" value="0" />
+              </properties>
+            </test-case>
+            <test-case id="1060" name="配置文件合法" fullname="CoffeeShop.Tests.SeatConfigTests.配置文件合法" methodname="配置文件合法" classname="CoffeeShop.Tests.SeatConfigTests" runstate="Runnable" seed="1245457025" result="Passed" start-time="2026-11-07 01:52:05Z" end-time="2026-11-07 01:52:05Z" duration="0.000437" asserts="0">
+              <properties>
+                <property name="retryIteration" value="0" />
+                <property name="repeatIteration" value="0" />
+              </properties>
+            </test-case>
+            <test-case id="1062" name="首切覆盖吧台凳与客人桌位" fullname="CoffeeShop.Tests.SeatConfigTests.首切覆盖吧台凳与客人桌位" methodname="首切覆盖吧台凳与客人桌位" classname="CoffeeShop.Tests.SeatConfigTests" runstate="Runnable" seed="1886656859" result="Passed" start-time="2026-11-07 01:52:05Z" end-time="2026-11-07 01:52:05Z" duration="0.000716" asserts="0">
+              <properties>
+                <property name="retryIteration" value="0" />
+                <property name="repeatIteration" value="0" />
+              </properties>
+            </test-case>
+          </test-suite>
+          <test-suite type="TestFixture" id="1053" name="SeatRegistryTests" fullname="CoffeeShop.Tests.SeatRegistryTests" classname="CoffeeShop.Tests.SeatRegistryTests" runstate="Runnable" testcasecount="5" result="Passed" start-time="2026-11-07 01:52:05Z" end-time="2026-11-07 01:52:05Z" duration="0.001574" total="5" passed="5" failed="0" inconclusive="0" skipped="0" asserts="0">
+            <properties />
+            <test-case id="1058" name="全量释放后所有座位可用" fullname="CoffeeShop.Tests.SeatRegistryTests.全量释放后所有座位可用" methodname="全量释放后所有座位可用" classname="CoffeeShop.Tests.SeatRegistryTests" runstate="Runnable" seed="1831949637" result="Passed" start-time="2026-11-07 01:52:05Z" end-time="2026-11-07 01:52:05Z" duration="0.000310" asserts="0">
+              <properties>
+                <property name="retryIteration" value="0" />
+                <property name="repeatIteration" value="0" />
+              </properties>
+            </test-case>
+            <test-case id="1056" name="未知座位id返回失败" fullname="CoffeeShop.Tests.SeatRegistryTests.未知座位id返回失败" methodname="未知座位id返回失败" classname="CoffeeShop.Tests.SeatRegistryTests" runstate="Runnable" seed="545865868" result="Passed" start-time="2026-11-07 01:52:05Z" end-time="2026-11-07 01:52:05Z" duration="0.000100" asserts="0">
+              <properties>
+                <property name="retryIteration" value="0" />
+                <property name="repeatIteration" value="0" />
+              </properties>
+            </test-case>
+            <test-case id="1054" name="计数随占用变化" fullname="CoffeeShop.Tests.SeatRegistryTests.计数随占用变化" methodname="计数随占用变化" classname="CoffeeShop.Tests.SeatRegistryTests" runstate="Runnable" seed="1700316410" result="Passed" start-time="2026-11-07 01:52:05Z" end-time="2026-11-07 01:52:05Z" duration="0.000162" asserts="0">
+              <properties>
+                <property name="retryIteration" value="0" />
+                <property name="repeatIteration" value="0" />
+              </properties>
+            </test-case>
+            <test-case id="1057" name="重复id登记会抛异常" fullname="CoffeeShop.Tests.SeatRegistryTests.重复id登记会抛异常" methodname="重复id登记会抛异常" classname="CoffeeShop.Tests.SeatRegistryTests" runstate="Runnable" seed="834500760" result="Passed" start-time="2026-11-07 01:52:05Z" end-time="2026-11-07 01:52:05Z" duration="0.000186" asserts="0">
+              <properties>
+                <property name="retryIteration" value="0" />
+                <property name="repeatIteration" value="0" />
+              </properties>
+            </test-case>
+            <test-case id="1055" name="重复占用同一座位被拒绝" fullname="CoffeeShop.Tests.SeatRegistryTests.重复占用同一座位被拒绝" methodname="重复占用同一座位被拒绝" classname="CoffeeShop.Tests.SeatRegistryTests" runstate="Runnable" seed="1312671655" result="Passed" start-time="2026-11-07 01:52:05Z" end-time="2026-11-07 01:52:05Z" duration="0.000106" asserts="0">
+              <properties>
+                <property name="retryIteration" value="0" />
+                <property name="repeatIteration" value="0" />
+              </properties>
+            </test-case>
+          </test-suite>
+          <test-suite type="TestFixture" id="1045" name="SeatStateTests" fullname="CoffeeShop.Tests.SeatStateTests" classname="CoffeeShop.Tests.SeatStateTests" runstate="Runnable" testcasecount="7" result="Passed" start-time="2026-11-07 01:52:05Z" end-time="2026-11-07 01:52:05Z" duration="0.001741" total="7" passed="7" failed="0" inconclusive="0" skipped="0" asserts="0">
+            <properties />
+            <test-case id="1050" name="他人不能释放别人的座位" fullname="CoffeeShop.Tests.SeatStateTests.他人不能释放别人的座位" methodname="他人不能释放别人的座位" classname="CoffeeShop.Tests.SeatStateTests" runstate="Runnable" seed="2035535757" result="Passed" start-time="2026-11-07 01:52:05Z" end-time="2026-11-07 01:52:05Z" duration="0.000145" asserts="0">
+              <properties>
+                <property name="retryIteration" value="0" />
+                <property name="repeatIteration" value="0" />
+              </properties>
+            </test-case>
+            <test-case id="1047" name="已占用座位拒绝第二个占用者" fullname="CoffeeShop.Tests.SeatStateTests.已占用座位拒绝第二个占用者" methodname="已占用座位拒绝第二个占用者" classname="CoffeeShop.Tests.SeatStateTests" runstate="Runnable" seed="467347921" result="Passed" start-time="2026-11-07 01:52:05Z" end-time="2026-11-07 01:52:05Z" duration="0.000115" asserts="0">
+              <properties>
+                <property name="retryIteration" value="0" />
+                <property name="repeatIteration" value="0" />
+              </properties>
+            </test-case>
+            <test-case id="1052" name="座位id不能为空" fullname="CoffeeShop.Tests.SeatStateTests.座位id不能为空" methodname="座位id不能为空" classname="CoffeeShop.Tests.SeatStateTests" runstate="Runnable" seed="319822336" result="Passed" start-time="2026-11-07 01:52:05Z" end-time="2026-11-07 01:52:05Z" duration="0.000247" asserts="0">
+              <properties>
+                <property name="retryIteration" value="0" />
+                <property name="repeatIteration" value="0" />
+              </properties>
+            </test-case>
+            <test-case id="1049" name="本人可以释放座位" fullname="CoffeeShop.Tests.SeatStateTests.本人可以释放座位" methodname="本人可以释放座位" classname="CoffeeShop.Tests.SeatStateTests" runstate="Runnable" seed="938605613" result="Passed" start-time="2026-11-07 01:52:05Z" end-time="2026-11-07 01:52:05Z" duration="0.000115" asserts="0">
+              <properties>
+                <property name="retryIteration" value="0" />
+                <property name="repeatIteration" value="0" />
+              </properties>
+            </test-case>
+            <test-case id="1048" name="空占用者标识被拒绝" fullname="CoffeeShop.Tests.SeatStateTests.空占用者标识被拒绝" methodname="空占用者标识被拒绝" classname="CoffeeShop.Tests.SeatStateTests" runstate="Runnable" seed="1033908498" result="Passed" start-time="2026-11-07 01:52:05Z" end-time="2026-11-07 01:52:05Z" duration="0.000117" asserts="0">
+              <properties>
+                <property name="retryIteration" value="0" />
+                <property name="repeatIteration" value="0" />
+              </properties>
+            </test-case>
+            <test-case id="1046" name="空座位可以被占用" fullname="CoffeeShop.Tests.SeatStateTests.空座位可以被占用" methodname="空座位可以被占用" classname="CoffeeShop.Tests.SeatStateTests" runstate="Runnable" seed="1818072077" result="Passed" start-time="2026-11-07 01:52:05Z" end-time="2026-11-07 01:52:05Z" duration="0.000123" asserts="0">
+              <properties>
+                <property name="retryIteration" value="0" />
+                <property name="repeatIteration" value="0" />
+              </properties>
+            </test-case>
+            <test-case id="1051" name="释放空座位返回失败" fullname="CoffeeShop.Tests.SeatStateTests.释放空座位返回失败" methodname="释放空座位返回失败" classname="CoffeeShop.Tests.SeatStateTests" runstate="Runnable" seed="1534980693" result="Passed" start-time="2026-11-07 01:52:05Z" end-time="2026-11-07 01:52:05Z" duration="0.000079" asserts="0">
+              <properties>
+                <property name="retryIteration" value="0" />
+                <property name="repeatIteration" value="0" />
+              </properties>
+              <output><![CDATA[Saving results to: C:/Users/zang/AppData/LocalLow/DefaultCompany/game\TestResults.xml
+]]></output>
+            </test-case>
+          </test-suite>
+        </test-suite>
+      </test-suite>
+    </test-suite>
+  </test-suite>
+</test-run>

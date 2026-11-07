@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "note": "座位配置（04 票 / FR-SEAT-01）。这里只声明语义：绑哪个场景对象、朝哪边、桌面在多远。具体世界坐标、朝向向量、坐下点、站立点、桌面点位全部在运行时由 SeatingManager 从场景几何解析，家具挪位后不会失效。faceDir 描述相对店内的世界方向：店内主通道在 -Z 一侧，斜窗在东北角。",
+  "note": "座位配置（04 票 / FR-SEAT-01）。这里只声明语义：绑哪个场景对象、朝哪边、桌面在多远。具体世界坐标、朝向向量、坐下点、站立点、桌面点位全部在运行时由 SeatingManager 从场景几何解析，家具挪位后不会失效。faceDir 描述相对店内的世界方向：店内主通道在 -Z 一侧，斜窗在东北角。双人沙发是同一件家具两个座位，用 lateralOffset（沿坐者左右，米）分开，anchor 可以重复。",
   "seats": [
     { "id": "bar-1", "zone": "bar", "kind": "barStool", "anchor": "Bar_Stool_1", "faceTarget": "Bar_Counter", "seatHeight": 0.66, "surfaceHeight": 1.05 },
     { "id": "bar-2", "zone": "bar", "kind": "barStool", "anchor": "Bar_Stool_2", "faceTarget": "Bar_Counter", "seatHeight": 0.66, "surfaceHeight": 1.05 },
@@ -40,6 +40,27 @@
     { "id": "meeting-3", "zone": "meeting", "kind": "armchair", "anchor": "Meeting_Chair_1_-1", "faceTarget": "Meeting_Table", "seatHeight": 0.45 },
     { "id": "meeting-4", "zone": "meeting", "kind": "armchair", "anchor": "Meeting_Chair_1_1", "faceTarget": "Meeting_Table", "seatHeight": 0.45 },
     { "id": "meeting-5", "zone": "meeting", "kind": "armchair", "anchor": "Meeting_Chair_2_-1", "faceTarget": "Meeting_Table", "seatHeight": 0.45 },
-    { "id": "meeting-6", "zone": "meeting", "kind": "armchair", "anchor": "Meeting_Chair_2_1", "faceTarget": "Meeting_Table", "seatHeight": 0.45 }
+    { "id": "meeting-6", "zone": "meeting", "kind": "armchair", "anchor": "Meeting_Chair_2_1", "faceTarget": "Meeting_Table", "seatHeight": 0.45 },
+
+    { "id": "sofa-i1-l-1", "zone": "sofa", "kind": "sofa", "anchor": "Immersive_Sofa_1_L", "faceTarget": "Immersive_Table_1", "seatHeight": 0.44, "surfaceForward": 0.45, "lateralOffset": -0.30 },
+    { "id": "sofa-i1-l-2", "zone": "sofa", "kind": "sofa", "anchor": "Immersive_Sofa_1_L", "faceTarget": "Immersive_Table_1", "seatHeight": 0.44, "surfaceForward": 0.45, "lateralOffset": 0.30 },
+    { "id": "sofa-i1-r-1", "zone": "sofa", "kind": "sofa", "anchor": "Immersive_Sofa_1_R", "faceTarget": "Immersive_Table_1", "seatHeight": 0.44, "surfaceForward": 0.45, "lateralOffset": -0.30 },
+    { "id": "sofa-i1-r-2", "zone": "sofa", "kind": "sofa", "anchor": "Immersive_Sofa_1_R", "faceTarget": "Immersive_Table_1", "seatHeight": 0.44, "surfaceForward": 0.45, "lateralOffset": 0.30 },
+    { "id": "sofa-i2-l-1", "zone": "sofa", "kind": "sofa", "anchor": "Immersive_Sofa_2_L", "faceTarget": "Immersive_Table_2", "seatHeight": 0.44, "surfaceForward": 0.45, "lateralOffset": -0.30 },
+    { "id": "sofa-i2-l-2", "zone": "sofa", "kind": "sofa", "anchor": "Immersive_Sofa_2_L", "faceTarget": "Immersive_Table_2", "seatHeight": 0.44, "surfaceForward": 0.45, "lateralOffset": 0.30 },
+    { "id": "sofa-i2-r-1", "zone": "sofa", "kind": "sofa", "anchor": "Immersive_Sofa_2_R", "faceTarget": "Immersive_Table_2", "seatHeight": 0.44, "surfaceForward": 0.45, "lateralOffset": -0.30 },
+    { "id": "sofa-i2-r-2", "zone": "sofa", "kind": "sofa", "anchor": "Immersive_Sofa_2_R", "faceTarget": "Immersive_Table_2", "seatHeight": 0.44, "surfaceForward": 0.45, "lateralOffset": 0.30 },
+    { "id": "sofa-g1-a-1", "zone": "sofa", "kind": "sofa", "anchor": "Group_Sofa_1_-1", "faceTarget": "Group_Table_1", "seatHeight": 0.44, "surfaceForward": 0.45, "lateralOffset": -0.30 },
+    { "id": "sofa-g1-a-2", "zone": "sofa", "kind": "sofa", "anchor": "Group_Sofa_1_-1", "faceTarget": "Group_Table_1", "seatHeight": 0.44, "surfaceForward": 0.45, "lateralOffset": 0.30 },
+    { "id": "sofa-g1-b-1", "zone": "sofa", "kind": "sofa", "anchor": "Group_Sofa_1_1", "faceTarget": "Group_Table_1", "seatHeight": 0.44, "surfaceForward": 0.45, "lateralOffset": -0.30 },
+    { "id": "sofa-g1-b-2", "zone": "sofa", "kind": "sofa", "anchor": "Group_Sofa_1_1", "faceTarget": "Group_Table_1", "seatHeight": 0.44, "surfaceForward": 0.45, "lateralOffset": 0.30 },
+    { "id": "sofa-g2-a-1", "zone": "sofa", "kind": "sofa", "anchor": "Group_Sofa_2_-1", "faceTarget": "Group_Table_2", "seatHeight": 0.44, "surfaceForward": 0.45, "lateralOffset": -0.30 },
+    { "id": "sofa-g2-a-2", "zone": "sofa", "kind": "sofa", "anchor": "Group_Sofa_2_-1", "faceTarget": "Group_Table_2", "seatHeight": 0.44, "surfaceForward": 0.45, "lateralOffset": 0.30 },
+    { "id": "sofa-g2-b-1", "zone": "sofa", "kind": "sofa", "anchor": "Group_Sofa_2_1", "faceTarget": "Group_Table_2", "seatHeight": 0.44, "surfaceForward": 0.45, "lateralOffset": -0.30 },
+    { "id": "sofa-g2-b-2", "zone": "sofa", "kind": "sofa", "anchor": "Group_Sofa_2_1", "faceTarget": "Group_Table_2", "seatHeight": 0.44, "surfaceForward": 0.45, "lateralOffset": 0.30 },
+    { "id": "sofa-g3-a-1", "zone": "sofa", "kind": "sofa", "anchor": "Group_Sofa_3_-1", "faceTarget": "Group_Table_3", "seatHeight": 0.44, "surfaceForward": 0.45, "lateralOffset": -0.30 },
+    { "id": "sofa-g3-a-2", "zone": "sofa", "kind": "sofa", "anchor": "Group_Sofa_3_-1", "faceTarget": "Group_Table_3", "seatHeight": 0.44, "surfaceForward": 0.45, "lateralOffset": 0.30 },
+    { "id": "sofa-g3-b-1", "zone": "sofa", "kind": "sofa", "anchor": "Group_Sofa_3_1", "faceTarget": "Group_Table_3", "seatHeight": 0.44, "surfaceForward": 0.45, "lateralOffset": -0.30 },
+    { "id": "sofa-g3-b-2", "zone": "sofa", "kind": "sofa", "anchor": "Group_Sofa_3_1", "faceTarget": "Group_Table_3", "seatHeight": 0.44, "surfaceForward": 0.45, "lateralOffset": 0.30 }
   ]
 }

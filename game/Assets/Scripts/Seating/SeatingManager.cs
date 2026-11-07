@@ -103,8 +103,22 @@ namespace CoffeeShop.Seating
             }
             facing = new Vector3(facing.x, 0f, facing.z).normalized;
 
+            // 双人沙发一件家具两个座位：按"坐者右手方向"把座位点推开（lateralOffset 对称给 ±0.30）。
+            // 用朝向推左右而不是读对象自身 X 轴：FBX 根节点带 -90°X，局部轴和世界轴对不上，
+            // 而朝向是这里已经算好的、可信的那个量。
+            if (Mathf.Abs(entry.lateralOffset) > 1e-4f)
+            {
+                var lateral = new Vector3(facing.z, 0f, -facing.x);   // = up × facing
+                seatPoint += lateral * entry.lateralOffset;
+            }
+
             float seatHeight = SeatConfig.ResolveSeatHeight(entry);
-            float standOffset = entry.standOffset > 0.01f ? entry.standOffset : 0.55f;
+            // 站位距离要够沙发自己那一圈："正后方 0.55m" 减去探测胶囊半径 0.28 只剩 0.27m，
+            // 而双人沙发背框在 -0.32m，正好被自己挡住 → 20 个沙发位全部原地起立。
+            // 沙发默认退到 0.66m（0.66-0.28=0.38 才越过背框），同时仍守住"站位不超出座位 0.70m"。
+            float standOffset = entry.standOffset > 0.01f
+                ? entry.standOffset
+                : (kind == SeatKind.Sofa ? 0.66f : 0.55f);
 
             return new SeatAnchor
             {

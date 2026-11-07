@@ -21,7 +21,7 @@ namespace CoffeeShop.Seating
     public class SeatEntry
     {
         public string id;              // 唯一编号
-        public string zone;            // 区域：bar / sun / round / meeting
+        public string zone;            // 区域：bar / sun / round / meeting / sofa
         public string kind;            // 座椅类型，见 SeatConfig.ParseKind
         public string anchor;          // 场景里座椅对象的名字（必填）
         public string faceTarget;      // 朝向参照物：朝它最近的一面
@@ -30,6 +30,12 @@ namespace CoffeeShop.Seating
         public float surfaceForward = 0.50f; // 桌面探测点：沿朝向前方多少米打向下射线
         public float surfaceHeight;          // 显式指定桌面高度（给了就不打射线）；0 = 打射线探测
         public float standOffset;      // 起身后站位在座位后方多少米；0 = 默认
+        /// <summary>
+        /// 沿"座椅左右方向"的偏移（米），正数朝坐者右手边。
+        /// 双人沙发是**一件家具两个座位**，靠它把两个座位点从沙发中心左右各推开 0.30m；
+        /// 其他单座椅保持 0。方向由 seats.json 的朝向解算，所以换朝向不用改数值。
+        /// </summary>
+        public float lateralOffset;
     }
 
     [Serializable]
@@ -86,6 +92,8 @@ namespace CoffeeShop.Seating
                 if (!string.IsNullOrWhiteSpace(e.faceDir) && !faceDirs.ContainsKey(e.faceDir.ToUpperInvariant()))
                     errors.Add($"{who} faceDir 无法识别: {e.faceDir}");
                 if (e.seatHeight < 0f) errors.Add($"{who} seatHeight 不能为负");
+                if (Mathf.Abs(e.lateralOffset) > 0.65f)
+                    errors.Add($"{who} lateralOffset 超出 ±0.65m: {e.lateralOffset}");
             }
             return errors;
         }

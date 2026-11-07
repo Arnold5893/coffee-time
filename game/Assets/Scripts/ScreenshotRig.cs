@@ -163,6 +163,34 @@ public class ScreenshotRig : MonoBehaviour
             }
         }
 
+        // ---- 04 票补完：双人沙发一椅两座，只坐左半边，右半边仍空着 ----
+        if (seatMgr != null && seatAct != null && player != null)
+        {
+            // 选多人桌 1 的沙发：它在店中央、灯下最亮，验收图才看得清"一椅两座"（沉浸区那片偏暗）
+            var sofaSeat = seatMgr.Find("sofa-g1-a-1") ?? seatMgr.Find("sofa-i1-l-1");
+            if (sofaSeat != null)
+            {
+                player.Teleport(sofaSeat.StandPoint, sofaSeat.Facing);
+                if (followRig != null) followRig.enabled = false;
+                Vector3 sf = sofaSeat.Facing * Vector3.forward;
+                Vector3 sl = Vector3.Cross(Vector3.up, sf).normalized;
+                // 机位从桌子另一侧斜看回来：同一张沙发"坐了一个、还空着一个"要同时入画
+                cam.transform.position = sofaSeat.SeatPoint + sf * 2.05f + sl * 1.60f + Vector3.up * 1.45f;
+                cam.transform.LookAt(sofaSeat.SeatPoint + Vector3.up * 0.72f);
+                for (int i = 0; i < 12; i++) yield return null;
+
+                if (seatAct.TrySit(sofaSeat))
+                {
+                    for (int i = 0; i < 45; i++) yield return null;
+                    Debug.Log($"[rig] seated sofa={sofaSeat.Id} occupied={!sofaSeat.IsFree} blend={seatAct.Blend:F2}");
+                    yield return CaptureCurrent(cam, rt, "setup_screenshot_seated_sofa.png");
+                    seatAct.TryStand();
+                    for (int i = 0; i < 30; i++) yield return null;
+                }
+                else Debug.LogWarning($"[rig] 沙发坐下失败: {sofaSeat.Id}");
+            }
+        }
+
         // ---- 门口落脚区：阳光区长桌在 12 号凳后收头，门前留出空地 ----
         if (followRig != null) followRig.enabled = false;
         yield return Capture(cam, rt, camPosEntry, camLookEntry, "setup_screenshot_entry_corner.png");

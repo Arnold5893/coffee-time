@@ -49,14 +49,16 @@ namespace CoffeeShop.Testing
             Check(seating.Errors.Count == 0, "配置无错误" + (seating.Errors.Count > 0 ? ": " + string.Join("; ", seating.Errors) : ""));
             Check(seating.Missing.Count == 0, "所有 anchor 都在场景里找到" +
                   (seating.Missing.Count > 0 ? ": 缺 " + string.Join(", ", seating.Missing) : ""));
-            Check(seating.Seats.Count >= 20, $"座位总数 {seating.Seats.Count} >= 20");
+            Check(seating.Seats.Count >= 53, $"座位总数 {seating.Seats.Count} >= 53");
             Check(seating.CountInZone("bar") == 3, "吧台凳 3 个");
             Check(seating.CountInZone("round") == 12, "圆桌座位 12 个");
             Check(seating.CountInZone("meeting") == 6, "会议桌座位 6 个");
             Check(seating.CountInZone("sun") == 12, "阳光区座位 12 个");
+            Check(seating.CountInZone("sofa") == 20, "双人沙发座位 20 个（10 张沙发 x 2 座）");
 
             // ---- 2. 每个座位的几何都解析出来了 ----------------------------
             int badFacing = 0, badSurface = 0, badStand = 0, badSeat = 0, crampedStand = 0;
+            var crampedIds = new System.Collections.Generic.List<string>();
             foreach (var s in seating.Seats)
             {
                 Vector3 fwd = s.Facing * Vector3.forward;
@@ -77,6 +79,7 @@ namespace CoffeeShop.Testing
                 {
                     // 四周全是家具（背后就是圆桌/墙）的座位只能原地起立，属于真实布局限制，单独计数
                     crampedStand++;
+                    crampedIds.Add(s.Id);
                     Vector3 standDir = s.Facing * Vector3.forward;
                     Vector3 ideal = new Vector3(s.SeatPoint.x, 0f, s.SeatPoint.z) - standDir * 0.55f;
                     var ca = new Vector3(ideal.x, s.SeatPoint.y + 0.55f, ideal.z);
@@ -94,7 +97,15 @@ namespace CoffeeShop.Testing
             Check(badFacing == 0, "所有座位朝向都是水平单位向量");
             Check(badSurface == 0, "所有桌面点位高度合理");
             Check(badStand == 0, "所有站位都在座位后方 0.70m 以内");
-            Check(crampedStand <= 3, $"原地起立的夹缝座 {crampedStand} 个（上限 3，背后就是家具）");
+            // 已知的夹缝座（真实布局限制，不是 bug）：
+            //   sun-5 / sun-6  背后紧贴圆桌 2 的两把椅子，0.55m 内所有角度都被占满；
+            //   sofa-i2-r-*    沉浸区 2 号桌的右沙发背后就是墙。
+            // 白名单而不是单纯放开上限：别处一旦冒出新的夹缝座，这条仍然会红。
+            var knownCramped = new[] { "sun-5", "sun-6", "sofa-i2-r-1", "sofa-i2-r-2" };
+            foreach (var id in crampedIds)
+                Check(System.Array.IndexOf(knownCramped, id) >= 0, $"夹缝座 {id} 在已知名单内");
+            Check(crampedStand <= knownCramped.Length,
+                  $"原地起立的夹缝座 {crampedStand} 个（上限 {knownCramped.Length}，背后就是家具）");
             Check(badSeat == 0, "所有座面高度合理");
 
             // ---- 3. 走到吧台凳旁：提示与最近空座 --------------------------
@@ -108,8 +119,28 @@ namespace CoffeeShop.Testing
             Check(seatAct.NearestFree == seat, "站位 0.5m 内识别到这张空座");
             Check(seat.IsFree, "坐下前是空的");
 
-            // 太远就不该有提示
-            var farPoint = seat.StandPoint - (seat.Facing * Vector3.forward) * 3f;
+            // 太远就不该有提示。
+            // 不能简单取"正后方 3m"：沙发位接进来以后，吧凳正后方 3m 可能正好落在别的座位旁边，
+            // 那样失败的不是提示逻辑而是选点。这里绕一圈找一个离**所有**座位都够远的空地。
+            Vector3 farPoint = seat.StandPoint;
+            bool farFound = false;
+            for (float d = 3f; d <= 5f && !farFound; d += 0.5f)
+            {
+                for (int a = 0; a < 8 && !farFound; a++)
+                {
+                    var dir = Quaternion.AngleAxis(a * 45f, Vector3.up) * (-(seat.Facing * Vector3.forward));
+                    var p = seat.StandPoint + dir * d;
+                    bool clear = true;
+                    foreach (var other in seating.Seats)
+                    {
+                        if (new Vector2(other.StandPoint.x - p.x, other.StandPoint.z - p.z).magnitude
+                            < seatAct.reachRadius + 0.8f) { clear = false; break; }
+                    }
+                    if (clear) { farPoint = p; farFound = true; }
+                }
+            }
+            log.AppendLine($"far point: {farPoint} (found={farFound})");
+            Check(farFound, "找到一处离所有座位都够远的空地");
             Check(seating.NearestFree(farPoint, seatAct.reachRadius) == null, "离 3m 远时不提示");
 
             // ---- 4. 按交互坐下 --------------------------------------------
