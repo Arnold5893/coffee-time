@@ -31,4 +31,12 @@ namespace CoffeeShop.Seating
             $"{Id}({Zone}) seat=({SeatPoint.x:F2},{SeatPoint.z:F2}) " +
             $"face=({Facing * Vector3.forward}) surface=({SurfacePoint.x:F2},{SurfacePoint.y:F2},{SurfacePoint.z:F2})";
     }
+
+    /// <summary>
+    /// 挂在座椅家具的根节点上，只做一件事：告诉遮挡淡化"这是座位，别把我变透明"。
+    /// 人坐上去时椅子本来就在身体位置上，淡化了就会像穿进身体里。
+    /// </summary>
+    public class SeatFurniture : MonoBehaviour
+    {
+    }
 }

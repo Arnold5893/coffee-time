@@ -35,6 +35,10 @@ public class ScreenshotRig : MonoBehaviour
     public Vector3 camPosEntry;
     public Vector3 camLookEntry;
 
+    // 07 票 fix：后场操作台（咖啡机以东留空 + 旧木桌）
+    public Vector3 camPosBack;
+    public Vector3 camLookBack;
+
     IEnumerator Start()
     {
         var cam = Camera.main;
@@ -61,6 +65,7 @@ public class ScreenshotRig : MonoBehaviour
 
         yield return Capture(cam, rt, camPosBar, camLookBar, "setup_screenshot_bar.png");
         yield return Capture(cam, rt, camPosEq, camLookEq, "setup_screenshot_equipment.png");
+        yield return Capture(cam, rt, camPosBack, camLookBack, "setup_screenshot_backarea.png");
         yield return Capture(cam, rt, camPosStool, camLookStool, "setup_screenshot_stool.png");
         yield return Capture(cam, rt, camPosChair, camLookChair, "setup_screenshot_armchair.png");
 
@@ -135,9 +140,10 @@ public class ScreenshotRig : MonoBehaviour
                 if (followRig != null) followRig.enabled = false;
                 Vector3 seatFwd = seat.Facing * Vector3.forward;
                 Vector3 seatLat = Vector3.Cross(Vector3.up, seatFwd).normalized;
-                // 机位在座位斜后方：同时看得到人、凳子、以及前方的吧台
-                cam.transform.position = seat.SeatPoint - seatFwd * 1.15f + seatLat * 1.85f + Vector3.up * 1.55f;
-                cam.transform.LookAt(seat.SeatPoint + Vector3.up * 0.85f);
+                // 机位在座位斜后方：既看得到人坐进凳子里的样子，也看得到靠背
+                // （靠背在人背后，机位站得越正越容易被人挡住）
+                cam.transform.position = seat.SeatPoint - seatFwd * 1.30f + seatLat * 1.55f + Vector3.up * 1.38f;
+                cam.transform.LookAt(seat.SeatPoint + Vector3.up * 0.80f);
                 for (int i = 0; i < 12; i++) yield return null;
                 yield return CaptureCurrent(cam, rt, "setup_screenshot_seat_prompt.png");
 
@@ -180,6 +186,7 @@ public class ScreenshotRig : MonoBehaviour
 
     IEnumerator Capture(Camera cam, RenderTexture rt, Vector3 pos, Vector3 look, string file)
     {
+        Debug.Log($"[rig] capture {file} from {pos} look {look}");
         cam.transform.position = pos;
         cam.transform.LookAt(look);
         for (int i = 0; i < 6; i++) yield return null;   // 渲染几帧后再读回

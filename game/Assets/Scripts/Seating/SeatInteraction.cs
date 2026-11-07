@@ -22,10 +22,8 @@ namespace CoffeeShop.Seating
         public SeatingManager seating;
         public PlayerMotor motor;
         public PlayerInputRouter router;
-        [Tooltip("角色可见体（Player/Visual），坐下时整体下沉")]
+        [Tooltip("角色可见体（Player/Visual）。坐下时按部件重摆成坐姿，不做整体下沉")]
         public Transform visual;
-        [Tooltip("腿部视觉体，坐下时收起来；留空则只做整体下沉")]
-        public Transform legs;
 
         [Header("交互")]
         [Tooltip("离座位多近才出提示、才能坐（米）")]
@@ -49,11 +47,23 @@ namespace CoffeeShop.Seating
         float targetBlend;
         Vector3 fromPos, toPos;
         Quaternion fromRot, toRot;
-        Vector3 visualBase;
-        Vector3 legsPosBase;
-        Vector3 legsScaleBase;
         float poseSeatHeight = 0.45f;
-        bool poseActive;
+
+        /// <summary>一个视觉部件的"站姿"快照；坐姿由站位插值过去。</summary>
+        struct PartPose
+        {
+            public Transform t;
+            public Vector3 pos, euler, scale;
+        }
+
+        // 0 大腿 / 1 小腿 / 2 躯干 / 3 头 / 4 朝向标
+        static readonly string[] PartNames =
+        {
+            "PlayerVisual_Legs", "PlayerVisual_Shin", "PlayerVisual_Body",
+            "PlayerVisual_Head", "PlayerVisual_Facing"
+        };
+
+        PartPose[] parts;
 
         public bool IsSeated => seated != null;
         public SeatAnchor CurrentSeat => seated;
@@ -67,7 +77,7 @@ namespace CoffeeShop.Seating
         void Awake()
         {
             controller = GetComponent<CharacterController>();
-            if (visual != null) visualBase = visual.localPosition;
+            if (parts == null) CacheParts();
             CreatePrompt();
         }
 
@@ -102,7 +112,6 @@ namespace CoffeeShop.Seating
 
             seated = seat;
             poseSeatHeight = seat.SeatHeight;
-            poseActive = true;
             fromPos = transform.position;
             fromRot = transform.rotation;
             toPos = new Vector3(seat.SeatPoint.x, fromPos.y, seat.SeatPoint.z);
@@ -154,7 +163,6 @@ namespace CoffeeShop.Seating
             var seat = seated;
             transform.SetPositionAndRotation(new Vector3(toPos.x, transform.position.y, toPos.z), toRot);
             seated = null;
-            poseActive = false;
             ApplyPose(0f, poseSeatHeight);
 
             if (seat != null && seating != null) seating.Registry.Release(seat.Id, occupantId);
@@ -163,24 +171,76 @@ namespace CoffeeShop.Seating
         }
 
         /// <summary>
-        /// 坐下姿态占位：整体下沉到"头顶 ≈ 座面 + 0.80m"，同时把腿收起来、上身略前倾。
+        /// 坐下姿态占位：**按部件重摆**，不是整体往下沉。
+        ///
+        /// 旧版只是把整个视觉体下沉 14cm、腿压短，结果身体比座面还低、比靠背还宽，
+        /// 整把凳子被吞进身体里，看起来就是穿模。现在：
+        ///   大腿绕 X 转 90° 躺平向前伸、小腿从膝盖垂到地面、躯干底面正落在座面上、
+        ///   躯干进深从 0.38 收到 0.30 —— 比靠背（本地 z ≈ -0.20）窄，靠背就能露出来。
         /// 骨骼模型接进来后整段替换成 Animator 播放。
         /// </summary>
         void ApplyPose(float t, float seatHeight)
         {
-            if (visual == null) return;
-            float drop = Mathf.Max(0.10f, 0.80f - seatHeight) * t;
-            visual.localPosition = visualBase + new Vector3(0f, -drop, 0f);
-            visual.localRotation = Quaternion.Euler(-7f * t, 0f, 0f);
+            if (parts == null || parts.Length == 0) return;
 
-            if (legs != null)
+            if (t <= 1e-4f)
             {
-                var ls = legsScaleBase;
-                ls.y = Mathf.Lerp(legsScaleBase.y, legsScaleBase.y * 0.42f, t);   // 腿收短
-                legs.localScale = ls;
-                var lp = legsPosBase;
-                lp.y = Mathf.Lerp(legsPosBase.y, legsPosBase.y * 0.52f, t);      // 腿往上收进身体
-                legs.localPosition = lp;
+                for (int i = 0; i < parts.Length; i++)
+                {
+                    if (parts[i].t == null) continue;
+                    parts[i].t.localPosition = parts[i].pos;
+                    parts[i].t.localEulerAngles = parts[i].euler;
+                    parts[i].t.localScale = parts[i].scale;
+                }
+                return;
+            }
+
+            float hs = Mathf.Clamp(seatHeight, 0.30f, 0.80f);
+            float kneeY = hs + 0.17f;                       // 大腿中线：略高于座面，正好搭在坐板上
+            float shinLen = Mathf.Max(0.28f, kneeY);        // 小腿长度 = 膝盖到地面的高度
+
+            // 大腿：躺平，从臀下向前伸 0.28m（膝盖停在吧台前沿之外，不钻进柜台）
+            SetPart(0, t, new Vector3(0f, kneeY, 0.14f), new Vector3(90f, 0f, 0f),
+                    new Vector3(0.30f, 0.14f, 0.30f));
+            // 小腿：垂直悬在膝盖下方
+            SetPart(1, t, new Vector3(0f, shinLen * 0.5f, 0.22f), Vector3.zero,
+                    new Vector3(0.20f, shinLen * 0.5f, 0.20f));
+            // 躯干：底面 = 座面顶，进深收窄给靠背让位
+            SetPart(2, t, new Vector3(0f, hs + 0.30f, 0.03f), Vector3.zero,
+                    new Vector3(0.36f, 0.28f, 0.28f));
+            // 头：坐在躯干顶端
+            SetPart(3, t, new Vector3(0f, hs + 0.72f, 0.03f), Vector3.zero,
+                    new Vector3(0.26f, 0.28f, 0.26f));
+            // 朝向标：落到胸口前方
+            SetPart(4, t, new Vector3(0f, hs + 0.42f, 0.175f), Vector3.zero,
+                    new Vector3(0.13f, 0.15f, 0.03f));
+        }
+
+        void SetPart(int i, float t, Vector3 posePos, Vector3 poseEuler, Vector3 poseScale)
+        {
+            if (i < 0 || i >= parts.Length) return;
+            var p = parts[i];
+            if (p.t == null) return;
+            p.t.localPosition = Vector3.Lerp(p.pos, posePos, t);
+            p.t.localEulerAngles = Vector3.Lerp(p.euler, poseEuler, t);
+            p.t.localScale = Vector3.Lerp(p.scale, poseScale, t);
+        }
+
+        /// <summary>抓一次站姿快照。只在第一次绑定时抓，避免坐着重绑把坐姿记成站姿。</summary>
+        void CacheParts()
+        {
+            if (visual == null) return;
+            parts = new PartPose[PartNames.Length];
+            for (int i = 0; i < PartNames.Length; i++)
+            {
+                var t = visual.Find(PartNames[i]);
+                parts[i] = new PartPose
+                {
+                    t = t,
+                    pos = t != null ? t.localPosition : Vector3.zero,
+                    euler = t != null ? t.localEulerAngles : Vector3.zero,
+                    scale = t != null ? t.localScale : Vector3.one
+                };
             }
         }
 
@@ -275,16 +335,7 @@ namespace CoffeeShop.Seating
             motor = playerMotor;
             router = inputRouter;
             visual = visualRoot;
-            if (visual != null)
-            {
-                visualBase = visual.localPosition;
-                if (legs == null) legs = visual.Find("PlayerVisual_Legs");
-            }
-            if (legs != null)
-            {
-                legsPosBase = legs.localPosition;
-                legsScaleBase = legs.localScale;
-            }
+            if (parts == null) CacheParts();
         }
 
         void OnDrawGizmosSelected()

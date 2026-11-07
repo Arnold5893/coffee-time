@@ -24,6 +24,11 @@ desktop.ini
 # 本地 agent 状态（记忆 / 身份文件，不随仓库分发）
 .workbuddy/
 
+# 机位预演 / 临时裁剪图（工具本身 .scratch/tools/cam_preview.py 保留，图是跑一次生成一张）
+.scratch/cam_prev_*.png
+.scratch/crop_*.png
+.scratch/top_bar.png
+
 # ---------------------------------------------------------------------------
 # Unity 工程（game/）的可再生目录 —— 与 game/.gitignore 内容同源。
 # 这里再写一遍，是为了兼容「只读仓库根 .gitignore、不读子目录 .gitignore」的客户端：

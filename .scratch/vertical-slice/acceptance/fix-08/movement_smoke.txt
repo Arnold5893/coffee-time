@@ -1,0 +1,4 @@
+[SMOKE] anchors=6 room=(11.04, 2.00, 15.25) backMaxZ=-0.10
+[SMOKE]
+probes=48 deadEnds=0 outOfRoom=0
+SMOKE RESULT: PASS

@@ -69,6 +69,8 @@ namespace CoffeeShop.Cameras
                     var r = hits[i].collider != null ? hits[i].collider.GetComponentInParent<Renderer>() : null;
                     if (r == null) continue;
                     if (r.transform.IsChildOf(target)) continue;   // 不淡化角色自己
+                    // 不淡化座椅：人坐上去时椅子就在身体位置上，淡化了像穿模
+                    if (r.GetComponentInParent<CoffeeShop.Seating.SeatFurniture>() != null) continue;
                     want.Add(r);
                 }
             }

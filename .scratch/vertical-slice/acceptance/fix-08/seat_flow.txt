@@ -1,0 +1,4 @@
+    cramped sun-5: 原地起立，理想站位被挡住: Round2_Chair_2
+    cramped sun-6: 原地起立，理想站位被挡住: Round2_Chair_2 | Round_Table_2 | Round2_Chair_1
+geometry: badFacing=0 badSurface=0 badStand=0 badSeat=0 cramped=2
+SEAT RESULT: PASS

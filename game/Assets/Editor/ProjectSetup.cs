@@ -360,7 +360,10 @@ public static class ProjectSetup
                 g.GetComponent<Renderer>().sharedMaterial = mat;
                 return g;
             }
-            Prim(PrimitiveType.Capsule, new Vector3(0f, 0.42f, 0f), new Vector3(0.34f, 0.42f, 0.34f), matBody, "PlayerVisual_Legs");   // 腿（坐下时收起来）
+            // 腿拆成大腿/小腿两节：站着时两节拼成一条腿，坐下时大腿转成水平、小腿垂下，
+            // 才不会像旧版那样整体缩成一坨顶穿座面（04 票 fix：坐姿穿模）
+            Prim(PrimitiveType.Capsule, new Vector3(0f, 0.62f, 0f), new Vector3(0.30f, 0.20f, 0.30f), matBody, "PlayerVisual_Legs");   // 大腿
+            Prim(PrimitiveType.Capsule, new Vector3(0f, 0.23f, 0f), new Vector3(0.26f, 0.23f, 0.26f), matBody, "PlayerVisual_Shin");   // 小腿
             Prim(PrimitiveType.Capsule, new Vector3(0f, 1.04f, 0f), new Vector3(0.44f, 0.40f, 0.38f), matBody, "PlayerVisual_Body");   // 身
             Prim(PrimitiveType.Sphere, new Vector3(0f, 1.50f, 0f), new Vector3(0.26f, 0.28f, 0.26f), matSkin, "PlayerVisual_Head");    // 头
             Prim(PrimitiveType.Cube, new Vector3(0f, 1.12f, 0.185f), new Vector3(0.13f, 0.15f, 0.03f), matSkin, "PlayerVisual_Facing"); // 朝向标
@@ -485,6 +488,19 @@ public static class ProjectSetup
                 report.AppendLine("seating missing anchors: " + string.Join(", ", seating.Missing));
             foreach (var err in seating.Errors) report.AppendLine("seating config error: " + err);
 
+            // 给每把座椅的根节点打标记：遮挡淡化遇到它不淡化（人坐上去时椅子就在身上）
+            int tagged = 0;
+            foreach (var s in seating.Seats)
+            {
+                if (s.Anchor == null) continue;
+                if (s.Anchor.GetComponent<CoffeeShop.Seating.SeatFurniture>() == null)
+                {
+                    s.Anchor.gameObject.AddComponent<CoffeeShop.Seating.SeatFurniture>();
+                    tagged++;
+                }
+            }
+            report.AppendLine($"seating tagged solid: {tagged}");
+
             var seatInteract = playerGO.AddComponent<CoffeeShop.Seating.SeatInteraction>();
             seatInteract.Bind(seating, motor, router, visual);
             report.AppendLine($"seat interact: reach={seatInteract.reachRadius:F2}m " +
@@ -504,6 +520,20 @@ public static class ProjectSetup
             // 门口落脚区机位：站在店内正对门 3.3m，一眼看到门、门口空地、以及阳光区长桌收头
             rig.camPosEntry = doorCenterW + interiorDir * 3.3f + Vector3.up * 1.6f;
             rig.camLookEntry = doorCenterW + Vector3.up * 0.85f;
+            // 后场机位：站在旧木桌东侧、通道南沿往西扫，一条线拍全「旧木桌 → 空地 → 台面末端（咖啡机）」
+            // （坐标全部按场景包围盒推，别写死世界坐标：FBX 根节点带 -90°X 与平移，Blender 坐标不等于 Unity 坐标）
+            // Blender 侧先用 .scratch/tools/cam_preview.py 预演构图，再换算到这里：
+            //   Blender (9.62,1.82,1.90)→(6.90,0.42,0.80)  ==  Unity (-9.62,1.82,-1.90)→(-6.90,0.42,-0.80)
+            //   ctb.center=(-8.52,?, -0.43) ⇒ 相机 = center+(-1.10, ·, -1.47)，注视 = center+(1.62, ·, -0.37)
+            var cmT0 = all.FirstOrDefault(t => t.name == "Coffee_Machine");
+            if (cmT0 != null)
+            {
+                var cmb = cmT0.GetComponent<Renderer>().bounds;
+                var ctT0 = all.FirstOrDefault(t => t.name == "Back_Clutter_Table");
+                var ctb = ctT0 != null ? ctT0.GetComponent<Renderer>().bounds : cmb;
+                rig.camPosBack = new Vector3(ctb.center.x - 1.10f, 1.82f, ctb.center.z - 1.47f);
+                rig.camLookBack = new Vector3(ctb.center.x + 1.62f, 0.42f, ctb.center.z - 0.37f);
+            }
             // 吧台机位：站在通道正中（两柜之间），沿吧台纵向（X）偏一点看过去，能同时看到前柜、通道、后柜
             var aisleCenter = (frontR.bounds.center + backR.bounds.center) * 0.5f;
             rig.camPosBar = aisleCenter + new Vector3(2.8f, 0.7f, 0f);

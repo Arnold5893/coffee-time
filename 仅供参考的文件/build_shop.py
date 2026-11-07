@@ -1046,7 +1046,11 @@ for k, px in enumerate((518, 615, 711)):
 # --- 后操作台 (靠后墙) ---
 BACK_Y = 0.1 + 0.33
 b = B("Back_Counter")
-bx0b, bx1b = P(280, 0)[0], P(910, 0)[0]
+# 实景核对（2026-11-06）：操作台只做到咖啡机为止，咖啡机以东是一段空地，空地过后靠墙
+# 另有一张堆杂物的旧木桌（见 Back_Clutter_Table）。原来做到 px 910，咖啡机（px 630）
+# 以东凭空多出 3.2m 空台面，纯属建模偏差。
+BACK_END_PX = 662                     # 咖啡机东缘：CM x = px 630 + 0.40m ≈ 31px
+bx0b, bx1b = P(280, 0)[0], P(BACK_END_PX, 0)[0]
 b.box((bx1b - bx0b, 0.62, 0.86), ((bx0b + bx1b) / 2, BACK_Y, 0.43), M_STEEL)
 b.box((bx1b - bx0b, 0.64, 0.04), ((bx0b + bx1b) / 2, BACK_Y, 0.88), M_STEEL)
 for x in np.arange(bx0b + 0.4, bx1b, 0.8):
@@ -1057,17 +1061,18 @@ b.box((0.9, 0.03, 0.6), (bx0b + 4.0, 0.12, 1.85), M_CORK)
 for k in range(10):
     b.box((0.09, 0.005, 0.07), (bx0b + 3.65 + (k % 5) * 0.16, 0.137, 1.7 + (k // 5) * 0.22), M_PAPER,
           (0, 0, 0))
-b.box((0.7, 0.2, 0.5), (bx1b - 0.6, 0.2, 2.1), M_ELEC)
+b.box((0.7, 0.2, 0.5), (P(902, 0)[0], 0.2, 2.1), M_ELEC)   # 配电箱固定在东段墙上，不随台面收短
 b.finish(COLLS["Bar"])
 
 # 灯箱 (后墙顶部): 素晴 logo + 咖啡豆画面
 b = B("Bar_Lightbox")
-lb_len = bx1b - bx0b
-b.box((lb_len, 0.1, 0.6), ((bx0b + bx1b) / 2, 0.15, 2.85), M_WHITE)
+LBX0, LBX1 = P(280, 0)[0], P(910, 0)[0]     # 灯箱照旧走满整段后墙，不跟着台面收
+lb_len = LBX1 - LBX0
+b.box((lb_len, 0.1, 0.6), ((LBX0 + LBX1) / 2, 0.15, 2.85), M_WHITE)
 logo_w = 0.6 * 2347 / 1138
-b.img_plane(logo_w, 0.56, MX((bx1b - 0.1 - logo_w / 2, 0.205, 2.85), (0, 0, math.pi)), M_LOGO)
-b.img_plane(logo_w, 0.56, MX((bx0b + 0.1 + logo_w / 2, 0.205, 2.85), (0, 0, math.pi)), M_LOGO)
-b.img_plane(lb_len - 2 * logo_w - 0.4, 0.56, MX(((bx0b + bx1b) / 2, 0.205, 2.85), (0, 0, math.pi)), M_BEANS)
+b.img_plane(logo_w, 0.56, MX((LBX1 - 0.1 - logo_w / 2, 0.205, 2.85), (0, 0, math.pi)), M_LOGO)
+b.img_plane(logo_w, 0.56, MX((LBX0 + 0.1 + logo_w / 2, 0.205, 2.85), (0, 0, math.pi)), M_LOGO)
+b.img_plane(lb_len - 2 * logo_w - 0.4, 0.56, MX(((LBX0 + LBX1) / 2, 0.205, 2.85), (0, 0, math.pi)), M_BEANS)
 b.finish(COLLS["Bar"], info=("素晴 灯箱", "吧台后的发光灯箱，左边是店名「素晴」书法 logo。"))
 
 # --- 咖啡机 VISACREM Ottima 2.0 (照片14) ---
@@ -1209,11 +1214,45 @@ b.box((0.5, 0.02, 0.26), (0, 0.32, 0.18), M_GRILLE)                     # 下散
 b.finish(COLLS["Bar"], (CM[0], BACK_Y + 0.01, 0), 0,
          info=("制冰机", "在咖啡机正下方，冰块随取随用。"))
 
-b = B("Back_Counter_Misc")
-b.cyl(0.08, 0.3, (CM[0] + 1.0, BACK_Y, 1.05), M_CERAMIC, seg=20)
-b.cyl(0.07, 0.12, (CM[0] + 1.8, BACK_Y + 0.1, 0.96), M_CUPGLASS, seg=16)
-b.box((0.4, 0.35, 0.35), (CM[0] + 2.5, BACK_Y, 1.075), M_DARKBOX)
-b.finish(COLLS["Bar"])
+# --- 咖啡机以东的空地之后：一张堆杂物的旧木桌（实景照片：书、音响、风扇、纸箱、绿植）---
+# 位置按「台面末端再空 1.1m」摆：台面止于 x≈6.52，桌面 7.62→9.42。
+b = B("Back_Clutter_Table")
+CTx, CTw, CTd, CTh = 8.52, 1.80, 0.58, 0.75
+b.box((CTw, CTd, 0.05), (0, 0, CTh - 0.025), M_WOOD)                        # 台面
+for sx in (-1, 1):
+    for sy in (-1, 1):
+        b.beam((sx * (CTw / 2 - 0.07), sy * (CTd / 2 - 0.07), 0),
+               (sx * (CTw / 2 - 0.07), sy * (CTd / 2 - 0.07), CTh - 0.05), 0.05, M_WOOD)
+b.box((CTw - 0.22, CTd - 0.14, 0.03), (0, 0, 0.30), M_WOOD)                 # 下层搁板
+# 一摞书/杂志
+for k in range(4):
+    b.box((0.30 - k * 0.015, 0.23 - k * 0.01, 0.035),
+          (-0.70 + k * 0.004, -0.02, CTh + 0.018 + k * 0.036),
+          M_PAPER if k % 2 else M_CORK, (0, 0, math.radians(k * 4 - 6)))
+# 黑音响 + 喇叭网
+b.box((0.34, 0.22, 0.17), (-0.26, 0.0, CTh + 0.085), M_DARKBOX)
+b.box((0.28, 0.015, 0.11), (-0.26, 0.115, CTh + 0.09), M_BLACK)
+b.cyl(0.012, 0.10, (-0.26, 0.0, CTh + 0.22), M_BLACK, seg=10)               # 音响小天线
+# 纸箱（敞口，露出里面的东西）
+b.box((0.34, 0.28, 0.24), (0.10, -0.03, CTh + 0.12), M_CORK)
+b.box((0.30, 0.24, 0.02), (0.10, -0.03, CTh + 0.235), M_DARKBOX)
+# 小风扇
+b.cyl(0.085, 0.025, (0.50, -0.04, CTh + 0.0125), M_BLACK, seg=20)
+b.cyl(0.022, 0.17, (0.50, -0.04, CTh + 0.11), M_BLACK, seg=10)
+b.cyl(0.105, 0.028, (0.50, -0.04, CTh + 0.22), M_WHITEM, seg=20, rot=(math.pi / 2, 0, 0))
+b.cyl(0.085, 0.012, (0.50, -0.055, CTh + 0.22), M_BLACK, seg=20, rot=(math.pi / 2, 0, 0))
+# 一个白瓷杯
+b.cyl(0.04, 0.09, (0.72, 0.08, CTh + 0.045), M_CERAMIC, seg=16)
+# 桌面上的小盆栽（就地生成，不走 PLANTS —— 那套是以地面为基准的）
+b.cyl(0.075, 0.13, (0.86, 0.10, CTh + 0.065), M_POTGRAY, seg=16, r2=0.088)
+b.cyl(0.078, 0.015, (0.86, 0.10, CTh + 0.135), M_SOIL, seg=16)
+for k in range(7):
+    yaw = k * (2 * math.pi / 7) + 0.3
+    b.beam((0.86, 0.10, CTh + 0.14),
+           (0.86 + 0.075 * math.cos(yaw), 0.10 + 0.075 * math.sin(yaw), CTh + 0.27),
+           0.006, M_STEM)
+b.finish(COLLS["Bar"], (CTx, BACK_Y, 0), 0,
+         info=("后场旧木桌", "咖啡机东边靠墙的旧木桌，堆着老板的书、音响、风扇、纸箱和一盆小绿植。"))
 
 # --- 吧台上方铜色吊架 ---
 b = B("Bar_Rack")
