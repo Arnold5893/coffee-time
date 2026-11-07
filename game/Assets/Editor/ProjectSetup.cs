@@ -522,7 +522,9 @@ public static class ProjectSetup
                 //     一路排到 −2.78 的热水机，中间没有一寸空档。
                 //     也不能放机顶：机顶本来就有一排温杯（5 玻璃杯 + 3 陶瓷杯），白道具混进去完全认不出。
                 float craftX = cmb.min.x - 0.51f;
-                float craftZ = cmb.center.z + 0.04f;
+                //    往柜里挪 0.10：太靠柜沿的话，54° 俯视的下边缘会切到柜台立面上，
+                //    画面下方就是一大块浅灰石材，很跳
+                float craftZ = cmb.center.z + 0.10f;
                 var stationCenter = new Vector3(craftX, 0.95f, aisleZ);
 
                 var stationGO = new GameObject("BarStation");
@@ -535,8 +537,8 @@ public static class ProjectSetup
                 station.center = stationCenter;
                 // 沿吧台 2m、垂直通道收到净宽以内（再宽就压进两侧柜体，站位判定会失效）
                 station.size = new Vector3(2.0f, 1.9f, Mathf.Max(0.90f, aisleWide - 0.06f));
-                // 近景注视点 = 工作区本身
-                station.workPoint = new Vector3(craftX, cmb.min.y + 0.05f, craftZ);
+                // 近景注视点 = 工作区本身（+0.02 让整排道具的视觉重心落在画面正中）
+                station.workPoint = new Vector3(craftX + 0.02f, cmb.min.y + 0.05f, craftZ);
                 // 工作区：咖啡机西侧空台面的柜面高度（cmb.min.y 是咖啡机底面 = 柜台面）。
                 //     +0.012 是 CraftView 那块防滑垫的厚度，道具摆在垫子顶面上。
                 station.counterAnchor = new Vector3(craftX, cmb.min.y + 0.012f, craftZ);

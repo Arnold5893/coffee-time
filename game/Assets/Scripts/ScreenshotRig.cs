@@ -225,6 +225,8 @@ public class ScreenshotRig : MonoBehaviour
             {
                 // 1) 把杯子拖到「台面」= 放错：判偏后只有「重做 / 继续」，没有全屏红闪
                 yield return RigCarry(view, 1);
+                // 等界面切到"重做 / 继续"再拍：判偏是同一帧发生的，立刻读回来还是上一张
+                for (int i = 0; i < 6; i++) yield return null;
                 Debug.Log($"[rig] deviation feedback={panel.LastFeedback} dev={craft.Deviations} " +
                           $"step={craft.StepId} mode={craft.Mode}");
                 yield return CaptureCurrent(cam, rt, "setup_screenshot_bar_deviation.png");
@@ -264,6 +266,8 @@ public class ScreenshotRig : MonoBehaviour
                     yield return null;
                 }
                 for (int i = 0; i < 32; i++) yield return null;
+                // 压到底、还没抬手 —— 这一张才看得到压粉器真正压在碗里（抬手它就退回座位了）
+                yield return CaptureCurrent(cam, rt, "setup_screenshot_bar_tamp.png");
                 view.PointerUp();
                 // 多等几帧再拍：抬手后压头要退回座子、这一步的道具也要重新收放，
                 // 只等一帧的话读回来还是"按着"的那张。

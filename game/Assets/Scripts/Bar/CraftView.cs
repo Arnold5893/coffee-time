@@ -48,13 +48,13 @@ namespace CoffeeShop.Bar
         // ---------------------------------------------------------------- 状态
 
         CraftSession s;
-        Transform row, pad, basket, basketInner, powder, tamperHead, tamperBase, cup, cupCoffee, pitcher, milkSurface;
+        Transform row, pad, basket, powder, tamperHead, cup, cupCoffee, pitcher, milkSurface;
         Transform[] rings = new Transform[5];
         readonly Transform[] bottles = new Transform[3];
 
         Vector3 rowDir;
         Vector3 rowFwd;                 // 从主排指向柜台里侧（Build 里算一次，释放落点也要用）
-        Vector3 cupHome, pitcherHome;
+        Vector3 cupHome, pitcherHome, tamperHome;
         Vector3[] spots = new Vector3[5];   // 0 萃取口 / 1 台面 / 2 托盘 / 3 出杯位 / 4 蒸汽位
 
         Hand hand;
@@ -65,6 +65,7 @@ namespace CoffeeShop.Bar
         float pushDepth;
         float tiltPx;
         float powderLevel;
+        float powderTamped;              // 粉饼被压实到多少（压过之后不会弹回来）
         bool heldInPlace;
         bool carrying;
         Vector3 carryTarget;
@@ -99,6 +100,7 @@ namespace CoffeeShop.Bar
             tiltPx = 0f;
             turnRadians = 0f;
             powderLevel = 0f;
+            powderTamped = 0f;
             carrying = false;
             heldInPlace = false;
             if (row != null) row.gameObject.SetActive(false);
@@ -270,9 +272,8 @@ namespace CoffeeShop.Bar
             // 蒸汽打起来的奶面在抖：奶缸没到位就没有这层动静
             if (milkSurface != null && heldInPlace)
             {
-                var mp = milkSurface.localPosition;
                 float wob = Mathf.Sin(Time.time * 11f) * 0.0015f;
-                milkSurface.localPosition = new Vector3(mp.x, mp.y + wob, mp.z);
+                milkSurface.localPosition = new Vector3(0f, 0.082f + wob, 0f);
             }
         }
 
@@ -303,6 +304,8 @@ namespace CoffeeShop.Bar
                     turnSinceTick = 0f;
                     break;
                 case Hand.Push:
+                    // 手指压下去多少，粉饼就被压实多少 —— 抬手后不回弹（压过的粉就是压过了）
+                    powderTamped = Mathf.Max(powderTamped, pushDepth * 0.85f);
                     if (pushDepth > 0.985f) { s.Tick(Time.deltaTime); PushFrames++; }
                     break;
                 case Hand.Hold:
@@ -323,42 +326,42 @@ namespace CoffeeShop.Bar
             if (s.StepIndex == gi) powderLevel = Mathf.Clamp01(s.Progress01);
             else if (s.StepIndex < gi) powderLevel = 0f;
 
-            if (powder != null)
+            if (powder != null && basket != null)
             {
-                // 粉面在碗壁里从底往上涨：粉少的时候碗口那圈深色内衬露在外面，涨满了才快齐口。
-                // 高度就是"磨了多少粉"——低一截就是不够，不需要任何文字提示。
-                float top = Mathf.Lerp(0.008f, 0.042f, powderLevel);
-                float bottom = 0.006f;
-                float h = Mathf.Max(0.002f, (top - bottom) * 0.5f);
-                var sc = powder.localScale;
-                powder.localScale = new Vector3(sc.x, h, sc.z);
-                powder.position = basket.position + Vector3.up * ((top + bottom) * 0.5f);
+                // 粉堆**一边长高一边铺开**。只让顶面升高是不够的 —— 54° 俯视下 1cm 高度差
+                // 在屏幕上只有七八个像素，"磨了一半"和"磨满了"看起来一样。半径跟着涨，
+                // 眼睛一量就知道还剩多少：一小撮 → 盖住半个碗底 → 铺满。
+                float spread = Mathf.Lerp(0.18f, 1f, Mathf.Clamp01(powderLevel));
+                float r = CraftProps.PowderR * spread;
+                float top = Mathf.Lerp(CraftProps.PowderFloor + 0.003f, 0.0380f, powderLevel);
+                float h = Mathf.Max(0.002f, (top - CraftProps.PowderFloor) * Mathf.Lerp(1f, 0.62f, powderTamped));
+                powder.position = basket.position + Vector3.up * CraftProps.PowderFloor;
+                powder.localScale = new Vector3(r, h, r);
 
                 float deg = TiltFromPixels(tiltPx);
                 powder.localEulerAngles = new Vector3(deg, 0f, deg * 0.6f);
                 if (Mathf.Abs(deg) > 1f)
                 {
-                    // 歪得越多，高的一侧越顶出碗口。只靠倾角，俯视里高低差只有十几像素，
-                    // 看不出"压歪了"；粉饼翘出碗沿，一眼就知道这一下没压平。
-                    powder.position += Vector3.up * (Mathf.Abs(deg) * 0.0013f);
+                    // 歪得越多，粉被挤得越偏 —— 粉饼明显不在碗心，另一侧露出一弯亮钢碗底。
+                    // 只转个角度是不够的：俯视下一个倾斜的圆柱看上去还是个正圆，什么都读不出来。
+                    float k = Mathf.Clamp01(Mathf.Abs(deg) / 15f) * 0.0075f;
+                    powder.position += new Vector3(-Mathf.Sign(deg) * k, 0f, Mathf.Sign(deg) * k * 0.6f);
+                    powder.position += Vector3.up * (Mathf.Abs(deg) * 0.0003f);
                 }
             }
 
-            if (tamperHead != null)
+            if (tamperHead != null && basket != null)
             {
-                // 压头跟着手下拖走：先横移到粉碗正上方，再压进碗里。
-                // 静止时它立在碗旁边的压粉器座上（真吧台也是这么摆的）。
-                Vector3 over = basket != null ? basket.position : tamperBase.position;
-                float slide = Mathf.Clamp01(pushDepth * 3.5f);
-                Vector3 at = Vector3.Lerp(tamperBase.position, over, slide);
-                float lift = Mathf.Lerp(0.100f, 0.020f, pushDepth);
+                // 压粉器：底座在垫子西端，压下时先横移到碗口正上方，再沉进碗里。
+                // 停住时它一定是"立在台面上"的姿态，不是浮在半空。
+                float slide = Mathf.Clamp01(pushDepth * 4f);
+                Vector3 at = Vector3.Lerp(tamperHome, basket.position, slide);
+                float lift = Mathf.Lerp(0f, 0.006f, slide);
+                lift = Mathf.Lerp(lift, 0.026f, pushDepth);
                 tamperHead.position = at + Vector3.up * lift;
             }
 
             if (cup != null && carrying) cup.position = Vector3.Lerp(cup.position, carryTarget, Time.deltaTime * 22f);
-            // 杯里的咖啡液是独立物件（Cup 是空杯、液面另放），杯子一动它必须跟着，
-            // 否则杯子被拖走后原处会留一摊咖啡。
-            if (cup != null && cupCoffee != null) cupCoffee.position = cup.position + Vector3.up * 0.034f;
             if (pitcher != null && carrying) pitcher.position = Vector3.Lerp(pitcher.position, carryTarget, Time.deltaTime * 22f);
 
             UpdateRings();
@@ -374,7 +377,7 @@ namespace CoffeeShop.Bar
             var mode = s.Mode;
 
             bool needBasket = id == "grind" || id == "tamp" || id == "extract" || id == "move";
-            bool needTamper = id == "tamp";
+            bool needTamper = id == "grind" || id == "tamp" || id == "extract" || id == "move";
             bool needCup = true;      // 杯子全程在台面上（那杯东西从头到尾看得见）
             bool needPitcher = id == "milk";
             bool needBottles = mode == CraftUiMode.Choose;
@@ -383,9 +386,7 @@ namespace CoffeeShop.Bar
             bool needLiquid = extractAt >= 0 && s.StepIndex >= extractAt;
 
             if (basket != null) basket.gameObject.SetActive(needBasket);
-            if (basketInner != null) basketInner.gameObject.SetActive(needBasket);
             if (powder != null) powder.gameObject.SetActive(needBasket);
-            if (tamperBase != null) tamperBase.gameObject.SetActive(needTamper);
             if (tamperHead != null) tamperHead.gameObject.SetActive(needTamper);
             if (cup != null) cup.gameObject.SetActive(needCup);
             if (cupCoffee != null) cupCoffee.gameObject.SetActive(needCup && needLiquid);
@@ -405,7 +406,9 @@ namespace CoffeeShop.Bar
             {
                 case CraftUiMode.Place: show = 0; break;
                 case CraftUiMode.Press:
-                    show = s.StepId == "serve" ? 3 : 2;
+                    // 压粉也是 Press 模式，但那儿没有"落点" —— 圈只标杯子该去的两个地方
+                    if (s.StepId == "serve") show = 3;
+                    else if (s.StepId == "move") show = 2;
                     break;
                 case CraftUiMode.Hold:
                     if (s.StepId == "milk") show = 4;
@@ -438,73 +441,74 @@ namespace CoffeeShop.Bar
             row = new GameObject("CraftProps").transform;
             row.SetParent(transform, false);
 
-            var steel = Mat(new Color(0.72f, 0.73f, 0.75f), 0.35f, 0.45f);
-            var dark = Mat(new Color(0.16f, 0.16f, 0.17f), 0.2f, 0.6f);
-            var darkInner = Mat(new Color(0.17f, 0.14f, 0.12f), 0f, 0.35f);   // 碗内壁：暖深棕，比纯黑像"装过粉的碗"
-            var ceramic = Mat(new Color(0.96f, 0.95f, 0.92f), 0.05f, 0.35f);
-            var coffee = Mat(new Color(0.42f, 0.27f, 0.16f), 0f, 0.75f);
-            var milkMat = Mat(new Color(0.97f, 0.96f, 0.93f), 0f, 0.4f);
-            var ringMat = Mat(new Color(1f, 0.88f, 0.66f), 0f, 0.5f);
-            var padMat = Mat(new Color(0.62f, 0.60f, 0.56f), 0f, 0.3f);
+            // 材质按真实器具的质感给：不锈钢高金属度、陶瓷低金属高光、咖啡粉几乎全哑。
+            // 之前全是 metallic 0.35 的"灰塑料"，明暗层次起不来，再好的形状也像积木。
+            var steel = PropMesh.Mat(new Color(0.80f, 0.81f, 0.82f), 0.72f, 0.60f);
+            var wood = PropMesh.Mat(new Color(0.27f, 0.15f, 0.085f), 0f, 0.32f);   // 压粉器把手是木头的
+            var ceramic = PropMesh.Mat(new Color(0.96f, 0.95f, 0.92f), 0.02f, 0.62f);
+            var coffee = PropMesh.Mat(new Color(0.33f, 0.19f, 0.10f), 0f, 0.16f);
+            var milkMat = PropMesh.Mat(new Color(0.97f, 0.96f, 0.93f), 0f, 0.45f);
+            var ringMat = PropMesh.Mat(new Color(1f, 0.85f, 0.55f), 0f, 0.5f);
+            // 垫子压暗：道具全是亮钢/白瓷，浅灰垫子会把它们一起洗白；深暖灰才衬得出来
+            var padMat = PropMesh.Mat(new Color(0.31f, 0.28f, 0.24f), 0f, 0.30f);
+            var padEdge = PropMesh.Mat(new Color(0.17f, 0.15f, 0.13f), 0f, 0.26f);
 
-            // 一横排，从西（萃取口，靠旧木桌）到东（出杯位，靠咖啡机）：
-            //   粉碗 → 奶缸 → 蒸汽位 → 压粉器 → 台面(放错) → 杯子 → 托盘 → 出杯位
-            // 间距 0.175、整排 0.88m，正好铺进咖啡机与木桌之间那 1.10m 的空台面。
-            // 道具尺寸比实物稍大（粉碗 ⌀0.14 对真实 0.058）：1m 外的俯视近景里，
-            // 真实比例的碗壁只有 2~3mm，屏幕上根本分不出碗沿和粉面。
+            // 一横排，西（木桌侧）→ 东（咖啡机侧）：
+            //   出杯位 → 压粉器座 → 粉碗 → 台面(放错) → 托盘 → 萃取口 → 蒸汽位
+            // 间距 0.12~0.16 按道具直径定（杯子 ⌀0.145 带把手 0.175，是最大的一件）。
             Vector3 A(float d) => anchor + rowDir * d;
-            // 顺序按真实动线排：萃取口在最东（贴着咖啡机），一路往西是放错的台面、
-            // 托盘、出杯位。萃取口不能跟粉碗同位置 —— 杯子放进去就是"碗里插了个杯子"。
-            spots[0] = A(0.40f);                  // 萃取口（紧贴咖啡机那侧）
-            spots[4] = A(0.22f);                  // 蒸汽位
-            spots[1] = A(-0.02f);                 // 台面（放错的那个）
-            spots[2] = A(-0.18f);                 // 托盘
-            spots[3] = A(-0.32f);                 // 出杯位（靠木桌那侧）
+            spots[0] = A(0.24f);                  // 萃取口（紧贴咖啡机）
+            spots[1] = A(0.06f);                  // 台面（放错的那个）
+            spots[2] = A(0.14f);                  // 托盘
+            spots[3] = A(-0.26f);                 // 出杯位（靠木桌那侧）
+            spots[4] = A(0.28f);                  // 蒸汽位
 
-            // 工作垫：整片木纹台面上道具没有落点感。浅色防滑垫把"操作区"从台面里分出来，
-            // 也当作深色道具（钢碗、咖啡粉）的底衬 —— 深色垫子会把这些全吞掉。
-            // 宽度贴着整排走（±0.35）：垫子比道具群大太多，近景里就只是"一大片灰"。
-            pad = Box("WorkPad", new Vector3(0.70f, 0.012f, 0.34f),
-                      new Vector3(anchor.x, anchor.y - 0.006f, anchor.z), padMat, row);
+            // 工作垫：圆角 + 上下倒角，比道具群略大一圈。
+            // 垫子不只是底衬 —— 它把 0.80m 的"操作区"从整片木纹台面里划出来，近景才有构图。
+            pad = CraftProps.WorkPad(padMat, padEdge, row).transform;
+            pad.position = new Vector3(anchor.x + 0.01f, anchor.y - 0.012f, anchor.z);
 
             for (int i = 0; i < rings.Length; i++)
             {
-                rings[i] = Cyl("Ring" + i, 0.130f, 0.003f, spots[i] + Vector3.up * 0.002f, ringMat, row);
+                rings[i] = CraftProps.SpotRing(ringMat, row).transform;
+                rings[i].position = spots[i] + Vector3.up * 0.0006f;
                 rings[i].gameObject.SetActive(false);
             }
 
-            // 粉碗固定站在工作台中间偏西（不占任何热点）：磨豆、压粉都在它上面，
-            // 杯子的萃取口在另一头贴着咖啡机，两件东西永远不会叠。
-            Vector3 basketSpot = A(-0.20f);
-            basket = Cyl("Basket", 0.140f, 0.055f, basketSpot + Vector3.up * 0.0275f, steel, row);
-            // 碗壁内衬：比碗口低 7mm，粉面在它里面涨 —— 粉少的时候看得见一圈深色碗壁，满了才快齐口
-            basketInner = Cyl("BasketInner", 0.112f, 0.048f, basketSpot + Vector3.up * 0.024f, darkInner, row);
-            powder = Cyl("Powder", 0.096f, 0.034f, basketSpot + Vector3.up * 0.020f, coffee, row);
+            // 粉碗：固定站在工作台中间偏西（不占任何热点）。磨豆、压粉都在它上面。
+            basket = CraftProps.Basket(steel, row).transform;
+            basket.position = A(-0.06f);
 
-            tamperBase = Cyl("TamperBase", 0.130f, 0.014f, A(-0.06f) + Vector3.up * 0.006f, steel, row);
-            tamperHead = new GameObject("TamperHead").transform;
-            tamperHead.SetParent(row, false);
-            tamperHead.position = tamperBase.position;
-            Cyl("TamperDisc", 0.130f, 0.034f, tamperBase.position + Vector3.up * 0.020f, steel, tamperHead);
-            Cyl("TamperGrip", 0.040f, 0.120f, tamperBase.position + Vector3.up * 0.085f, dark, tamperHead);
+            powder = CraftProps.Powder(coffee, row).transform;
 
-            cupHome = A(0.12f) + Vector3.up * 0.046f;
-            cup = Cyl("Cup", 0.100f, 0.105f, cupHome, ceramic, row);
-            cupCoffee = Cyl("CupCoffee", 0.082f, 0.004f, cupHome + Vector3.up * 0.034f, coffee, row);
+            // 压粉器有它自己的座位（垫子最西端），压粉时才横移到碗上
+            tamperHome = A(-0.20f);
+            tamperHead = CraftProps.Tamper(steel, wood, row).transform;
+            tamperHead.position = tamperHome;
 
-            // 奶缸和粉碗不会同时出现（打奶那步粉碗已经收起来了），摆得近一点没关系
-            pitcherHome = A(0.06f) + Vector3.up * 0.056f;   // 在蒸汽位旁边但不算"在位"
-            pitcher = Cyl("Pitcher", 0.110f, 0.115f, pitcherHome, steel, row);
-            milkSurface = Cyl("Milk", 0.088f, 0.004f, pitcherHome + Vector3.up * 0.050f, milkMat, row);
+            cupHome = A(-0.30f);
+            cup = CraftProps.Cup(ceramic, row).transform;
+            cup.position = cupHome;
+            cupCoffee = CraftProps.CupLiquid(coffee, cup).transform;
+            cupCoffee.localPosition = new Vector3(0f, 0.052f, 0f);
 
-            // 小瓶只在"选料"那步出现（其余道具这时都收起来了），可以借用主排的位置
+            // 奶缸只在"打奶"那步出现：平时收在粉碗那个位置（那时碗已经收起来了）
+            pitcherHome = A(-0.06f);
+            pitcher = CraftProps.Pitcher(steel, row).transform;
+            pitcher.position = pitcherHome;
+            milkSurface = CraftProps.MilkSurface(milkMat, pitcher).transform;
+            milkSurface.localPosition = new Vector3(0f, 0.082f, 0f);
+
+            // 小瓶只在"选料"那步出现（其余道具这时都收起来了），可以占用主排的位置
             for (int i = 0; i < bottles.Length; i++)
             {
-                Vector3 p = A(-0.24f + i * 0.075f) + rowFwd * 0.05f + Vector3.up * 0.050f;
-                bottles[i] = Cyl("Bottle" + i, 0.048f, 0.110f, p, i == 0 ? milkMat : coffee, row);
+                Vector3 p = A(-0.15f + i * 0.075f);
+                bottles[i] = CraftProps.Bottle(i == 0 ? milkMat : coffee, row).transform;
+                bottles[i].position = p;
             }
 
             row.gameObject.SetActive(false);
+            ResetProps();
         }
 
         void ResetProps()
@@ -512,67 +516,17 @@ namespace CoffeeShop.Bar
             if (row == null) return;
             if (cup != null) cup.position = cupHome;
             if (pitcher != null) pitcher.position = pitcherHome;
-            if (tamperHead != null) tamperHead.localPosition = new Vector3(0f, 0f, 0f);
+            if (tamperHead != null) tamperHead.position = tamperHome;
             if (powder != null)
             {
-                var sc = powder.localScale;
-                powder.localScale = new Vector3(sc.x, 0.001f, sc.z);
+                powder.localScale = new Vector3(CraftProps.PowderR * 0.3f, 0.003f, CraftProps.PowderR * 0.3f);
                 powder.localEulerAngles = Vector3.zero;
             }
             pushDepth = 0f;
             tiltPx = 0f;
             turnRadians = 0f;
             powderLevel = 0f;
-        }
-
-        static Transform Cyl(string name, float diameter, float height, Vector3 world, Material m, Transform parent)
-        {
-            var go = GameObject.CreatePrimitive(PrimitiveType.Cylinder);
-            go.name = name;
-            var col = go.GetComponent<Collider>();
-            if (col != null) Destroy(col);
-            go.transform.SetParent(parent, worldPositionStays: true);
-            go.transform.position = world;
-            go.transform.localScale = new Vector3(diameter, Mathf.Max(0.001f, height * 0.5f), diameter);
-            var r = go.GetComponent<Renderer>();
-            if (r != null)
-            {
-                r.sharedMaterial = m;
-                r.shadowCastingMode = UnityEngine.Rendering.ShadowCastingMode.Off;
-            }
-            return go.transform;
-        }
-
-        static Transform Box(string name, Vector3 size, Vector3 world, Material m, Transform parent)
-        {
-            var go = GameObject.CreatePrimitive(PrimitiveType.Cube);
-            go.name = name;
-            var col = go.GetComponent<Collider>();
-            if (col != null) Destroy(col);
-            go.transform.SetParent(parent, worldPositionStays: true);
-            go.transform.position = world;
-            go.transform.localScale = size;
-            var r = go.GetComponent<Renderer>();
-            if (r != null)
-            {
-                r.sharedMaterial = m;
-                r.shadowCastingMode = UnityEngine.Rendering.ShadowCastingMode.Off;
-            }
-            return go.transform;
-        }
-
-        static Material Mat(Color c, float metallic, float smooth)
-        {
-            var sh = Shader.Find("Universal Render Pipeline/Lit");
-            if (sh == null) sh = Shader.Find("Standard");
-            var m = new Material(sh);
-            // URP Lit 的主色是 _BaseColor；Material.color 走的是 _Color，在 URP 下静默无效，
-            // 设进去的道具会全是白模、只剩环境反射的颜色（钢碗发蓝、咖啡粉发白就是这么来的）。
-            if (m.HasProperty("_BaseColor")) m.SetColor("_BaseColor", c);
-            else m.color = c;
-            if (m.HasProperty("_Metallic")) m.SetFloat("_Metallic", metallic);
-            if (m.HasProperty("_Smoothness")) m.SetFloat("_Smoothness", smooth);
-            return m;
+            powderTamped = 0f;
         }
 
         // ---------------------------------------------------------------- 查询（验收 / 截图脚本用）

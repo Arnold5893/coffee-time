@@ -33,9 +33,9 @@ namespace CoffeeShop.Cameras
 
         [Header("吧台近景（07 票 / FR-MOV-05）")]
         [Tooltip("近景距离：凑到台面前，道具要占住画面 —— 退远了整排器物就只有几十个像素")]
-        [SerializeField] float focusDistance = 0.85f;
+        [SerializeField] float focusDistance = 0.80f;
         [Tooltip("近景俯角：工作区落在柜面（0.95m）上，俯角比看机顶时低得多，否则就是高机位俯拍")]
-        [SerializeField] float focusPitch = 46f;
+        [SerializeField] float focusPitch = 54f;
         [Tooltip("近景视野：收窄，画面更集中")]
         [SerializeField] float focusFov = 34f;
         [Tooltip("跟随点朝工作点前移多少米（把人让到画面边缘，台面居中）")]
