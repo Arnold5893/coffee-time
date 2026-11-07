@@ -194,8 +194,9 @@ public class ScreenshotRig : MonoBehaviour
             }
         }
 
-        // ---- 07 票验收：吧台工位近景 + 五原语制作界面 ----
-        if (barStation != null && barStation.panel != null && player != null && followRig != null)
+        // ---- 07 票验收：吧台工位近景 + 手柄直接操作 ----
+        if (barStation != null && barStation.panel != null && barStation.panel.view != null &&
+            player != null && followRig != null)
         {
             var panel = barStation.panel;
             Vector3 workDir = barStation.workPoint - barStation.center;
@@ -219,28 +220,56 @@ public class ScreenshotRig : MonoBehaviour
                       $"fov={followRig.CurrentFov:F1} dist={followRig.CurrentDistance:F2} " +
                       $"step={(craft != null ? craft.Describe() : "null")}");
 
+            var view = panel.view;
             if (craft != null)
             {
-                // 第一步是"放置"原语：先故意放错，拍一张判偏状态。
-                // 07 返工后这里**没有全屏红闪**了，只剩「重做 / 继续」+ 一声闷响。
-                panel.PickOption(1);
-                for (int i = 0; i < 3; i++) yield return null;
-                Debug.Log($"[rig] craft deviation feedback={panel.LastFeedback} dev={craft.Deviations} " +
+                // 1) 把杯子拖到「台面」= 放错：判偏后只有「重做 / 继续」，没有全屏红闪
+                yield return RigCarry(view, 1);
+                Debug.Log($"[rig] deviation feedback={panel.LastFeedback} dev={craft.Deviations} " +
                           $"step={craft.StepId} mode={craft.Mode}");
                 yield return CaptureCurrent(cam, rt, "setup_screenshot_bar_deviation.png");
 
-                // 重做 → 放对 → 走到"磨豆"，拍近景（click/hold 现在是占位按钮，交互待重做）
+                // 2) 重做 → 拖到萃取口 → 绕圈磨豆，转到一半拍近景（粉面正在涨）
                 panel.RetryStep();
-                panel.PickOption(0);
-                for (int i = 0; i < 4; i++) yield return null;
-                Debug.Log($"[rig] focus state {panel.StateDebug}");
+                yield return null;
+                yield return RigCarry(view, 0);
+
+                Vector2 c = view.ToScreen(view.BasketWorld);
+                view.PointerDown(c + new Vector2(70f, 0f));
+                for (int i = 0; i < 90 && craft.StepId == "grind"; i++)
+                {
+                    float a = i * 0.22f;
+                    view.PointerMove(c + new Vector2(Mathf.Cos(a), Mathf.Sin(a)) * 70f);
+                    yield return null;
+                }
+                Debug.Log($"[rig] grind powder={view.PowderLevel:P0} {panel.StateDebug}");
                 yield return CaptureCurrent(cam, rt, "setup_screenshot_bar_focus.png");
 
-                panel.StubComplete();   // 磨豆（占位）
-                for (int i = 0; i < 2; i++) yield return null;
-                panel.StubComplete();   // 压粉（占位）
-                for (int i = 0; i < 2; i++) yield return null;
-                Debug.Log($"[rig] after stub {panel.StateDebug} stubClicks={panel.StubCompletes}");
+                // 3) 继续转完 → 歪着压到底：粉饼就是斜的（没有红屏、没有提示）
+                for (int i = 90; i < 400 && craft.StepId == "grind"; i++)
+                {
+                    float a = i * 0.22f;
+                    view.PointerMove(c + new Vector2(Mathf.Cos(a), Mathf.Sin(a)) * 70f);
+                    yield return null;
+                }
+                view.PointerUp();
+                yield return null;
+
+                Vector2 p = view.ToScreen(view.BasketWorld) + new Vector2(0f, 120f);
+                view.PointerDown(p);
+                for (int i = 0; i < 20; i++)
+                {
+                    p += new Vector2(6f, -10f);
+                    view.PointerMove(p);
+                    yield return null;
+                }
+                for (int i = 0; i < 32; i++) yield return null;
+                view.PointerUp();
+                // 多等几帧再拍：抬手后压头要退回座子、这一步的道具也要重新收放，
+                // 只等一帧的话读回来还是"按着"的那张。
+                for (int i = 0; i < 8; i++) yield return null;
+                Debug.Log($"[rig] tamp tilt={view.TiltDeg:F1}° step={craft.StepId} {panel.StateDebug}");
+                yield return CaptureCurrent(cam, rt, "setup_screenshot_bar_defect.png");
             }
 
             barStation.Exit();
@@ -268,6 +297,19 @@ public class ScreenshotRig : MonoBehaviour
         foreach (var r in hidden) r.enabled = true;
 
         Quit(0);
+    }
+
+    /// <summary>截图脚本用：把杯子拖到某个热点。</summary>
+    IEnumerator RigCarry(CoffeeShop.Bar.CraftView view, int spot)
+    {
+        view.PointerDown(new Vector2(Screen.width * 0.5f, Screen.height * 0.5f));
+        yield return null;
+        view.PointerMove(view.ToScreen(view.SpotWorld(spot)));
+        yield return null;
+        view.PointerMove(view.ToScreen(view.SpotWorld(spot)));
+        yield return null;
+        view.PointerUp();
+        yield return null;
     }
 
     IEnumerator Capture(Camera cam, RenderTexture rt, Vector3 pos, Vector3 look, string file)
@@ -299,10 +341,12 @@ public class ScreenshotRig : MonoBehaviour
         yield return null;
     }
 
-    // 看门狗：900 帧（约 15 秒渲染循环）内未完成也强制退出，避免批处理挂死
+    // 看门狗：2400 帧内未完成也强制退出，避免批处理挂死。
+    //     19 张图每张都要 ReadPixels + EncodeToPNG，07 票的近景还要等镜头过渡和手势回合，
+    //     900 帧（15s）在加了几段之后就顶不住了 —— 放宽到 40s，真挂死照样会被收掉。
     void Update()
     {
-        if (Time.frameCount > 900)
+        if (Time.frameCount > 2400)
         {
             Debug.LogError("ScreenshotRig watchdog: timeout, force exit");
             Quit(3);

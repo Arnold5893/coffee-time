@@ -516,7 +516,14 @@ public static class ProjectSetup
                 var cmb = cmRenderer.bounds;
                 float aisleZ = (backR.bounds.min.z + frontR.bounds.max.z) * 0.5f;
                 float aisleWide = backR.bounds.min.z - frontR.bounds.max.z;
-                var stationCenter = new Vector3(cmb.center.x, 0.95f, aisleZ);
+
+                // 工作区落在**咖啡机西侧那段空台面**上（Unity x −7.62…−6.52，宽 1.10m，再往西就是旧木桌）。
+                //     咖啡机东侧不能放：Grinder_1 紧贴着机身（−5.71…−5.37），接着是压粉机、Grinder_2、水槽，
+                //     一路排到 −2.78 的热水机，中间没有一寸空档。
+                //     也不能放机顶：机顶本来就有一排温杯（5 玻璃杯 + 3 陶瓷杯），白道具混进去完全认不出。
+                float craftX = cmb.min.x - 0.51f;
+                float craftZ = cmb.center.z + 0.04f;
+                var stationCenter = new Vector3(craftX, 0.95f, aisleZ);
 
                 var stationGO = new GameObject("BarStation");
                 stationGO.transform.position = stationCenter;
@@ -528,9 +535,11 @@ public static class ProjectSetup
                 station.center = stationCenter;
                 // 沿吧台 2m、垂直通道收到净宽以内（再宽就压进两侧柜体，站位判定会失效）
                 station.size = new Vector3(2.0f, 1.9f, Mathf.Max(0.90f, aisleWide - 0.06f));
-                // 近景注视点：咖啡机前沿与通道之间，台面高度
-                station.workPoint = new Vector3(cmb.center.x, 0.98f,
-                                                (cmb.center.z + aisleZ) * 0.5f);
+                // 近景注视点 = 工作区本身
+                station.workPoint = new Vector3(craftX, cmb.min.y + 0.05f, craftZ);
+                // 工作区：咖啡机西侧空台面的柜面高度（cmb.min.y 是咖啡机底面 = 柜台面）。
+                //     +0.012 是 CraftView 那块防滑垫的厚度，道具摆在垫子顶面上。
+                station.counterAnchor = new Vector3(craftX, cmb.min.y + 0.012f, craftZ);
                 station.motor = motor;
                 station.router = router;
                 station.camRig = follow;
@@ -544,6 +553,9 @@ public static class ProjectSetup
                     esGO.AddComponent<UnityEngine.EventSystems.StandaloneInputModule>();
                 }
 
+                report.AppendLine($"counter: anchor=({station.counterAnchor.x:F2},{station.counterAnchor.y:F2},{station.counterAnchor.z:F2}) " +
+                                  $"back=({backR.bounds.min.x:F2}..{backR.bounds.max.x:F2}, {backR.bounds.min.y:F2}..{backR.bounds.max.y:F2}, {backR.bounds.min.z:F2}..{backR.bounds.max.z:F2}) " +
+                                  $"front=({frontR.bounds.min.z:F2}..{frontR.bounds.max.z:F2}) machine y={cmb.min.y:F2}..{cmb.max.y:F2} z={cmb.min.z:F2}..{cmb.max.z:F2}");
                 report.AppendLine($"bar station: center=({stationCenter.x:F2},{stationCenter.z:F2}) " +
                                   $"aisle={aisleWide:F2}m work=({station.workPoint.x:F2},{station.workPoint.z:F2}) " +
                                   $"sku={station.sku}");

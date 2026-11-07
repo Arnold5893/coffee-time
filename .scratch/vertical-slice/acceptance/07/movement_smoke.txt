@@ -1,2 +1,10 @@
+  anchor=(-5.9,-7.4) freeDirs=6/8
+  anchor=(-5.5,-1.5) freeDirs=7/8
+  anchor=(-7.6,-8.0) freeDirs=3/8
+  anchor=(-7.4,-6.5) freeDirs=6/8
+  anchor=(-2.6,-5.7) freeDirs=5/8
+  anchor=(-4.5,-8.7) freeDirs=7/8
 probes=48 deadEnds=0 outOfRoom=0
+barBlock: start=(-5.46,-1.45) moved=0.47 minPlanarDistToBackCounter=0.30 (>=0.20 means blocked outside)
+wallEscape=False
 SMOKE RESULT: PASS

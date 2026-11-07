@@ -10,18 +10,14 @@ namespace CoffeeShop.Bar
     /// <summary>
     /// 吧台制作界面（07 票 / FR-MAKE-03、NFR-05）。
     ///
-    /// 界面只是**发请求**给 <see cref="CraftSession"/>：
-    ///   select → 一排选项按钮
-    ///   place  → 一排热点按钮（放到哪）
-    ///   wait   → 不需要操作
-    ///   click / hold → **临时占位**：一个「完成这一步」按钮，直接按配方 param 结算。
+    /// 2026-11-07 返工后的分工：
+    ///   · **动作**全部交给 <see cref="CraftView"/>（绕圈磨豆、下拖压粉、拖杯子、拖奶缸）——
+    ///     手势铺满全屏，按钮只留「跳过 / 出杯 / 退出 / 重做 / 继续」这几个**操作选择**；
+    ///   · 这里只负责**字**：步骤名、一句怎么做、出杯后自动收起、判偏的一声闷响；
+    ///   · 界面**不显示任何文字评级**，也不再有全屏红闪（FR-EVAL-03）。
     ///
-    /// 2026-11-07 返工：原来的「按住攒进度条」与「点一下压粉」太生硬，全屏红闪也被否了，
-    /// 这两套交互连同进度条、红闪一起删掉了；占位只为保持流程可跑通、回归不中断。
-    /// 新交互在 brainstorm 定案后替换 <see cref="StubComplete"/>，**领域层的五原语不动**
-    /// （配方里 hold=达标秒数、click=按下达标秒数仍然成立，只是玩家用什么动作产出这些秒数要重新设计）。
-    ///
-    /// 界面**不显示任何文字评级**（FR-EVAL-03）：评分由领域层自己算，这层连读都不读它的档位。
+    /// 时间只在这个类里喂给 `Wait` 步骤（等萃取），其余步骤由 CraftView 按手势节奏喂，
+    /// 否则"转得动才磨"会被这一层的每帧 Tick 抹平。
     /// </summary>
     [DefaultExecutionOrder(75)]
     public class CraftPanel : MonoBehaviour
@@ -29,18 +25,19 @@ namespace CoffeeShop.Bar
         [Header("接线")]
         public Camera uiCamera;
         public AudioSource sfx;
+        [Tooltip("直接操作层：手势与台面道具")]
+        public CraftView view;
 
         [Header("观感")]
         [Tooltip("出杯后自动收起界面的延时（秒）")]
         public float closeDelay = 1.10f;
 
         Canvas canvas;
-        RectTransform craftRoot, hintRoot, optionsRow, decideRow, actionRoot;
-        Text stepText, actHintText, hintText, actionLabel, doneText;
+        RectTransform craftRoot, hintRoot, decideRow;
+        Text stepText, actHintText, hintText, doneText;
         Text skipLabel, serveLabel;
 
         CraftSession session;
-        string optionsForStep = "";
         float doneTimer;
         AudioClip thud, ding;
 
@@ -49,8 +46,6 @@ namespace CoffeeShop.Bar
         /// <summary>界面要求关掉（出杯后延时到 / 点了退出）。由 BarStation 轮询。</summary>
         public bool CloseRequested { get; private set; }
         public CraftFeedback? LastFeedback { get; private set; }
-        /// <summary>占位按钮被点了多少次（新交互做出来后这个计数应该消失）。</summary>
-        public int StubCompletes { get; private set; }
         public int OptionClicks { get; private set; }
         public int ExitClicks { get; private set; }
         public bool HintVisible => hintRoot != null && hintRoot.gameObject.activeSelf;
@@ -82,11 +77,11 @@ namespace CoffeeShop.Bar
             session = craft;
             session.Feedback += OnFeedback;
 
-            optionsForStep = "";
             doneTimer = 0f;
             CloseRequested = false;
             craftRoot.gameObject.SetActive(true);
             hintRoot.gameObject.SetActive(false);
+            if (view != null) view.Bind(session, uiCamera);
             Refresh();
         }
 
@@ -95,6 +90,7 @@ namespace CoffeeShop.Bar
             if (session != null) session.Feedback -= OnFeedback;
             session = null;
             CloseRequested = false;
+            if (view != null) view.Clear();
             if (craftRoot != null) craftRoot.gameObject.SetActive(false);
             ShowHint(false, "");
         }
@@ -107,19 +103,6 @@ namespace CoffeeShop.Bar
             if (show) UiKit.SetText(hintText, text);
         }
 
-        /// <summary>
-        /// 占位交互（07 返工中）：click/hold 步骤点一下直接按配方 param 结算。
-        /// 新交互设计定案后整个方法删掉，换成真正的动作映射。
-        /// </summary>
-        public void StubComplete()
-        {
-            if (session == null) return;
-            StubCompletes++;
-            // 占位多给 0.05s 余量：按固定步长累加会有浮点误差，差 1e-4 秒也会被判偏
-            float need = Mathf.Max(0.06f, session.StepParam) + 0.05f;
-            if (session.Mode == CraftUiMode.Hold) session.HoldFor(need);
-            else if (session.Mode == CraftUiMode.Press) session.Tap(need);
-        }
 
         public void PickOption(int index)
         {
@@ -165,7 +148,9 @@ namespace CoffeeShop.Bar
         {
             if (session == null) return;
 
-            session.Tick(Time.deltaTime);
+            // 只有"等它自己完成"的步骤由界面喂时间；转圈/下压/打奶由 CraftView 按手势节奏喂，
+            // 否则"不转就不磨"会被这里的每帧 Tick 抹平。
+            if (session.Mode == CraftUiMode.Wait) session.Tick(Time.deltaTime);
 
             // 配方最后一步就是"出杯"，做完自动落杯；质量由领域层算，界面不显示
             if (session.Mode == CraftUiMode.Done && !session.Maker.Served) session.Serve();
@@ -207,33 +192,30 @@ namespace CoffeeShop.Bar
 
             var mode = session.Mode;
             UiKit.SetText(stepText, session.StepName);
-            UiKit.SetText(actHintText, HintFor(mode));
+            UiKit.SetText(actHintText, HintFor(session.StepId, mode));
 
-            bool actionMode = mode == CraftUiMode.Press || mode == CraftUiMode.Hold;
-            SetActive(actionRoot, actionMode);
-            SetActive(optionsRow, mode == CraftUiMode.Choose || mode == CraftUiMode.Place);
             SetActive(decideRow, mode == CraftUiMode.Decide);
             SetActive(doneText, mode == CraftUiMode.Done);
-
-            if (actionMode) UiKit.SetText(actionLabel, "完成这一步");
-
-            if (session.Mode == CraftUiMode.Choose || session.Mode == CraftUiMode.Place)
-                BuildOptions(session.StepId + "|" + mode);
 
             // 没做完就能提前出杯（FR-MAKE-01）；已经走到最后一步就别重复点
             SetActive(skipLabel.transform.parent.gameObject, mode != CraftUiMode.Done);
             SetActive(serveLabel.transform.parent.gameObject, mode != CraftUiMode.Done);
         }
 
-        static string HintFor(CraftUiMode mode)
+        /// <summary>一句话说清"这一 hands 该做什么"。不是评级，是动作说明。</summary>
+        static string HintFor(string stepId, CraftUiMode mode)
         {
             switch (mode)
             {
-                case CraftUiMode.Hold: return "交互重做中（占位）：点一下推进";
-                case CraftUiMode.Press: return "交互重做中（占位）：点一下推进";
-                case CraftUiMode.Choose: return "选一个";
-                case CraftUiMode.Place: return "放到哪里";
-                case CraftUiMode.Wait: return "等它自己完成";
+                case CraftUiMode.Hold:
+                    return stepId == "milk" ? "把奶缸怼到蒸汽棒下，按住不放" : "按住，绕圈转手柄";
+                case CraftUiMode.Press:
+                    if (stepId == "tamp") return "按住往下拖，压到底停一下";
+                    if (stepId == "drizzle") return "按住，从杯口一边划到另一边";
+                    return "把杯子拖到出杯位";
+                case CraftUiMode.Place: return "把杯子拖到萃取口下";
+                case CraftUiMode.Choose: return "抓起要用的那一瓶";
+                case CraftUiMode.Wait: return "等它自己流完";
                 case CraftUiMode.Decide: return "重做这一步，还是带着继续？";
                 case CraftUiMode.Done: return "这杯好了";
                 default: return "";
@@ -248,31 +230,6 @@ namespace CoffeeShop.Bar
         static void SetActive(Component c, bool on)
         {
             if (c != null) SetActive(c.gameObject, on);
-        }
-
-        void BuildOptions(string key)
-        {
-            if (optionsForStep == key) return;
-            optionsForStep = key;
-
-            for (int i = optionsRow.childCount - 1; i >= 0; i--)
-                Destroy(optionsRow.GetChild(i).gameObject);
-
-            var options = session.Options;
-            const float width = 176f, height = 68f, gap = 16f;
-            float total = options.Length * width + Mathf.Max(0, options.Length - 1) * gap;
-            float x = -total * 0.5f + width * 0.5f;
-
-            for (int i = 0; i < options.Length; i++)
-            {
-                int index = i;
-                var btn = UiKit.TextButton("Option" + i, optionsRow, options[i], 26,
-                                           new Vector2(width, height), new Color(0.22f, 0.18f, 0.15f, 0.92f), Color.white);
-                UiKit.Place(btn.image.rectTransform, new Vector2(0.5f, 0.5f), new Vector2(0.5f, 0.5f),
-                            new Vector2(x, 0f), new Vector2(width, height));
-                btn.onClick.AddListener(() => PickOption(index));
-                x += width + gap;
-            }
         }
 
         // ------------------------------------------------------------ 搭建
@@ -326,21 +283,15 @@ namespace CoffeeShop.Bar
             actHintText = UiKit.Label("StepHint", craftRoot, 22, TextAnchor.MiddleCenter, new Color(1f, 0.92f, 0.78f, 0.92f));
             UiKit.Place(actHintText.rectTransform, new Vector2(0.5f, 1f), new Vector2(0.5f, 0.5f), new Vector2(0f, -104f), new Vector2(960f, 34f));
 
-            // 占位主按钮（圆形）—— 07 返工中，等新交互设计定案后整块替换
-            var stub = UiKit.TextButton("StubButton", craftRoot, "完成这一步", 26, new Vector2(168f, 168f),
-                                        new Color(0.96f, 0.90f, 0.78f, 0.95f), new Color(0.24f, 0.16f, 0.10f));
-            actionRoot = stub.image.rectTransform;
-            stub.image.sprite = UiKit.Circle();
-            stub.image.type = Image.Type.Simple;
-            UiKit.Place(actionRoot, new Vector2(0.5f, 0f), new Vector2(0.5f, 0.5f), new Vector2(0f, 116f), new Vector2(168f, 168f));
-            stub.onClick.AddListener(StubComplete);
-            actionLabel = stub.GetComponentInChildren<Text>();
-            actionRoot.gameObject.SetActive(false);
-
-            // 选项 / 热点
-            optionsRow = UiKit.Node("Options", craftRoot);
-            UiKit.Place(optionsRow, new Vector2(0.5f, 0f), new Vector2(0.5f, 0.5f), new Vector2(0f, 150f), new Vector2(960f, 80f));
-            optionsRow.gameObject.SetActive(false);
+            // 手势面：铺满全屏的透明层，鼠标与手指都在这里做动作（按钮在它之后，优先吃点击）
+            var surf = UiKit.Box("GestureSurface", craftRoot, new Color(0f, 0f, 0f, 0f));
+            var srt = surf.rectTransform;
+            srt.anchorMin = Vector2.zero;
+            srt.anchorMax = Vector2.one;
+            srt.offsetMin = Vector2.zero;
+            srt.offsetMax = Vector2.zero;
+            var relay = surf.gameObject.AddComponent<GestureRelay>();
+            relay.panel = this;
 
             // 判偏后的两个选择
             decideRow = UiKit.Node("Decide", craftRoot);
@@ -379,6 +330,30 @@ namespace CoffeeShop.Bar
             exit.onClick.AddListener(RequestExit);
 
             craftRoot.gameObject.SetActive(false);
+        }
+
+        /// <summary>把 uGUI 指针事件原样转给直接操作层：鼠标与触屏走同一条路。</summary>
+        class GestureRelay : MonoBehaviour,
+            UnityEngine.EventSystems.IPointerDownHandler,
+            UnityEngine.EventSystems.IDragHandler,
+            UnityEngine.EventSystems.IPointerUpHandler
+        {
+            public CraftPanel panel;
+
+            public void OnPointerDown(UnityEngine.EventSystems.PointerEventData e)
+            {
+                if (panel != null && panel.view != null) panel.view.PointerDown(e.position);
+            }
+
+            public void OnDrag(UnityEngine.EventSystems.PointerEventData e)
+            {
+                if (panel != null && panel.view != null) panel.view.PointerMove(e.position);
+            }
+
+            public void OnPointerUp(UnityEngine.EventSystems.PointerEventData e)
+            {
+                if (panel != null && panel.view != null) panel.view.PointerUp();
+            }
         }
     }
 }

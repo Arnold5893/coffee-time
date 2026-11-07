@@ -32,16 +32,16 @@ namespace CoffeeShop.Cameras
         [SerializeField] float yawSmoothTime = 0.05f;
 
         [Header("吧台近景（07 票 / FR-MOV-05）")]
-        [Tooltip("近景距离：贴到吧台前，比跟随距离近得多")]
-        [SerializeField] float focusDistance = 2.25f;
-        [Tooltip("近景俯角：站在通道里往台面俯看")]
-        [SerializeField] float focusPitch = 32f;
+        [Tooltip("近景距离：凑到台面前，道具要占住画面 —— 退远了整排器物就只有几十个像素")]
+        [SerializeField] float focusDistance = 0.85f;
+        [Tooltip("近景俯角：工作区落在柜面（0.95m）上，俯角比看机顶时低得多，否则就是高机位俯拍")]
+        [SerializeField] float focusPitch = 46f;
         [Tooltip("近景视野：收窄，画面更集中")]
-        [SerializeField] float focusFov = 42f;
+        [SerializeField] float focusFov = 34f;
         [Tooltip("跟随点朝工作点前移多少米（把人让到画面边缘，台面居中）")]
-        [SerializeField] float focusPivotToward = 0.42f;
-        [Tooltip("跟随点抬高多少米（吧台高 0.9，抬一点才看得见台面）")]
-        [SerializeField] float focusPivotRise = 0.16f;
+        [SerializeField] float focusPivotToward = 1.00f;
+        [Tooltip("跟随点抬高多少米（工作区在柜面上，抬一点让整排道具落在画面中间）")]
+        [SerializeField] float focusPivotRise = 0.06f;
         [Tooltip("切入时长（秒）；FR-MOV-05 要求 ≤3 秒")]
         [SerializeField] float focusInSeconds = CameraFocusState.DefaultInSeconds;
         [Tooltip("退出时长（秒）")]
@@ -119,6 +119,20 @@ namespace CoffeeShop.Cameras
             if (focus != null) focus.End();
         }
 
+        /// <summary>
+        /// 指定近景机位落在工作点的哪一侧（世界方向，从工作点指向相机）。
+        /// 用于"站在通道里正对柜台"这类由工位确定的构图 —— 别让相机自己猜，
+        /// 猜出来的侧肩机位在只有 0.65m 深的柜台上会把整排道具看叠。
+        /// </summary>
+        public void AimFrom(Vector3 dirFromWork)
+        {
+            dirFromWork.y = 0f;
+            if (dirFromWork.sqrMagnitude < 1e-4f) return;
+            float chosen = YawForCameraDir(dirFromWork.normalized);
+            yaw = chosen;
+            currentYaw = chosen;
+        }
+
         void Update()
         {
             var intent = inputRouter != null ? inputRouter.Intent : PlayerIntent.None;
@@ -186,6 +200,12 @@ namespace CoffeeShop.Cameras
             toWork.y = 0f;
             if (toWork.sqrMagnitude < 1e-4f) return float.NaN;
             toWork.Normalize();
+
+            // 相机抬得比工作面高出一大截时，柜台是矮的、挡不住它 —— 直接站到"人这一侧"正着俯看。
+            //     吧台近景必须这样：柜台只有 0.65m 深，侧肩视角看过去只剩一条，横向排开的道具全叠在一起。
+            //     探不到侧面遮挡也没关系，LateUpdate 里还有一层遮挡回避兜底。
+            if (focusDistance * Mathf.Sin(focusPitch * Mathf.Deg2Rad) > 0.75f)
+                return YawForCameraDir(-toWork);
 
             Vector3 left = new Vector3(-toWork.z, 0f, toWork.x);
             for (int k = 0; k < 2; k++)

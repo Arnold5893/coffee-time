@@ -41,6 +41,7 @@ namespace CoffeeShop.Drinks
         readonly DrinkMaker maker;
         bool pressing;
         float pressSeconds;
+        int pressStep = -1;          // 这次按压是在哪一步上按下的
 
         /// <summary>给表现层的即时反馈（闪光/音效/抖动），不含任何档位信息。</summary>
         public event Action<CraftFeedback> Feedback;
@@ -131,6 +132,7 @@ namespace CoffeeShop.Drinks
             if (Mode == CraftUiMode.Done) return;
             pressing = true;
             pressSeconds = 0f;
+            pressStep = maker.Index;
         }
 
         /// <summary>每帧喂一次时间：等待型自动推进；按住型只在按下期间攒进度。</summary>
@@ -149,6 +151,10 @@ namespace CoffeeShop.Drinks
         {
             if (!pressing) return;
             pressing = false;
+
+            // 手指还按着，这一步已经做完、进度到了下一步 —— 这次抬手不能结算到新步骤上。
+            // （磨豆转到一半就推进了，手一松会把"压粉"当成点一下 → 白白记一次偏差）
+            if (maker.Index != pressStep) { pressSeconds = 0f; return; }
 
             switch (Mode)
             {

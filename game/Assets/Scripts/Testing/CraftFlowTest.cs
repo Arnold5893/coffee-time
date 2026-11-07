@@ -13,8 +13,10 @@ using UnityEditor;
 namespace CoffeeShop.Testing
 {
     /// <summary>
-    /// 07 票自动化验收：工位判定 → 进入近景 → 五原语做完整杯 → 偏差反馈 → 退出恢复 → 通道可走。
-    /// 操作全部走 CraftPanel 的公开入口（指针回调与自动化用的是同一条路），
+    /// 07 票自动化验收（返工版）：工位判定 → 进入近景 → **手柄直接操作**做完整杯 →
+    /// 缺陷看得见 → 退出恢复 → 通道可走。
+    ///
+    /// 手势走的是 CraftView 的公开入口（和真实指针事件同一条路），
     /// 界面背后只发请求给 <see cref="CraftSession"/>，不直接改任何业务状态。
     /// </summary>
     public class CraftFlowTest : MonoBehaviour
@@ -26,6 +28,7 @@ namespace CoffeeShop.Testing
 
         readonly StringBuilder log = new StringBuilder();
         int failures;
+        CraftView view;
 
         void Check(bool ok, string what)
         {
@@ -74,7 +77,9 @@ namespace CoffeeShop.Testing
             Check(!player.enabled, "制作期间走路锁住（原地近景）");
 
             var craft = panel.Session;
+            view = panel.view;
             Check(craft != null, "界面拿到了 CraftSession");
+            Check(view != null && view.Bound, "直接操作层已绑定（台面道具就位）");
 
             // ---- 3. 近景切入 ≤3s，且确实收紧了 -----------------------------
             float t = 0f;
@@ -86,55 +91,91 @@ namespace CoffeeShop.Testing
             Vector3 camPos = followRig.transform.position;
             Check(Mathf.Abs(camPos.z - station.center.z) < 0.9f,
                   $"近景机位仍在吧台内侧通道里（z 偏差 {Mathf.Abs(camPos.z - station.center.z):F2}m）");
-            log.AppendLine($"  camera at ({camPos.x:F2},{camPos.y:F2},{camPos.z:F2}) work={station.workPoint}");
 
-            // ---- 4. 五原语 -------------------------------------------------
-            // 4.1 place：放杯（热点）
-            Check(craft.Mode == CraftUiMode.Place, "第一步是放置原语 → 出热点按钮");
-            Check(craft.Options.Length == 2, $"放置热点 {craft.Options.Length} 个");
-            int before = craft.StepIndex;
-            craft.Choose(0);        // 原语不符的请求：领域层拒绝，界面改不了状态
-            Check(craft.StepIndex == before, "发错原语的请求不改变步骤（NFR-05：UI 只发请求）");
-
-            panel.PickOption(1);    // 放到台面 = 放错
-            Check(craft.Mode == CraftUiMode.Decide, "放错位置会停下来等玩家决定");
+            // ---- 4. 直接操作做完整杯 ---------------------------------------
+            // 4.1 place：把杯子拖到台面（错）
+            Check(craft.Mode == CraftUiMode.Place, "第一步是放置原语 → 拖杯子");
+            Check(view.PowderLevel < 0.05f, $"开局粉碗是空的（粉面 {view.PowderLevel:P0}）");
+            yield return CarryTo(1);
+            Check(craft.Mode == CraftUiMode.Decide, "杯子拖到台面 = 放错，停下来等玩家决定");
             Check(panel.LastFeedback == CraftFeedback.Deviation, "判偏立刻发出反馈事件");
-            log.AppendLine("  注：全屏红闪已按返工意见删除，判偏的画面反馈待重新设计（现在只有闷响 + 重做/继续）");
+
             panel.RetryStep();
+            yield return null;
             Check(craft.Mode == CraftUiMode.Place, "重做后回到这一步重新放");
-            panel.PickOption(0);
-            Check(craft.StepId == "grind", "放到萃取口下才对");
 
-            // 4.2 hold / 4.3 click：交互已删，现在是占位按钮（点一下按配方 param 结算）
-            Check(craft.Mode == CraftUiMode.Hold, "磨豆是按住原语 → 出占位按钮");
-            panel.StubComplete();
-            Check(craft.StepId == "tamp", "占位点一下走完磨豆");
+            // 4.2 place：拖到萃取口下（对）
+            yield return CarryTo(0);
+            Check(craft.StepId == "grind", "杯子拖到萃取口下才对");
 
-            Check(craft.Mode == CraftUiMode.Press, "压粉是点击原语 → 出占位按钮");
-            panel.StubComplete();
-            Check(craft.StepId == "extract", "占位点一下走完压粉");
+            // 4.3 hold：磨豆 = 绕圈，不转就不磨
+            Check(craft.Mode == CraftUiMode.Hold, "磨豆是按住原语 → 手势是绕圈");
+            Vector2 center = view.ToScreen(view.BasketWorld);
+            view.PointerDown(center + new Vector2(70f, 0f));
+            for (int i = 0; i < 30; i++) yield return null;   // 按住不动
+            Check(craft.Progress01 < 0.01f, $"按住不转，粉一点都不出（进度 {craft.Progress01:P0}）");
+            Check(craft.StepId == "grind", "不转就一直停在这一步");
 
-            // 4.4 wait：萃取（不用操作，进度自己走）
-            Check(craft.Mode == CraftUiMode.Wait, "萃取是等待原语，不需要按");
+            // 转到粉面涨满就松手（这一步不会自己结束，松手才结算——这就是"够了没"的判断）
+            float turnT = 0f;
+            for (int i = 0; i < 400 && craft.Progress01 < 1f; i++)
+            {
+                float a = i * 0.22f;
+                view.PointerMove(center + new Vector2(Mathf.Cos(a), Mathf.Sin(a)) * 70f);
+                turnT += Time.deltaTime;
+                yield return null;
+            }
+            view.PointerUp();
+            yield return null;
+            Check(craft.StepId == "tamp", $"绕圈磨了 {turnT:F1}s 才过（配方要 2.5s）");
+            Check(view.PowderLevel > 0.95f, $"粉面涨满（{view.PowderLevel:P0}，这就是「粉够了」）");
+
+            // 4.4 click：压粉 = 下拖，压到底要停住
+            Check(craft.Mode == CraftUiMode.Press, "压粉是点击原语 → 手势是往下拖");
+            yield return Push(200f, 0f, 1);                  // 拖到底立刻松手 = 没停住
+            Check(craft.Mode == CraftUiMode.Decide, "压到底不停住 → 判偏");
+
+            panel.RetryStep();
+            yield return null;
+            yield return Push(200f, 6f, 32);                 // 手歪着压，但停够了
+            Check(craft.StepId == "extract", "拖到底停住 0.5s 才过");
+            Check(Mathf.Abs(view.TiltDeg) > 2f, $"压歪了粉饼就是斜的（{view.TiltDeg:F1}°，界面上没有任何提示）");
+
+            // 4.5 wait：萃取
+            Check(craft.Mode == CraftUiMode.Wait, "萃取是等待原语，不需要操作");
             float waitT = 0f;
             while (craft.StepId == "extract" && waitT < 9f) { waitT += Time.deltaTime; yield return null; }
-            Check(craft.StepId == "move", $"等待 {waitT:F1}s 自动完成萃取");
+            Check(craft.StepId == "move", $"等 {waitT:F1}s 自动流完");
 
-            // 4.5 后段：取杯（点击）→ 加奶（按住）→ 出杯（点击）
-            panel.StubComplete();
-            Check(craft.StepId == "milk", "取杯点一下就走");
+            // 4.6 move：把杯子拖到托盘
+            yield return CarryTo(2);
+            Check(craft.StepId == "milk", "杯子拖到托盘就走");
 
-            panel.StubComplete();
-            Check(craft.StepId == "serve", "加奶按够 2 秒");
+            // 4.7 hold：打奶 = 奶缸拖到蒸汽位并保持
+            Check(craft.Mode == CraftUiMode.Hold, "加奶是按住原语 → 奶缸保持");
+            view.PointerDown(view.ToScreen(view.PitcherWorld));
+            view.PointerMove(view.ToScreen(view.SpotWorld(4)));
+            float milkT = 0f;
+            while (craft.StepId == "milk" && milkT < 4f)
+            {
+                view.PointerMove(view.ToScreen(view.SpotWorld(4)));
+                milkT += Time.deltaTime;
+                yield return null;
+            }
+            view.PointerUp();
+            yield return null;
+            Check(craft.StepId == "serve", $"奶缸在蒸汽位保持 {milkT:F1}s 就走（配方 2.0s）");
 
-            panel.StubComplete();
+            // 4.8 serve：拖到出杯位
+            yield return CarryTo(3);
             for (int i = 0; i < 4; i++) yield return null;
 
             Check(craft.Maker.Served, "最后一步做完自动出杯");
             var review = craft.LastReview;
             Check(review != null && review.Quality == DrinkQuality.Good,
-                  $"放错那次重做了 → 整杯评价 {(review != null ? review.ToString() : "null")}");
+                  $"两次放错/压偏都重做了 → 整杯评价 {(review != null ? review.ToString() : "null")}");
             log.AppendLine($"  session: {craft.Describe()}");
+            log.AppendLine($"  props: powder={view.PowderLevel:P0} tilt={view.TiltDeg:F1}° turnFrames={view.TurnFrames} pushFrames={view.PushFrames}");
 
             // ---- 5. 出杯后自动收起，镜头恢复 -------------------------------
             float closeT = 0f;
@@ -177,12 +218,40 @@ namespace CoffeeShop.Testing
 
             Vector3 to = player.transform.position;
             float moved = Vector2.Distance(new Vector2(from.x, from.z), new Vector2(to.x, to.z));
-            float endZ = to.z;
             log.AppendLine($"  aisle walk: moved={moved:F2}m from=({from.x:F2},{from.z:F2}) to=({to.x:F2},{to.z:F2})");
             Check(moved > 0.6f, $"在吧台内侧通道里走了 {moved:F2}m（不被柜台卡住）");
-            Check(Mathf.Abs(endZ - station.center.z) < 0.75f, $"走完仍在通道里（z 偏差 {Mathf.Abs(endZ - station.center.z):F2}m）");
+            Check(Mathf.Abs(to.z - station.center.z) < 0.75f, $"走完仍在通道里（z 偏差 {Mathf.Abs(to.z - station.center.z):F2}m）");
 
             Finish(null);
+        }
+
+        // ------------------------------------------------------------ 手势
+
+        IEnumerator CarryTo(int spot)
+        {
+            view.PointerDown(new Vector2(Screen.width * 0.5f, Screen.height * 0.5f));
+            yield return null;
+            view.PointerMove(view.ToScreen(view.SpotWorld(spot)));
+            yield return null;
+            view.PointerMove(view.ToScreen(view.SpotWorld(spot)));
+            yield return null;
+            view.PointerUp();
+            yield return null;
+        }
+
+        IEnumerator Push(float pixels, float drift, int holdFrames)
+        {
+            Vector2 p = view.ToScreen(view.BasketWorld) + new Vector2(0f, 120f);
+            view.PointerDown(p);
+            for (int i = 0; i < 20; i++)
+            {
+                p += new Vector2(drift, -pixels / 20f);
+                view.PointerMove(p);
+                yield return null;
+            }
+            for (int i = 0; i < holdFrames; i++) yield return null;
+            view.PointerUp();
+            yield return null;
         }
 
         IEnumerator WaitFocus(float target, float timeout)

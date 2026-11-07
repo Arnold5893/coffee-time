@@ -33,6 +33,8 @@ namespace CoffeeShop.Bar
         public Vector3 workPoint;
         [Tooltip("默认做哪款（配方 sku）")]
         public string sku = "classic-latte";
+        [Tooltip("台面工作区（道具摆放的基准点），由构建脚本按后柜包围盒推出来")]
+        public Vector3 counterAnchor;
 
         bool active;
         float activeTime;
@@ -56,6 +58,16 @@ namespace CoffeeShop.Bar
 
         void Awake()
         {
+            // 直接操作层（07 返工）：道具与手势都挂在工位上，随进入/退出启停
+            if (panel != null && panel.view == null)
+            {
+                var viewGO = new GameObject("CraftView");
+                viewGO.transform.SetParent(transform, false);
+                var view = viewGO.AddComponent<CraftView>();
+                view.anchor = counterAnchor;
+                panel.view = view;
+            }
+
             recipe = LoadRecipe(sku);
             if (recipe == null) Debug.LogError($"[bar] 找不到配方 {sku}，工位无法开工");
         }
@@ -88,10 +100,19 @@ namespace CoffeeShop.Bar
             activeTime = 0f;
             EnterCount++;
 
+            if (panel.view != null) panel.view.anchor = counterAnchor;
             panel.Open(new CraftSession(recipe));
             if (motor != null) motor.enabled = false;
             if (router != null) router.SetUiMode(true);
-            if (camRig != null) camRig.FocusOn(workPoint);
+            if (camRig != null)
+            {
+                camRig.FocusOn(workPoint);
+                // 机位方向由工位定死：相机站在工位中心那一侧（通道里）正对柜台。
+                //     不这么钉的话，相机是"猜"出来的侧肩机位，柜台只有 0.65m 深，横排的道具会叠成一条。
+                Vector3 side = center - workPoint;
+                side.y = 0f;
+                if (side.sqrMagnitude > 1e-4f) camRig.AimFrom(side.normalized);
+            }
             return true;
         }
 
