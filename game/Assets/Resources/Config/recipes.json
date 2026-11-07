@@ -1,0 +1,66 @@
+{
+  "version": 1,
+  "note": "配方配置（06 票 / FR-MAKE-02/04/05）。一份配方同时喂手动（玩家逐步操作、记录偏差）与自动（老板、按 cost 计时、无偏差）两种驱动。primitive 五选一：click/hold/select/place/wait。judged=true 的步骤参与错误率统计（等待型一律不判）；optional 缺省为 false 即必需，缺了直接判非常差。gate 是系统门槛：指向的步骤没做完，这一步的操作一律被拒绝（不判错）。param 按原语解释：hold=按住达标秒数，wait=等待秒数，click=按下达标的秒数（0 表示点一下即可）。",
+  "recipes": [
+    {
+      "sku": "classic-latte",
+      "name": "经典拿铁",
+      "line": "latte",
+      "steps": [
+        { "id": "cup",    "name": "取杯放到萃取口下", "primitive": "click",  "judged": false },
+        { "id": "grind",  "name": "磨豆",             "primitive": "hold",   "judged": true,  "param": 2.5, "cost": 3.0 },
+        { "id": "tamp",   "name": "压粉",             "primitive": "click",  "judged": true,  "param": 0.4, "cost": 1.5 },
+        { "id": "extract","name": "萃取",             "primitive": "wait",   "judged": false, "param": 6.0, "cost": 6.0, "gate": "tamp" },
+        { "id": "move",   "name": "拿起杯子放到台面", "primitive": "click",  "judged": false, "cost": 1.5, "gate": "extract" },
+        { "id": "milk",   "name": "加奶",             "primitive": "hold",   "judged": true,  "param": 2.0, "cost": 3.0 },
+        { "id": "serve",  "name": "出杯",             "primitive": "click",  "judged": false, "cost": 1.0 }
+      ]
+    },
+    {
+      "sku": "coconut-latte",
+      "name": "生椰拿铁",
+      "line": "latte",
+      "steps": [
+        { "id": "cup",      "name": "取杯放到萃取口下", "primitive": "click",  "judged": false },
+        { "id": "grind",    "name": "磨豆",             "primitive": "hold",   "judged": true,  "param": 2.5, "cost": 3.0 },
+        { "id": "tamp",     "name": "压粉",             "primitive": "click",  "judged": true,  "param": 0.4, "cost": 1.5 },
+        { "id": "extract",  "name": "萃取",             "primitive": "wait",   "judged": false, "param": 6.0, "cost": 6.0, "gate": "tamp" },
+        { "id": "move",     "name": "拿起杯子放到台面", "primitive": "click",  "judged": false, "cost": 1.5, "gate": "extract" },
+        { "id": "milkType", "name": "选奶",             "primitive": "select", "judged": true,  "options": ["椰奶", "牛奶"], "correct": "椰奶", "cost": 1.5 },
+        { "id": "milk",     "name": "加奶",             "primitive": "hold",   "judged": true,  "param": 2.0, "cost": 3.0, "gate": "milkType" },
+        { "id": "serve",    "name": "出杯",             "primitive": "click",  "judged": false, "cost": 1.0 }
+      ]
+    },
+    {
+      "sku": "osmanthus-latte",
+      "name": "桂花拿铁",
+      "line": "latte",
+      "steps": [
+        { "id": "cup",     "name": "取杯放到萃取口下", "primitive": "click",  "judged": false },
+        { "id": "grind",   "name": "磨豆",             "primitive": "hold",   "judged": true,  "param": 2.5, "cost": 3.0 },
+        { "id": "tamp",    "name": "压粉",             "primitive": "click",  "judged": true,  "param": 0.4, "cost": 1.5 },
+        { "id": "extract", "name": "萃取",             "primitive": "wait",   "judged": false, "param": 6.0, "cost": 6.0, "gate": "tamp" },
+        { "id": "move",    "name": "拿起杯子放到台面", "primitive": "click",  "judged": false, "cost": 1.5, "gate": "extract" },
+        { "id": "milk",    "name": "加奶",             "primitive": "hold",   "judged": true,  "param": 2.0, "cost": 3.0 },
+        { "id": "flavor",  "name": "加桂花风味",       "primitive": "select", "judged": true,  "options": ["桂花", "香草", "焦糖"], "correct": "桂花", "cost": 1.5 },
+        { "id": "serve",   "name": "出杯",             "primitive": "click",  "judged": false, "cost": 1.0 }
+      ]
+    },
+    {
+      "sku": "caramel-macchiato",
+      "name": "焦糖玛奇朵",
+      "line": "latte",
+      "steps": [
+        { "id": "cup",     "name": "取杯放到萃取口下", "primitive": "click",  "judged": false },
+        { "id": "grind",   "name": "磨豆",             "primitive": "hold",   "judged": true,  "param": 2.5, "cost": 3.0 },
+        { "id": "tamp",    "name": "压粉",             "primitive": "click",  "judged": true,  "param": 0.4, "cost": 1.5 },
+        { "id": "extract", "name": "萃取",             "primitive": "wait",   "judged": false, "param": 6.0, "cost": 6.0, "gate": "tamp" },
+        { "id": "move",    "name": "拿起杯子放到台面", "primitive": "click",  "judged": false, "cost": 1.5, "gate": "extract" },
+        { "id": "milk",    "name": "加奶",             "primitive": "hold",   "judged": true,  "param": 2.0, "cost": 3.0 },
+        { "id": "flavor",  "name": "加焦糖风味",       "primitive": "select", "judged": true,  "options": ["焦糖", "香草", "桂花"], "correct": "焦糖", "cost": 1.5 },
+        { "id": "drizzle", "name": "淋酱画格",         "primitive": "click",  "judged": false, "cost": 2.0 },
+        { "id": "serve",   "name": "出杯",             "primitive": "click",  "judged": false, "cost": 1.0 }
+      ]
+    }
+  ]
+}
